@@ -238,6 +238,9 @@ function RawMessages(props: Props) {
           }
           const basePath = queriedData[lastKeyPath]?.path ?? "";
           let itemLabel = label;
+          if (typeof itemValue === "bigint") {
+            itemLabel = itemValue.toString();
+          }
           // output preview for the first x items if the data is in binary format
           // sample output: Int8Array(331776) [-4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, -4, ...]
           let smallNumberArrayStr = "";

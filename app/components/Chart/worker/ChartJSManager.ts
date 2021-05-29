@@ -241,20 +241,12 @@ export default class ChartJSManager {
 
     const out = new Array<RpcElement>();
 
-    for (const element of elements) {
-      const data = this._chartInstance?.data.datasets[element.datasetIndex]?.data[element.index];
-      if (data == undefined || typeof data === "number") {
-        continue;
-      }
-
-      // turn into an object we can send over the rpc
-      out.push({
-        view: {
-          x: element.element.x,
-          y: element.element.y,
-        },
-        data,
-      });
+    for (const {
+      datasetIndex,
+      index,
+      element: { x, y },
+    } of elements) {
+      out.push({ datasetIndex, index, view: { x, y } });
     }
 
     return out;

@@ -90,7 +90,7 @@ function getXForPoint(
   xAxisRanges: readonly (readonly TooltipItem[])[] | undefined,
   xItem: TooltipItem | undefined,
   xAxisPath: BasePlotPath | undefined,
-): number {
+): number | bigint {
   if (isCustomScale(xAxisVal) && xAxisPath) {
     if (isReferenceLinePlotPathType(xAxisPath)) {
       return Number.parseFloat(xAxisPath.value);
@@ -100,7 +100,7 @@ function getXForPoint(
         return NaN;
       }
       const value = xItem.queriedData[innerIdx]?.value;
-      return isTime(value) ? toSec(value) : Number(value);
+      return isTime(value) ? toSec(value) : typeof value === "bigint" ? value : Number(value);
     }
   }
   return xAxisVal === "timestamp" ? timestamp : innerIdx;
@@ -127,9 +127,14 @@ function getPointsAndTooltipsForMessagePathItem(
     innerIdx,
     { value, path: queriedPath, constantName },
   ] of yItem.queriedData.entries()) {
-    if (typeof value === "number" || typeof value === "boolean" || typeof value === "string") {
-      const valueNum = Number(value);
-      if (!isNaN(valueNum)) {
+    if (
+      typeof value === "number" ||
+      typeof value === "boolean" ||
+      typeof value === "string" ||
+      typeof value === "bigint"
+    ) {
+      const valueNum = typeof value === "bigint" ? value : Number(value);
+      if (typeof valueNum === "bigint" || !isNaN(valueNum)) {
         const x = getXForPoint(xAxisVal, elapsedTime, innerIdx, xAxisRanges, xItem, xAxisPath);
         const y = valueNum;
         const tooltip = {
@@ -142,7 +147,7 @@ function getPointsAndTooltipsForMessagePathItem(
           constantName,
           startTime,
         };
-        points.push({ x, y });
+        points.push({ x: Number(x), y: Number(y) });
         tooltips.push(tooltip);
       }
     } else if (isTime(value)) {
@@ -158,7 +163,7 @@ function getPointsAndTooltipsForMessagePathItem(
         constantName,
         startTime,
       };
-      points.push({ x, y });
+      points.push({ x: Number(x), y });
       tooltips.push(tooltip);
     }
   }
@@ -282,7 +287,7 @@ function getDatasetAndTooltipsFromMessagePlotPath(
   };
   return {
     dataset,
-    tooltips: flatten(rangesOfTooltips),
+    tooltips: flatten(rangesOfTooltips), //FIXME
     hasMismatchedData,
     path: path.value,
   };
@@ -312,7 +317,7 @@ export function getDatasetsAndTooltips(
   xAxisPath?: BasePlotPath,
 ): {
   datasets: DataSet[];
-  tooltips: TimeBasedChartTooltipData[];
+  tooltips: TimeBasedChartTooltipData[][];
   pathsWithMismatchedDataLengths: string[];
 } {
   const datasetsAndTooltips = filterMap(paths, (path: PlotPath, index: number) => {
@@ -336,7 +341,7 @@ export function getDatasetsAndTooltips(
 
   return {
     datasets: datasetsAndTooltips.map(({ dataset }) => dataset),
-    tooltips: flatten(datasetsAndTooltips.map(({ tooltips }) => tooltips)),
+    tooltips: datasetsAndTooltips.map(({ tooltips }) => tooltips),
     pathsWithMismatchedDataLengths: datasetsAndTooltips
       .filter(({ hasMismatchedData }) => hasMismatchedData)
       .map(({ path }) => path),
@@ -360,7 +365,7 @@ type PlotChartProps = {
   maxYValue: number;
   saveCurrentView: (minY: number, maxY: number, width?: number) => void;
   datasets: ComponentProps<typeof TimeBasedChart>["data"]["datasets"];
-  tooltips: TimeBasedChartTooltipData[];
+  tooltips: TimeBasedChartTooltipData[][];
   xAxisVal: PlotXAxisVal;
   currentTime?: number;
   defaultView?: ChartDefaultView;

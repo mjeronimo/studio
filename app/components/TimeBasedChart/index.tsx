@@ -68,12 +68,12 @@ export const getTooltipItemForMessageHistoryItem = (item: MessageAndData): Toolt
 };
 
 export type TimeBasedChartTooltipData = {
-  x: number;
-  y: number;
+  x: number | bigint;
+  y: number | bigint;
   datasetKey?: string;
   item: TooltipItem;
   path: string;
-  value: number | boolean | string;
+  value: number | bigint | boolean | string;
   constantName?: string;
   startTime: Time;
   source?: number;
@@ -135,7 +135,7 @@ export type Props = {
   height: number;
   zoom: boolean;
   data: ChartComponentProps["data"];
-  tooltips?: TimeBasedChartTooltipData[];
+  tooltips?: TimeBasedChartTooltipData[][];
   xAxes?: ScaleOptions;
   yAxes: ScaleOptions;
   annotations?: AnnotationOptions[];
@@ -407,9 +407,8 @@ export default memo<Props>(function TimeBasedChart(props: Props) {
       // Locate the tooltip for our data
       // We do a lazy linear find for now - a perf on this vs map lookups might be useful
       // Note then you need to make keys from x/y points
-      const tooltipData = tooltips?.find(
-        (item) => item.x === element.data?.x && item.y === element.data?.y,
-      );
+      // FIXME: doesn't account for downsampling
+      const tooltipData = tooltips?.[element.datasetIndex]?.[element.index];
       if (!tooltipData) {
         return setActiveTooltip(undefined);
       }

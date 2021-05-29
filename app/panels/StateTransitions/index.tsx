@@ -234,7 +234,7 @@ const StateTransitions = React.memo(function StateTransitions(props: Props) {
   const { datasets, tooltips, maxY } = useMemo(() => {
     let outMaxY: number | undefined;
 
-    const outTooltips: TimeBasedChartTooltipData[] = [];
+    const outTooltips: TimeBasedChartTooltipData[][] = [];
     const outDatasets: typeof data["datasets"] = [];
 
     let pathIndex = 0;
@@ -302,7 +302,7 @@ const StateTransitions = React.memo(function StateTransitions(props: Props) {
           constantName,
           startTime,
         };
-        outTooltips.unshift(tooltip);
+        outTooltips.unshift([tooltip]);
 
         // the current point is added even if different from previous value to avoid _gaps_ in the data
         // this is a myproduct of using separate datasets to render each color
