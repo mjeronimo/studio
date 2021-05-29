@@ -2,6 +2,8 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/
 
+import { I64Array } from "@foxglove/int64array";
+
 interface Indexable {
   [index: number]: unknown;
 }
@@ -170,6 +172,7 @@ export const deserializers: BuiltinReaders & {
   uint16Array: MakeTypedArrayDeserialze(Uint16Array, "getUint16"),
   int32Array: MakeTypedArrayDeserialze(Int32Array, "getInt32"),
   uint32Array: MakeTypedArrayDeserialze(Uint32Array, "getUint32"),
+  // int64Array: MakeTypedArrayDeserialze(I64Array as unknown as typeof BigInt64Array, "getBigInt64"),
   int64Array: MakeTypedArrayDeserialze(BigInt64Array, "getBigInt64"),
   uint64Array: MakeTypedArrayDeserialze(BigUint64Array, "getBigUint64"),
   float32Array: MakeTypedArrayDeserialze(Float32Array, "getFloat32"),

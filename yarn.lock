@@ -2565,6 +2565,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@foxglove/int64array@workspace:packages/int64array":
+  version: 0.0.0-use.local
+  resolution: "@foxglove/int64array@workspace:packages/int64array"
+  dependencies:
+    typescript: 4.3.2
+  languageName: unknown
+  linkType: soft
+
 "@foxglove/just-fetch@workspace:packages/just-fetch":
   version: 0.0.0-use.local
   resolution: "@foxglove/just-fetch@workspace:packages/just-fetch"
