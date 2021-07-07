@@ -24,8 +24,8 @@ import {
 import { GlobalVariables } from "@foxglove/studio-base/hooks/useGlobalVariables";
 import { RosDatatypes } from "@foxglove/studio-base/types/RosDatatypes";
 import { Range } from "@foxglove/studio-base/util/ranges";
-import { TimestampMethod } from "@foxglove/studio-base/util/time";
 import { NotificationSeverity } from "@foxglove/studio-base/util/sendNotification";
+import { TimestampMethod } from "@foxglove/studio-base/util/time";
 
 // re-exported until other import sites are updated from players/types to @foxglove/studio
 export type { MessageEvent };

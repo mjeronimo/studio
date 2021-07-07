@@ -1,6 +1,7 @@
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/
+
 import { IconButton, IContextualMenuItem, useTheme } from "@fluentui/react";
 import { PropsWithChildren, useCallback, useContext, useMemo } from "react";
 
@@ -9,8 +10,8 @@ import {
   MessagePipelineContext,
   useMessagePipeline,
 } from "@foxglove/studio-base/components/MessagePipeline";
-import { PlayerPrecenceIcon } from "@foxglove/studio-base/components/PlayerStatusIndicator/PlayerPresenceIcon";
 import NotificationModal from "@foxglove/studio-base/components/NotificationModal";
+import { PlayerPrecenceIcon } from "@foxglove/studio-base/components/PlayerStatusIndicator/PlayerPresenceIcon";
 import ModalContext from "@foxglove/studio-base/context/ModalContext";
 import { PlayerPresence, PlayerProblem } from "@foxglove/studio-base/players/types";
 

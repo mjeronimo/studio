@@ -35,7 +35,7 @@ export default function NotificationModal({
             color: displayPropsBySeverity[severity],
           },
         },
-        subText: subText,
+        subText,
       }}
       minWidth={700}
     >

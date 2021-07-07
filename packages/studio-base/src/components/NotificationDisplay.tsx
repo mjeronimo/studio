@@ -135,7 +135,7 @@ function NotificationItem(props: NotificationItemProps) {
   return (
     <SItemContainer onClick={onClick} color={color}>
       <SText className="notification-message">{notification.message}</SText>
-      {!notification.read && <div style={{ paddingRight: 8 }}>•</div>}
+      {notification.read === false && <div style={{ paddingRight: 8 }}>•</div>}
       <STime>{timeString}</STime>
     </SItemContainer>
   );
@@ -205,7 +205,7 @@ export default function NotificationDisplay(): React.ReactElement {
     }
   }, []);
 
-  const unreadCount = notifications.reduce((acc, err) => acc + (err.read ? 0 : 1), 0);
+  const unreadCount = notifications.reduce((acc, err) => acc + (err.read === true ? 0 : 1), 0);
 
   const firstNotification = notifications[0];
   const { name, color, IconSvg } = displayPropsBySeverity[firstNotification?.severity ?? "error"];
