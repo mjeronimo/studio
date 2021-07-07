@@ -10,7 +10,7 @@ import {
   useMessagePipeline,
 } from "@foxglove/studio-base/components/MessagePipeline";
 import { PlayerPrecenceIcon } from "@foxglove/studio-base/components/PlayerStatusIndicator/PlayerPresenceIcon";
-import PlayerProblemModal from "@foxglove/studio-base/components/PlayerStatusIndicator/PlayerProblemModal";
+import NotificationModal from "@foxglove/studio-base/components/NotificationModal";
 import ModalContext from "@foxglove/studio-base/context/ModalContext";
 import { PlayerPresence, PlayerProblem } from "@foxglove/studio-base/players/types";
 
@@ -65,7 +65,15 @@ export function PlayerStatusIndicator(): JSX.Element {
   const showProblemModal = useCallback(
     (problem: PlayerProblem) => {
       const remove = modalHost.addModalElement(
-        <PlayerProblemModal problem={problem} onRequestClose={() => remove()} />,
+        <NotificationModal
+          notification={{
+            message: problem.message,
+            subText: problem.tip,
+            details: problem.error,
+            severity: problem.severity,
+          }}
+          onRequestClose={() => remove()}
+        />,
       );
     },
     [modalHost],

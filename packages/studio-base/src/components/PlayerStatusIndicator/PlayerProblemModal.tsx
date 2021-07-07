@@ -2,19 +2,10 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/
 
-import { mergeStyleSets } from "@fluentui/react";
-import { ComponentProps } from "react";
+import { Modal, Text, IModalProps, mergeStyleSets } from "@fluentui/react";
 
-import Modal, { Title } from "@foxglove/studio-base/components/Modal";
 import { PlayerProblem } from "@foxglove/studio-base/players/types";
 import mixins from "@foxglove/studio-base/styles/mixins.module.scss";
-
-type ModalProps = ComponentProps<typeof Modal>;
-
-type Props = {
-  problem: PlayerProblem;
-  onRequestClose: ModalProps["onRequestClose"];
-};
 
 const styles = mergeStyleSets({
   modalBody: {
@@ -33,12 +24,16 @@ const styles = mergeStyleSets({
   },
 });
 
-export default function PlayerProblemModal(props: Props): JSX.Element {
-  const { problem } = props;
-
+export default function PlayerProblemModal({
+  problem,
+  onRequestClose,
+}: {
+  problem: PlayerProblem;
+  onRequestClose: IModalProps["onDismiss"];
+}): JSX.Element {
   return (
-    <Modal onRequestClose={props.onRequestClose}>
-      <Title>{problem.message}</Title>
+    <Modal onDismiss={onRequestClose}>
+      <Text>{problem.message}</Text>
       <hr />
       <div className={styles.modalBody}>
         {problem.tip != undefined && (

@@ -26,21 +26,13 @@ import Menu from "@foxglove/studio-base/components/Menu";
 import NotificationModal from "@foxglove/studio-base/components/NotificationModal";
 import {
   DetailsType,
+  NotificationMessage,
   NotificationType,
   setNotificationHandler,
   unsetNotificationHandler,
   NotificationSeverity,
 } from "@foxglove/studio-base/util/sendNotification";
 import { colors } from "@foxglove/studio-base/util/sharedStyleConstants";
-
-export type NotificationMessage = {
-  readonly id: string;
-  readonly message: string;
-  readonly details: DetailsType;
-  readonly read: boolean;
-  readonly created: Date;
-  readonly severity: NotificationSeverity;
-};
 
 const Container = styled.div<{ flash: boolean; unread: boolean; color: string }>`
   height: 100%;
