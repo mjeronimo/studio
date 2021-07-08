@@ -17,10 +17,11 @@ import {
   IPalette,
   hsl2rgb,
   getColorFromRGBA,
+  IFontStyles,
 } from "@fluentui/react";
 import { createTheme } from "@fluentui/theme";
 
-import { SANS_SERIF } from "@foxglove/studio-base/styles/fonts";
+import { SANS_SERIF, MONOSPACE } from "@foxglove/studio-base/styles/fonts";
 import styles from "@foxglove/studio-base/styles/variables.module.scss";
 import { colors } from "@foxglove/studio-base/util/sharedStyleConstants";
 
@@ -153,6 +154,11 @@ export default createTheme({
       },
     },
   },
+  fonts: {
+    monospaceFontStyle: {
+      fontFamily: MONOSPACE,
+    },
+  } as Partial<IFontStyles>,
   isInverted: true,
   palette: {
     ...themeColors(),

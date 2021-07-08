@@ -4,5 +4,36 @@
 
 // Keep in sync with fonts.module.scss
 // We tried importing scss vars directly in JS, but style-loader doesn't support web workers
-export const SANS_SERIF = `-apple-system, BlinkMacSystemFont, "Segoe UI", "Ubuntu", "Roboto", sans-serif`;
-export const MONOSPACE = `"Roboto Mono"`;
+
+export const SANS_SERIF = [
+  // Apple
+  "-apple-system",
+  "BlinkMacSystemFont",
+  "ui-sans-serif",
+  // Windows
+  "Segoe UI",
+  // Ubuntu
+  "Ubuntu",
+  // Chrome OS and Android
+  "Roboto",
+  // Fallback
+  "sans-serif",
+].join(",");
+
+export const MONOSPACE = [
+  // Apple
+  "SF Mono",
+  "ui-monospace",
+  // Windows
+  "Segoe UI Mono",
+  //  Ubuntu
+  "Ubuntu Mono",
+  // Chrome OS + Android
+  "Roboto Mono",
+  // Styled fallbacks
+  "Menlo",
+  "Monaco",
+  "Courier",
+  // Fallback
+  "monospace",
+].join(",");

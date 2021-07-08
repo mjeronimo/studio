@@ -44,8 +44,8 @@ export default function NotificationModal({
           styles={{
             field: {
               color: theme.semanticColors.bodyText,
-              fontSize: "81.25%",
-              fontFamily: "'Ubuntu Mono', Menlo, Monaco, Courier, monospace !important",
+              fontSize: `${theme.fonts.small}`,
+              fontFamily: `${theme.fonts.monospaceFontStyle.fontFamily} !important`,
               maxHeight: "50vh",
               overflowY: "auto",
             },
