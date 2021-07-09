@@ -154,11 +154,6 @@ export default createTheme({
       },
     },
   },
-  fonts: {
-    monospaceFontStyle: {
-      fontFamily: MONOSPACE,
-    },
-  } as Partial<IFontStyles>,
   isInverted: true,
   palette: {
     ...themeColors(),
