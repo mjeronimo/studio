@@ -12,7 +12,7 @@
 @mixin ff-sans-serif {
   font-family:
     // Apple
-    -apple-system, BlinkMacSystemFont,
+    -apple-system, ui-sans-serif,
     // Windows
     "Segoe UI",
     // Ubuntu
@@ -28,5 +28,18 @@
 // We currently avoid monospace system fonts due to DWriteFont::Create electron crash
 // when rendering offscreen canvas (see comments in ChartJsMux.ts and https://github.com/foxglove/studio/pull/933).
 @mixin ff-monospace {
-  font-family: "Roboto Mono";
+  font-family: 
+    // Apple
+    "SF Mono", "ui-monospace",
+    // Windows
+    "Segoe UI Mono",
+    //  Ubuntu
+    "Ubuntu Mono",
+    // Chrome OS + Android
+    "Roboto Mono",
+    // Styled fallbacks
+    "Menlo",
+    "Monaco", "Courier",
+    // Fallback
+    "monospace";
 }
