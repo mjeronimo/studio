@@ -39,6 +39,8 @@ declare global {
     | "Info"
     | "Loop"
     | "LoopFilled"
+    | "Maximize"
+    | "Minimize"
     | "More"
     | "MoreVertical"
     | "Next"

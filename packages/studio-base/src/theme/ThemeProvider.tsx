@@ -3,6 +3,8 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/
 import { ThemeProvider as FluentThemeProvider } from "@fluentui/react";
 import {
+  ArrowMaximize20Regular,
+  ArrowMinimize20Regular,
   Next20Filled,
   Next20Regular,
   Pause20Filled,
@@ -53,6 +55,8 @@ const icons: {
   Flow: <Icons.FlowIcon />,
   GenericScan: <Icons.GenericScanIcon />,
   Info: <Icons.InfoIcon />,
+  Maximize: <ArrowMaximize20Regular />,
+  Minimize: <ArrowMinimize20Regular />,
   More: <Icons.MoreIcon />,
   MoreVertical: <Icons.MoreVerticalIcon />,
   Next: <Next20Regular />,
