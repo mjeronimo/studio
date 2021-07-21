@@ -8,7 +8,7 @@ import { MONOSPACE, SANS_SERIF } from "@foxglove/studio-base/styles/fonts";
 import { colors as sharedColors, spacing } from "@foxglove/studio-base/util/sharedStyleConstants";
 
 /**
- * @deprecated The LegacyGlobalButton should not be used for new features. use @fluentui/react instead
+ * @deprecated The LegacyGlobalButton should not be used for new features. use fluentui/react instead
  */
 export const LegacyGlobalButton = styled.button`
   /* Re-homed from global.scss */
@@ -55,7 +55,7 @@ export const LegacyGlobalButton = styled.button`
 `;
 
 /**
- * @deprecated The LegacyGlobalInput should not be used for new features. use @fluentui/react instead
+ * @deprecated The LegacyGlobalInput should not be used for new features. use fluentui/react instead
  */
 export const LegacyGlobalInput = styled.input`
   /* Re-homed from global.scss */
@@ -80,7 +80,7 @@ export const LegacyGlobalInput = styled.input`
 `;
 
 /**
- * @deprecated The LegacyGlobalTextarea should not be used for new features. use @fluentui/react instead
+ * @deprecated The LegacyGlobalTextarea should not be used for new features. use fluentui/react instead
  */
 export const LegacyGlobalTextarea = styled.textarea`
   /* Re-homed from global.scss */
@@ -106,7 +106,7 @@ export const LegacyGlobalTextarea = styled.textarea`
 `;
 
 /**
- * @deprecated The LegacyGlobalSelect should not be used for new features. use @fluentui/react instead
+ * @deprecated The LegacyGlobalSelect should not be used for new features. use fluentui/react instead
  */
 export const LegacyGlobalSelect = styled.select`
   background-color: rgba(255, 255, 255, 0.05);
@@ -130,7 +130,7 @@ export const LegacyGlobalSelect = styled.select`
 `;
 
 /**
- * @deprecated The LegacyGlobalTable should not be used for new features. use @fluentui/react instead
+ * @deprecated The LegacyGlobalTable should not be used for new features. use fluentui/react instead
  */
 export const LegacyGlobalTable = styled.table`
   th {
