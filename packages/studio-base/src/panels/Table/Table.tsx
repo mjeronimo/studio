@@ -103,11 +103,11 @@ type STableHeaderProps = {
 
 const STableHeader = styled.th<STableHeaderProps>`
   border-bottom: ${({ isSortedAsc }: STableHeaderProps) =>
-    isSortedAsc ? `solid 3px ${toolsColorScheme.blue.medium}` : "none"};
+    isSortedAsc ? `solid 3px ${toolsColorScheme.blue.medium}` : "none"} !important;
   border-top: ${({ isSortedDesc }: STableHeaderProps) =>
-    isSortedDesc ? `solid 3px ${toolsColorScheme.blue.medium}` : "none"};
-  border-left: none;
-  border-right: none;
+    isSortedDesc ? `solid 3px ${toolsColorScheme.blue.medium}` : "none"} !important;
+  border-left: none !important;
+  border-right: none !important;
   font-weight: bold;
   cursor: pointer;
   width: ${({ id }: STableHeaderProps) => (id === "expander" ? "25px" : "auto")};
@@ -115,7 +115,7 @@ const STableHeader = styled.th<STableHeaderProps>`
 `;
 
 const STableData = styled.td`
-  padding: 4px;
+  padding: 4px !important;
   white-space: nowrap;
   text-overflow: ellipsis;
 `;
