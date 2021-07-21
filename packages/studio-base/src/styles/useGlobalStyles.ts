@@ -104,6 +104,9 @@ const useGlobalStyles = makeStyles((theme) => {
         color: theme.semanticColors.linkHovered,
       },
     },
+    ":global(i, em)": {
+      fontStyle: "italic",
+    },
     ":global(b, strong)": {
       fontWeight: "bold",
       letterSpacing: "0.4px",
