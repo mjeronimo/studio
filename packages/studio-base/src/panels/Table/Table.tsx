@@ -109,7 +109,7 @@ const STableHeader = styled.th<STableHeaderProps>`
   border-left: none !important;
   border-right: none !important;
   padding: 4px !important;
-  font-weight: bold;
+  font-weight: bold !important;
   cursor: pointer;
   width: ${({ id }: STableHeaderProps) => (id === "expander" ? "25px" : "auto")};
   text-align: left;

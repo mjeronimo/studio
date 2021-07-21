@@ -68,6 +68,7 @@ const SGlobalVariablesTable = styled.div`
   th,
   td {
     line-height: 100%;
+    padding: 4px !important;
     border: none;
   }
 
