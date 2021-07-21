@@ -28,7 +28,10 @@ import styled from "styled-components";
 
 import EmptyState from "@foxglove/studio-base/components/EmptyState";
 import Icon from "@foxglove/studio-base/components/Icon";
-import { LegacyGlobalButton } from "@foxglove/studio-base/styles/legacyGlobalStyles";
+import {
+  LegacyGlobalButton,
+  LegacyGlobalTable,
+} from "@foxglove/studio-base/styles/legacyGlobalStyles";
 import { toolsColorScheme } from "@foxglove/studio-base/util/toolsColorScheme";
 
 import TableCell from "./TableCell";
@@ -83,7 +86,7 @@ function getColumnsFromObject(
   return columns;
 }
 
-const STable = styled.table`
+const STable = styled(LegacyGlobalTable)`
   border: none;
   width: 100%;
 `;

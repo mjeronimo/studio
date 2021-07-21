@@ -21,6 +21,7 @@ import {
   useCurrentLayoutActions,
   useCurrentLayoutSelector,
 } from "@foxglove/studio-base/context/CurrentLayoutContext";
+import { LegacyGlobalInput } from "@foxglove/studio-base/styles/legacyGlobalStyles";
 import {
   formatDate,
   formatTime,
@@ -31,7 +32,7 @@ import { formatTimeRaw, isTimeInRangeInclusive } from "@foxglove/studio-base/uti
 
 import styles from "./index.module.scss";
 
-const SInput = styled.input`
+const SInput = styled(LegacyGlobalInput)`
   padding: 8px 4px;
   width: calc(100% - 4px);
 `;

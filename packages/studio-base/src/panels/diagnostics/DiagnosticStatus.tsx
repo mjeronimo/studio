@@ -29,6 +29,7 @@ import { openSiblingPlotPanel } from "@foxglove/studio-base/panels/Plot";
 import { openSiblingStateTransitionsPanel } from "@foxglove/studio-base/panels/StateTransitions";
 import { Config } from "@foxglove/studio-base/panels/diagnostics/DiagnosticStatusPanel";
 import colors from "@foxglove/studio-base/styles/colors.module.scss";
+import { LegacyGlobalTable } from "@foxglove/studio-base/styles/legacyGlobalStyles";
 import { PanelConfig } from "@foxglove/studio-base/types/panels";
 import { nonEmptyOrUndefined } from "@foxglove/studio-base/util/emptyOrUndefined";
 
@@ -73,7 +74,7 @@ const ResizeHandle = styled.div.attrs<{ splitFraction: number }>(({ splitFractio
   }
 `;
 
-const KeyValueTable = styled.table`
+const KeyValueTable = styled(LegacyGlobalTable)`
   table-layout: fixed;
   width: 100%;
   line-height: 1.3em;

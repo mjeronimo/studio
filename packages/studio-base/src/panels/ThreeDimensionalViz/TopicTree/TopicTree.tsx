@@ -34,6 +34,7 @@ import useChangeDetector from "@foxglove/studio-base/hooks/useChangeDetector";
 import useLinkedGlobalVariables from "@foxglove/studio-base/panels/ThreeDimensionalViz/Interactions/useLinkedGlobalVariables";
 import { TopicSettingsCollection } from "@foxglove/studio-base/panels/ThreeDimensionalViz/SceneBuilder";
 import { syncBags, SYNC_OPTIONS } from "@foxglove/studio-base/panels/ThreeDimensionalViz/syncBags";
+import { LegacyGlobalInput } from "@foxglove/studio-base/styles/legacyGlobalStyles";
 import { colors } from "@foxglove/studio-base/util/sharedStyleConstants";
 
 import { Save3DConfig } from "../index";
@@ -162,7 +163,7 @@ const SFilter = styled.div`
   flex: 1;
 `;
 
-const SInput = styled.input`
+const SInput = styled(LegacyGlobalInput)`
   height: 24px;
   background: transparent;
   flex: 1;

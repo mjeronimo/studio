@@ -26,6 +26,7 @@ import {
   usePanelMosaicId,
 } from "@foxglove/studio-base/context/CurrentLayoutContext";
 import { PanelInfo, usePanelCatalog } from "@foxglove/studio-base/context/PanelCatalogContext";
+import { LegacyGlobalInput } from "@foxglove/studio-base/styles/legacyGlobalStyles";
 import {
   PanelConfig,
   MosaicDropTargetPosition,
@@ -49,7 +50,7 @@ const SSearchInputContainer = styled(Flex)`
   border-radius: 4px;
 `;
 
-const SSearchInput = styled.input`
+const SSearchInput = styled(LegacyGlobalInput)`
   background-color: ${colors.DARK5};
   padding: 8px;
   width: 100%;
