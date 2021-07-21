@@ -28,6 +28,7 @@ import styled from "styled-components";
 
 import EmptyState from "@foxglove/studio-base/components/EmptyState";
 import Icon from "@foxglove/studio-base/components/Icon";
+import { LegacyGlobalButton } from "@foxglove/studio-base/styles/legacyGlobalStyles";
 import { toolsColorScheme } from "@foxglove/studio-base/util/toolsColorScheme";
 
 import TableCell from "./TableCell";
@@ -240,24 +241,24 @@ export default function Table({
       </STable>
       {!isNested && (
         <div style={{ margin: "4px auto 0" }}>
-          <button onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
+          <LegacyGlobalButton onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
             {"<<"}
-          </button>{" "}
-          <button onClick={() => previousPage()} disabled={!canPreviousPage}>
+          </LegacyGlobalButton>{" "}
+          <LegacyGlobalButton onClick={() => previousPage()} disabled={!canPreviousPage}>
             {"<"}
-          </button>{" "}
+          </LegacyGlobalButton>{" "}
           <span>
             Page{" "}
             <strong>
               {pageIndex + 1} of {pageOptions.length}
             </strong>{" "}
           </span>
-          <button onClick={() => nextPage()} disabled={!canNextPage}>
+          <LegacyGlobalButton onClick={() => nextPage()} disabled={!canNextPage}>
             {">"}
-          </button>{" "}
-          <button onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
+          </LegacyGlobalButton>{" "}
+          <LegacyGlobalButton onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
             {">>"}
-          </button>{" "}
+          </LegacyGlobalButton>{" "}
           <select
             value={pageSize}
             onChange={(e) => {

@@ -37,6 +37,7 @@ import useDeepMemo from "@foxglove/studio-base/hooks/useDeepMemo";
 import { MessageEvent } from "@foxglove/studio-base/players/types";
 import inScreenshotTests from "@foxglove/studio-base/stories/inScreenshotTests";
 import colors from "@foxglove/studio-base/styles/colors.module.scss";
+import { LegacyGlobalButton } from "@foxglove/studio-base/styles/legacyGlobalStyles";
 import { CameraInfo, StampedMessage } from "@foxglove/studio-base/types/Messages";
 import { PanelConfigSchema, SaveConfig } from "@foxglove/studio-base/types/panels";
 import { nonEmptyOrUndefined } from "@foxglove/studio-base/util/emptyOrUndefined";
@@ -132,7 +133,7 @@ const ToggleComponent = ({
   dataTest?: string;
 }) => {
   return (
-    <button
+    <LegacyGlobalButton
       style={{ maxWidth: "100%", padding: "4px 8px" }}
       className={cx({ disabled })}
       data-test={dataTest}
@@ -141,7 +142,7 @@ const ToggleComponent = ({
       <Icon style={{ marginLeft: 4 }}>
         <MenuDownIcon style={{ width: 14, height: 14, opacity: 0.5 }} />
       </Icon>
-    </button>
+    </LegacyGlobalButton>
   );
 };
 

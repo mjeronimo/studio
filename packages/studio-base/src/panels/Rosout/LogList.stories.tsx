@@ -13,6 +13,8 @@
 
 import { Component } from "react";
 
+import { LegacyGlobalButton } from "@foxglove/studio-base/styles/legacyGlobalStyles";
+
 import LogList, { RenderRow } from "./LogList";
 
 const MSG_BATCH_SIZE = 100;
@@ -95,7 +97,9 @@ class Example extends Component<Props, State> {
           flexDirection: "column",
         }}
       >
-        <button onClick={this.togglePause}>{paused ? "Resume Stream" : "Pause Stream"}</button>
+        <LegacyGlobalButton onClick={this.togglePause}>
+          {paused ? "Resume Stream" : "Pause Stream"}
+        </LegacyGlobalButton>
         <LogList items={items} renderRow={renderRow} />
       </div>
     );

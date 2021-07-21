@@ -21,6 +21,7 @@ import Icon from "@foxglove/studio-base/components/Icon";
 import useGlobalVariables from "@foxglove/studio-base/hooks/useGlobalVariables";
 import GlobalVariableName from "@foxglove/studio-base/panels/ThreeDimensionalViz/Interactions/GlobalVariableName";
 import colors from "@foxglove/studio-base/styles/colors.module.scss";
+import { LegacyGlobalInput } from "@foxglove/studio-base/styles/legacyGlobalStyles";
 
 import useLinkedGlobalVariables from "../useLinkedGlobalVariables";
 import SGlobalVariableForm from "./SGlobalVariableForm";
@@ -96,7 +97,7 @@ export default function LinkToGlobalVariable({
           <GlobalVariableName name={name} />.
         </p>
         <UnlinkGlobalVariables name={name} showList />
-        <input
+        <LegacyGlobalInput
           autoFocus
           type="text"
           value={`$${name}`}

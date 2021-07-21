@@ -113,7 +113,9 @@ const TopicSettingsEditor = React.memo<Props>(function TopicSettingsEditor({
           onSettingsChange={onSettingsChange}
         />
       </ErrorBoundary>
-      <button onClick={() => onSettingsChange({})}>Reset to defaults</button>
+      <LegacyGlobalButton onClick={() => onSettingsChange({})}>
+        Reset to defaults
+      </LegacyGlobalButton>
     </div>
   );
 });

@@ -35,6 +35,7 @@ import {
 } from "@foxglove/studio-base/panels/ThreeDimensionalViz/threeDimensionalVizUtils";
 import { ThreeDimensionalVizConfig } from "@foxglove/studio-base/panels/ThreeDimensionalViz/types";
 import colors from "@foxglove/studio-base/styles/colors.module.scss";
+import { LegacyGlobalInput } from "@foxglove/studio-base/styles/legacyGlobalStyles";
 import clipboard from "@foxglove/studio-base/util/clipboard";
 import { point2DValidator, cameraStateValidator } from "@foxglove/studio-base/util/validators";
 
@@ -202,7 +203,7 @@ export default function CameraInfo({
                     <SLabel>Auto sync:</SLabel>
                   </Tooltip>
                   <SValue>
-                    <input
+                    <LegacyGlobalInput
                       type="checkbox"
                       checked={autoSyncCameraState}
                       onChange={() =>
@@ -220,7 +221,7 @@ export default function CameraInfo({
                     Show crosshair:
                   </SLabel>
                   <SValue>
-                    <input
+                    <LegacyGlobalInput
                       type="checkbox"
                       disabled={cameraState.perspective}
                       checked={showCrosshair}

@@ -25,6 +25,7 @@ import Icon from "@foxglove/studio-base/components/Icon";
 import useDeepChangeDetector from "@foxglove/studio-base/hooks/useDeepChangeDetector";
 import { Interactive } from "@foxglove/studio-base/panels/ThreeDimensionalViz/Interactions/types";
 import Transforms from "@foxglove/studio-base/panels/ThreeDimensionalViz/Transforms";
+import { LegacyGlobalInput } from "@foxglove/studio-base/styles/legacyGlobalStyles";
 import { TextMarker, Color } from "@foxglove/studio-base/types/Messages";
 import { isNonEmptyOrUndefined } from "@foxglove/studio-base/util/emptyOrUndefined";
 import { colors } from "@foxglove/studio-base/util/sharedStyleConstants";
@@ -287,7 +288,7 @@ const SearchText = React.memo<SearchTextComponentProps>(function SearchText({
         <Icon medium>
           <SearchIcon />
         </Icon>
-        <input
+        <LegacyGlobalInput
           autoFocus
           ref={searchInputRef}
           type="text"

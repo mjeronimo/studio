@@ -19,6 +19,7 @@ import NotificationDisplay, {
   NotificationList,
 } from "@foxglove/studio-base/components/NotificationDisplay";
 import NotificationModal from "@foxglove/studio-base/components/NotificationModal";
+import { LegacyGlobalButton } from "@foxglove/studio-base/styles/legacyGlobalStyles";
 import sendNotification, { NotificationMessage } from "@foxglove/studio-base/util/sendNotification";
 
 const randomNum = () => Math.floor(Math.random() * 1000);
@@ -40,9 +41,9 @@ const NotificationDisplayWrapper = () => (
 
 const AddMoreButtons = () => (
   <div style={{ paddingTop: 20 }}>
-    <button onClick={addInfo}>add info</button>
-    <button onClick={addWarning}>add warning</button>
-    <button onClick={addError}>add error</button>
+    <LegacyGlobalButton onClick={addInfo}>add info</LegacyGlobalButton>
+    <LegacyGlobalButton onClick={addWarning}>add warning</LegacyGlobalButton>
+    <LegacyGlobalButton onClick={addError}>add error</LegacyGlobalButton>
   </div>
 );
 

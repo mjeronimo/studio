@@ -59,6 +59,7 @@ import { usePanelCatalog } from "@foxglove/studio-base/context/PanelCatalogConte
 import { PanelIdContext } from "@foxglove/studio-base/context/PanelIdContext";
 import { usePanelSettings } from "@foxglove/studio-base/context/PanelSettingsContext";
 import usePanelDrag from "@foxglove/studio-base/hooks/usePanelDrag";
+import { LegacyGlobalButton } from "@foxglove/studio-base/styles/legacyGlobalStyles";
 import { TabPanelConfig } from "@foxglove/studio-base/types/layouts";
 import { PanelConfig, SaveConfig, PanelConfigSchema } from "@foxglove/studio-base/types/panels";
 import { TAB_PANEL_TYPE } from "@foxglove/studio-base/util/globalConstants";
@@ -544,13 +545,13 @@ export default function Panel<Config extends PanelConfig>(
               </div>
             )}
             {fullScreen && (
-              <button
+              <LegacyGlobalButton
                 className={styles.exitFullScreen}
                 onClick={exitFullScreen}
                 data-panel-overlay-exit
               >
                 <CloseIcon /> <span>Exit fullscreen</span>
-              </button>
+              </LegacyGlobalButton>
             )}
             <ErrorBoundary>
               {PanelComponent.supportsStrictMode ?? true ? (

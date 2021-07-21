@@ -25,6 +25,7 @@ import Panel from "@foxglove/studio-base/components/Panel";
 import { usePanelContext } from "@foxglove/studio-base/components/PanelContext";
 import PanelToolbar from "@foxglove/studio-base/components/PanelToolbar";
 import TopicToRenderMenu from "@foxglove/studio-base/components/TopicToRenderMenu";
+import { LegacyGlobalInput } from "@foxglove/studio-base/styles/legacyGlobalStyles";
 import { PanelConfigSchema } from "@foxglove/studio-base/types/panels";
 import filterMap from "@foxglove/studio-base/util/filterMap";
 import { DIAGNOSTIC_TOPIC } from "@foxglove/studio-base/util/globalConstants";
@@ -141,7 +142,7 @@ function DiagnosticSummary(props: Props): JSX.Element {
   );
 
   const hardwareFilter = (
-    <input
+    <LegacyGlobalInput
       style={{ width: "100%", padding: "0", background: "transparent", opacity: "0.5" }}
       value={hardwareIdFilter}
       placeholder={"Filter hardware id"}

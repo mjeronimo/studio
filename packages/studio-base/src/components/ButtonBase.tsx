@@ -14,6 +14,8 @@
 import cx from "classnames";
 import { CSSProperties } from "react";
 
+import { LegacyGlobalButton } from "@foxglove/studio-base/styles/legacyGlobalStyles";
+
 export type Props = {
   id?: string;
   small?: boolean;
@@ -102,7 +104,7 @@ class ButtonBaseImpl extends React.Component<Props> {
     });
 
     return (
-      <button
+      <LegacyGlobalButton
         type="button"
         className={classes}
         id={id}
@@ -116,7 +118,7 @@ class ButtonBaseImpl extends React.Component<Props> {
         ref={innerRef}
       >
         {children}
-      </button>
+      </LegacyGlobalButton>
     );
   }
 }

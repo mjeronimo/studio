@@ -1,0 +1,166 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/
+
+import styled from "styled-components";
+
+import { MONOSPACE, SANS_SERIF } from "@foxglove/studio-base/styles/fonts";
+import { colors, spacing } from "@foxglove/studio-base/util/sharedStyleConstants";
+
+/**
+ * @deprecated The LegacyGlobalButton should not be used for new features. use @fluentui/react instead
+ */
+export const LegacyGlobalButton = styled.button`
+  /* Re-homed from global.scss */
+  background-color: ${colors.BACKGROUND_CONTROL};
+  border-radius: 4px;
+  border: none;
+  color: ${colors.TEXT_CONTROL};
+  font-family: ${SANS_SERIF};
+  font-size: 1rem;
+  margin: ${spacing.CONTROL_MARGIN};
+  padding: 8px 12px;
+  position: relative;
+  text-align: center;
+
+  &:focus {
+    outline: none;
+  }
+  &.is-danger {
+    background-color: ${colors.RED};
+  }
+  &.is-warning {
+    background-color: ${colors.BACKGROUND_CONTROL};
+  }
+  &:not(.disabled):not(:disabled):not(.ms-Button):hover {
+    cursor: pointer;
+    color: ${colors.TEXT_CONTROL_HOVER};
+  }
+  &.is-primary {
+    background-color: ${colors.GREEN};
+    color: ${colors.BACKGROUND};
+  }
+  &.selected {
+    background-color: ${colors.DARK5};
+    color: ${colors.TEXT_NORMAL};
+  }
+  &.disabled,
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  &.is-small {
+    padding: 4px 8px;
+  }
+`;
+
+/**
+ * @deprecated The LegacyGlobalInput should not be used for new features. use @fluentui/react instead
+ */
+export const LegacyGlobalInput = styled.input`
+  /* Re-homed from global.scss */
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  border: none;
+  color: ${colors.TEXT_CONTROL};
+  font-family: ${SANS_SERIF};
+  font-size: 1rem;
+  margin: ${spacing.CONTROL_MARGIN};
+  padding: 8px 12px;
+  text-align: left;
+
+  &.disabled {
+    color: ${colors.TEXT_INPUT_DISABLED};
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+  &:focus {
+    background-color: rgba(255, 255, 255, 0.075);
+    outline: none;
+  }
+`;
+
+/**
+ * @deprecated The LegacyGlobalTextarea should not be used for new features. use @fluentui/react instead
+ */
+export const LegacyGlobalTextarea = styled.textarea`
+  /* Re-homed from global.scss */
+  background-color: ${colors.DARK};
+  border-radius: 4px;
+  border: 2px solid ${colors.TEXT_NORMAL};
+  border: none;
+  color: ${colors.TEXT_NORMAL};
+  font-family: ${MONOSPACE};
+  font-size: 1rem;
+  margin: ${spacing.CONTROL_MARGIN};
+  padding: 8px 12px;
+  text-align: left;
+
+  &:focus {
+    background-color: black;
+    outline: none;
+  }
+  &.disabled {
+    background-color: rgba(255, 255, 255, 0.3);
+    color: ${colors.TEXT_INPUT_DISABLED};
+  }
+`;
+
+/**
+ * @deprecated The LegacyGlobalSelect should not be used for new features. use @fluentui/react instead
+ */
+export const LegacyGlobalSelect = styled.select`
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  border: none;
+  color: ${colors.TEXT_CONTROL};
+  font-family: ${SANS_SERIF};
+  font-size: 1rem;
+  margin: ${spacing.CONTROL_MARGIN};
+  padding: 8px 12px;
+  text-align: left;
+
+  &:focus {
+    outline: none;
+    background-color: rgba(255, 255, 255, 0.075);
+  }
+  &.disabled {
+    color: ${colors.TEXT_INPUT_DISABLED};
+    background-color: rgba(255, 255, 255, 0.3);
+  }
+`;
+
+/**
+ * @deprecated The LegacyGlobalTable should not be used for new features. use @fluentui/react instead
+ */
+export const LegacyGlobalTable = styled.table`
+  th {
+    color: ${colors.TEXT_NORMAL};
+
+    tr:first-child & {
+      padding-top: 4px;
+      padding-bottom: 4px;
+    }
+  }
+  th,
+  td {
+    border: 1px solid ${colors.DIVIDER};
+    padding: 0 0.3em;
+    line-height: 1.3em;
+  }
+  tr {
+    svg {
+      opacity: 0.6;
+    }
+  }
+
+  tr:hover {
+    td {
+      background-color: ${colors.DARK4};
+      cursor: pointer;
+    }
+
+    svg {
+      opacity: 0.8;
+    }
+  }
+`;

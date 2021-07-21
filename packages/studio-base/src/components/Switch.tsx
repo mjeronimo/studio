@@ -13,6 +13,8 @@
 
 import styled from "styled-components";
 
+import { LegacyGlobalInput } from "@foxglove/studio-base/styles/legacyGlobalStyles";
+
 const SSwitch = styled.label`
   position: relative;
   vertical-align: top;
@@ -68,7 +70,7 @@ type Props = {
 export default function Switch({ isChecked, onChange }: Props): JSX.Element {
   return (
     <SSwitch className="switch">
-      <input type="checkbox" checked={isChecked} onChange={onChange} />
+      <LegacyGlobalInput type="checkbox" checked={isChecked} onChange={onChange} />
       <span className="circle" />
     </SSwitch>
   );
