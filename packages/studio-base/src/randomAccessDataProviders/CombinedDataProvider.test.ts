@@ -41,7 +41,6 @@ import {
 import { RosDatatypes } from "@foxglove/studio-base/types/RosDatatypes";
 import delay from "@foxglove/studio-base/util/delay";
 import { SECOND_SOURCE_PREFIX } from "@foxglove/studio-base/util/globalConstants";
-import sendNotification from "@foxglove/studio-base/util/sendNotification";
 
 // reusable providers
 function provider1(initiallyLoaded = false) {
@@ -359,7 +358,6 @@ describe("CombinedDataProvider", () => {
         { parsedMessages: ["/some_topic"] },
       );
       expect(messagesResult).toEqual({ parsedMessages: [message] });
-      sendNotification.expectCalledDuringTest();
     });
   });
 

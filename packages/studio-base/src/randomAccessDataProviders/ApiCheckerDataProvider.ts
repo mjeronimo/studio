@@ -25,7 +25,6 @@ import {
   GetMessagesTopics,
   InitializationResult,
 } from "@foxglove/studio-base/randomAccessDataProviders/types";
-import sendNotification from "@foxglove/studio-base/util/sendNotification";
 import { formatTimeRaw } from "@foxglove/studio-base/util/time";
 
 // We wrap every RandomAccessDataProvider in an ApiCheckerDataProvider to strictly enforce
@@ -231,10 +230,10 @@ export default class ApiCheckerDataProvider implements RandomAccessDataProvider 
 
   async close(): Promise<void> {
     if (!this._initializationResult) {
-      this._warn("close was called before initialize finished");
+      throw new Error("close was called before initialize finished");
     }
     if (this._closed) {
-      this._warn("close was called twice");
+      throw new Error("close was called twice");
     }
     this._closed = true;
     return await this._provider?.close();
@@ -242,12 +241,9 @@ export default class ApiCheckerDataProvider implements RandomAccessDataProvider 
 
   _warn(message: string): void {
     const prefixedMessage = `ApiCheckerDataProvider(${this._name}): ${message}`;
-    sendNotification("Internal data provider assertion failed", prefixedMessage, "app", "warn");
 
-    if (process.env.NODE_ENV !== "production") {
-      // In tests and local development, also throw a hard message so we'll be more
-      // likely to notice it / fail CI.
-      throw Error(`ApiCheckerDataProvider assertion failed: ${prefixedMessage}`);
-    }
+    // fixme - maybe we shouldn't have the Apichecker at all - this is adding quite the additional
+    // overhead to a processing pipeline
+    throw new Error(`Internal data provider assertion failed: ${prefixedMessage}`);
   }
 }

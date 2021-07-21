@@ -42,7 +42,6 @@ import {
   mergeNewRangeIntoUnsortedNonOverlappingList,
   missingRanges,
 } from "@foxglove/studio-base/util/ranges";
-import sendNotification from "@foxglove/studio-base/util/sendNotification";
 
 // I (JP) mostly just made these numbers up. It might be worth experimenting with different values
 // for these, but it seems to work reasonably well in my tests.
@@ -548,17 +547,9 @@ export default class MemoryCacheDataProvider implements RandomAccessDataProvider
       }
 
       const connectionSuccess = await this._setConnection(newConnection).catch((err) => {
-        sendNotification(
-          `MemoryCacheDataProvider connection ${
-            this._currentConnection ? this._currentConnection.id : ""
-          }`,
-          err?.message ?? "<unknown error>",
-          "app",
-          "error",
-        );
+        // fixme - add to running problems for next getMessages call? or maybe progress callback call?
       });
-
-      if (connectionSuccess !== true) {
+      if (!connectionSuccess) {
         // Connection interrupted, or otherwise unsuccessful.
         break;
       }
@@ -628,12 +619,7 @@ export default class MemoryCacheDataProvider implements RandomAccessDataProvider
       const { rosBinaryMessages, parsedMessages } = messages;
 
       if (parsedMessages != undefined) {
-        const types = (Object.keys(messages) as (keyof typeof messages)[])
-          .filter((type) => messages[type] != undefined)
-          .join("\n");
-        sendNotification("MemoryCacheDataProvider got bad message types", types, "app", "error");
-        // Do not retry.
-        return false;
+        throw new Error("MemoryCacheDataProvider got bad message types");
       }
 
       // If we're not current any more, discard the messages, because otherwise we might write duplicate messages.
@@ -662,6 +648,7 @@ export default class MemoryCacheDataProvider implements RandomAccessDataProvider
         try {
           const msgSize = lazyReader.size(bytes);
           if (msgSize > bytes.byteLength) {
+            // fixme - this needs to become a player problem
             sendNotification(
               `Message buffer not large enough on ${rosBinaryMessage.topic}`,
               `Cannot read ${msgSize} byte message from ${bytes.byteLength} byte buffer`,
@@ -670,6 +657,7 @@ export default class MemoryCacheDataProvider implements RandomAccessDataProvider
             );
           }
         } catch (error) {
+          // fixme - this needs to become a player problem
           sendNotification(
             `Message size parsing failed on ${rosBinaryMessage.topic}`,
             error,
@@ -689,6 +677,9 @@ export default class MemoryCacheDataProvider implements RandomAccessDataProvider
       if (sizeInBytes > MAX_BLOCK_SIZE_BYTES && !this._loggedTooLargeError) {
         this._loggedTooLargeError = true;
 
+        // fixme - throw? Seems too much - will this prevent user from using the app?
+        // should this be exposed as an error event instead?
+        // fixme - this should be a player problem?
         sendNotification(
           "Very large block found",
           `A very large block (${Math.round(
