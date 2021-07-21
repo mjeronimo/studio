@@ -17,6 +17,7 @@ import ErrorBoundary from "@foxglove/studio-base/components/ErrorBoundary";
 import GridSettingsEditor from "@foxglove/studio-base/panels/ThreeDimensionalViz/TopicSettingsEditor/GridSettingsEditor";
 import { TopicSettingsEditorProps } from "@foxglove/studio-base/panels/ThreeDimensionalViz/TopicSettingsEditor/types";
 import { Topic } from "@foxglove/studio-base/players/types";
+import { LegacyGlobalButton } from "@foxglove/studio-base/styles/legacyGlobalStyles";
 import {
   FOXGLOVE_GRID_DATATYPE,
   NAV_MSGS_PATH_DATATYPE,
