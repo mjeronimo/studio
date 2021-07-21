@@ -132,6 +132,9 @@ export const LegacyGlobalSelect = styled.select`
  * @deprecated The LegacyGlobalTable should not be used for new features. use fluentui/react instead
  */
 export const LegacyGlobalTable = styled.table`
+  border: "none";
+  width: 100%;
+
   th {
     color: ${sharedColors.TEXT_NORMAL};
 

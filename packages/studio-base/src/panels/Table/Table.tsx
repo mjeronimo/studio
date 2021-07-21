@@ -31,6 +31,7 @@ import Icon from "@foxglove/studio-base/components/Icon";
 import {
   LegacyGlobalButton,
   LegacyGlobalTable,
+  LegacyGlobalSelect,
 } from "@foxglove/studio-base/styles/legacyGlobalStyles";
 import { toolsColorScheme } from "@foxglove/studio-base/util/toolsColorScheme";
 
@@ -85,11 +86,6 @@ function getColumnsFromObject(
 
   return columns;
 }
-
-const STable = styled(LegacyGlobalTable)`
-  border: none;
-  width: 100%;
-`;
 
 const STableRow = styled.tr`
   background-color: ${({ index }: { index: number }) =>
@@ -195,7 +191,7 @@ export default function Table({
 
   return (
     <>
-      <STable {...getTableProps()}>
+      <LegacyGlobalTable {...getTableProps()}>
         <thead>
           {headerGroups.map((headerGroup, i) => {
             return (
@@ -241,7 +237,7 @@ export default function Table({
             );
           })}
         </tbody>
-      </STable>
+      </LegacyGlobalTable>
       {!isNested && (
         <div style={{ margin: "4px auto 0" }}>
           <LegacyGlobalButton onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
@@ -262,7 +258,7 @@ export default function Table({
           <LegacyGlobalButton onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
             {">>"}
           </LegacyGlobalButton>{" "}
-          <select
+          <LegacyGlobalSelect
             value={pageSize}
             onChange={(e) => {
               setPageSize(Number(e.target.value));
@@ -273,7 +269,7 @@ export default function Table({
                 Show {size}
               </option>
             ))}
-          </select>
+          </LegacyGlobalSelect>
         </div>
       )}
     </>
