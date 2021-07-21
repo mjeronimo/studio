@@ -25,6 +25,7 @@ import PanelToolbar from "@foxglove/studio-base/components/PanelToolbar";
 import { JSONInput } from "@foxglove/studio-base/components/input/JSONInput";
 import { usePreviousValue } from "@foxglove/studio-base/hooks/usePreviousValue";
 import { ParameterValue, PlayerCapabilities } from "@foxglove/studio-base/players/types";
+import { LegacyGlobalTable } from "@foxglove/studio-base/styles/legacyGlobalStyles";
 
 import AnimatedRow from "./AnimatedRow";
 import ParametersPanel from "./ParametersPanel";
@@ -101,7 +102,7 @@ function Parameters(): ReactElement {
       <PanelToolbar helpContent={helpContent} floating />
       <Scrollable>
         <ParametersTable>
-          <table>
+          <LegacyGlobalTable>
             <thead>
               <tr>
                 <th>Parameter</th>
@@ -133,7 +134,7 @@ function Parameters(): ReactElement {
                 );
               })}
             </tbody>
-          </table>
+          </LegacyGlobalTable>
         </ParametersTable>
       </Scrollable>
     </ParametersPanel>

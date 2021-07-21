@@ -5,17 +5,17 @@
 import styled from "styled-components";
 
 import { MONOSPACE, SANS_SERIF } from "@foxglove/studio-base/styles/fonts";
-import { colors, spacing } from "@foxglove/studio-base/util/sharedStyleConstants";
+import { colors as sharedColors, spacing } from "@foxglove/studio-base/util/sharedStyleConstants";
 
 /**
  * @deprecated The LegacyGlobalButton should not be used for new features. use @fluentui/react instead
  */
 export const LegacyGlobalButton = styled.button`
   /* Re-homed from global.scss */
-  background-color: ${colors.BACKGROUND_CONTROL};
+  background-color: ${sharedColors.BACKGROUND_CONTROL};
   border-radius: 4px;
   border: none;
-  color: ${colors.TEXT_CONTROL};
+  color: ${sharedColors.TEXT_CONTROL};
   font-family: ${SANS_SERIF};
   font-size: 1rem;
   margin: ${spacing.CONTROL_MARGIN};
@@ -27,22 +27,22 @@ export const LegacyGlobalButton = styled.button`
     outline: none;
   }
   &.is-danger {
-    background-color: ${colors.RED};
+    background-color: ${sharedColors.RED};
   }
   &.is-warning {
-    background-color: ${colors.BACKGROUND_CONTROL};
+    background-color: ${sharedColors.BACKGROUND_CONTROL};
   }
   &:not(.disabled):not(:disabled):not(.ms-Button):hover {
     cursor: pointer;
-    color: ${colors.TEXT_CONTROL_HOVER};
+    color: ${sharedColors.TEXT_CONTROL_HOVER};
   }
   &.is-primary {
-    background-color: ${colors.GREEN};
-    color: ${colors.BACKGROUND};
+    background-color: ${sharedColors.GREEN};
+    color: ${sharedColors.BACKGROUND};
   }
   &.selected {
-    background-color: ${colors.DARK5};
-    color: ${colors.TEXT_NORMAL};
+    background-color: ${sharedColors.DARK5};
+    color: ${sharedColors.TEXT_NORMAL};
   }
   &.disabled,
   &:disabled {
@@ -62,7 +62,7 @@ export const LegacyGlobalInput = styled.input`
   background-color: rgba(255, 255, 255, 0.05);
   border-radius: 4px;
   border: none;
-  color: ${colors.TEXT_CONTROL};
+  color: ${sharedColors.TEXT_CONTROL};
   font-family: ${SANS_SERIF};
   font-size: 1rem;
   margin: ${spacing.CONTROL_MARGIN};
@@ -70,7 +70,7 @@ export const LegacyGlobalInput = styled.input`
   text-align: left;
 
   &.disabled {
-    color: ${colors.TEXT_INPUT_DISABLED};
+    color: ${sharedColors.TEXT_INPUT_DISABLED};
     background-color: rgba(255, 255, 255, 0.3);
   }
   &:focus {
@@ -84,11 +84,11 @@ export const LegacyGlobalInput = styled.input`
  */
 export const LegacyGlobalTextarea = styled.textarea`
   /* Re-homed from global.scss */
-  background-color: ${colors.DARK};
+  background-color: ${sharedColors.DARK};
   border-radius: 4px;
-  border: 2px solid ${colors.TEXT_NORMAL};
+  border: 2px solid ${sharedColors.TEXT_NORMAL};
   border: none;
-  color: ${colors.TEXT_NORMAL};
+  color: ${sharedColors.TEXT_NORMAL};
   font-family: ${MONOSPACE};
   font-size: 1rem;
   margin: ${spacing.CONTROL_MARGIN};
@@ -101,7 +101,7 @@ export const LegacyGlobalTextarea = styled.textarea`
   }
   &.disabled {
     background-color: rgba(255, 255, 255, 0.3);
-    color: ${colors.TEXT_INPUT_DISABLED};
+    color: ${sharedColors.TEXT_INPUT_DISABLED};
   }
 `;
 
@@ -112,7 +112,7 @@ export const LegacyGlobalSelect = styled.select`
   background-color: rgba(255, 255, 255, 0.05);
   border-radius: 4px;
   border: none;
-  color: ${colors.TEXT_CONTROL};
+  color: ${sharedColors.TEXT_CONTROL};
   font-family: ${SANS_SERIF};
   font-size: 1rem;
   margin: ${spacing.CONTROL_MARGIN};
@@ -124,7 +124,7 @@ export const LegacyGlobalSelect = styled.select`
     background-color: rgba(255, 255, 255, 0.075);
   }
   &.disabled {
-    color: ${colors.TEXT_INPUT_DISABLED};
+    color: ${sharedColors.TEXT_INPUT_DISABLED};
     background-color: rgba(255, 255, 255, 0.3);
   }
 `;
@@ -134,7 +134,7 @@ export const LegacyGlobalSelect = styled.select`
  */
 export const LegacyGlobalTable = styled.table`
   th {
-    color: ${colors.TEXT_NORMAL};
+    color: ${sharedColors.TEXT_NORMAL};
 
     tr:first-child & {
       padding-top: 4px;
@@ -143,7 +143,7 @@ export const LegacyGlobalTable = styled.table`
   }
   th,
   td {
-    border: 1px solid ${colors.DIVIDER};
+    border: 1px solid ${sharedColors.DIVIDER};
     padding: 0 0.3em;
     line-height: 1.3em;
   }
@@ -155,7 +155,7 @@ export const LegacyGlobalTable = styled.table`
 
   tr:hover {
     td {
-      background-color: ${colors.DARK4};
+      background-color: ${sharedColors.DARK4};
       cursor: pointer;
     }
 

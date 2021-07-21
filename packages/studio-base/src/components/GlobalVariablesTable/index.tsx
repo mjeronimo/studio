@@ -27,6 +27,7 @@ import useGlobalVariables, {
 } from "@foxglove/studio-base/hooks/useGlobalVariables";
 import { usePreviousValue } from "@foxglove/studio-base/hooks/usePreviousValue";
 import useLinkedGlobalVariables from "@foxglove/studio-base/panels/ThreeDimensionalViz/Interactions/useLinkedGlobalVariables";
+import { LegacyGlobalTable } from "@foxglove/studio-base/styles/legacyGlobalStyles";
 import { colors as sharedColors } from "@foxglove/studio-base/util/sharedStyleConstants";
 
 // The minimum amount of time to wait between showing the global variable update animation again
@@ -292,7 +293,7 @@ function GlobalVariablesTable(): ReactElement {
 
   return (
     <SGlobalVariablesTable>
-      <table>
+      <LegacyGlobalTable>
         <thead>
           <tr>
             <th>Variable</th>
@@ -354,7 +355,7 @@ function GlobalVariablesTable(): ReactElement {
             </SAnimatedRow>
           ))}
         </tbody>
-      </table>
+      </LegacyGlobalTable>
       <Flex style={{ marginTop: 20 }}>
         <DefaultButton
           text="Add variable"
