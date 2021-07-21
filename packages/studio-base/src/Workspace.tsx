@@ -55,6 +55,7 @@ import useElectronFilesToOpen from "@foxglove/studio-base/hooks/useElectronFiles
 import useNativeAppMenuEvent from "@foxglove/studio-base/hooks/useNativeAppMenuEvent";
 import welcomeLayout from "@foxglove/studio-base/layouts/welcomeLayout";
 import { PlayerPresence } from "@foxglove/studio-base/players/types";
+import useGlobalStyles from "@foxglove/studio-base/styles/useGlobalStyles";
 import { isNonEmptyOrUndefined } from "@foxglove/studio-base/util/emptyOrUndefined";
 import inAutomatedRunMode from "@foxglove/studio-base/util/inAutomatedRunMode";
 
@@ -147,6 +148,7 @@ type WorkspaceProps = {
 };
 
 export default function Workspace(props: WorkspaceProps): JSX.Element {
+  const classes = useGlobalStyles();
   const containerRef = useRef<HTMLDivElement>(ReactNull);
   const { currentSourceName, selectSource } = usePlayerSelection();
   const playerPresence = useMessagePipeline(
@@ -410,7 +412,7 @@ export default function Workspace(props: WorkspaceProps): JSX.Element {
           <div style={{ fontSize: "4em", marginBottom: "1em" }}>Drop a file here</div>
         </DropOverlay>
       </DocumentDropListener>
-      <div ref={containerRef} className="app-container" tabIndex={0}>
+      <div ref={containerRef} className={classes.container} tabIndex={0}>
         <GlobalKeyListener />
         {shortcutsModalOpen && (
           <ShortcutsModal onRequestClose={() => setShortcutsModalOpen(false)} />
