@@ -87,7 +87,6 @@ export const LegacyGlobalTextarea = styled.textarea`
   background-color: ${sharedColors.DARK};
   border-radius: 4px;
   border: 2px solid ${sharedColors.TEXT_NORMAL};
-  border: none;
   color: ${sharedColors.TEXT_NORMAL};
   font-family: ${MONOSPACE};
   font-size: 1rem;
