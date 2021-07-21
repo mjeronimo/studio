@@ -87,6 +87,11 @@ a {
   }
 }
 
+i,
+em {
+  font-style: italic;
+}
+
 b,
 strong {
   @extend %bold;
