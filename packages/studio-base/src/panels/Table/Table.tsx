@@ -108,6 +108,7 @@ const STableHeader = styled.th<STableHeaderProps>`
     isSortedDesc ? `solid 3px ${toolsColorScheme.blue.medium}` : "none"} !important;
   border-left: none !important;
   border-right: none !important;
+  padding: 4px !important;
   font-weight: bold;
   cursor: pointer;
   width: ${({ id }: STableHeaderProps) => (id === "expander" ? "25px" : "auto")};
