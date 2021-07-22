@@ -22,7 +22,6 @@ export default function CssBaseline(): ReactNull {
       margin: 0,
       padding: 0,
       border: 0,
-      fontSize: "100%",
       font: "inherit",
       verticalAlign: "baseline",
     },
@@ -32,9 +31,6 @@ export default function CssBaseline(): ReactNull {
     },
     ":global(body)": {
       lineHeight: "1",
-      background: theme.semanticColors.bodyBackground,
-      color: theme.semanticColors.bodyText,
-      ...theme.fonts.xSmall,
     },
     ":global(ol, ul)": {
       listStyle: "none",
@@ -56,6 +52,9 @@ export default function CssBaseline(): ReactNull {
       flex: "1 1 100%",
       outline: "none",
       overflow: "hidden",
+      background: theme.semanticColors.bodyBackground,
+      color: theme.semanticColors.bodyText,
+      ...theme.fonts.small,
     },
     ":global(#root)": {
       // ensure portals are able to stack on top of the main app
