@@ -22,7 +22,6 @@ import {
 import { useState, useCallback, useMemo, useRef, useEffect } from "react";
 
 import { Time } from "@foxglove/rostime";
-
 import {
   useCurrentLayoutActions,
   useCurrentLayoutSelector,
