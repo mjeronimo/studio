@@ -2,48 +2,50 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/
 
-import { makeStyles } from "@fluentui/react";
+import { mergeStyles, useTheme } from "@fluentui/react";
 
 import { MONOSPACE } from "@foxglove/studio-base/styles/fonts";
 
-const elementSelector: string =
+const ELEMENT_SELECTORS: string =
   ":global(html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, canvas, details, embed, figure, figcaption, footer, header, hgroup, menu, nav, output, ruby, section, summary, time, mark, audio, video)";
-const roleSelector: string =
+const ROLE_SELECTORS: string =
   ":global(article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section)";
 
-const useGlobalStyles = makeStyles((theme) => {
+export default function CssBaseline(): ReactNull {
+  const theme = useTheme();
+
   const containerStyles = {
     width: "100%",
     height: "100%",
-    margin: "0",
-    padding: "0",
     display: "flex",
     flexDirection: "column",
+    position: "relative",
     flex: "1 1 100%",
-    background: theme.semanticColors.bodyBackground,
     outline: "none",
-    fontSize: theme.fonts.smallPlus.fontSize,
-    color: theme.semanticColors.bodyText,
+    overflow: "hidden",
   };
 
-  return {
+  mergeStyles({
     // http://meyerweb.com/eric/tools/css/reset/
     // v2.0 | 20110126
     // License: none (public domain)
-    [elementSelector]: {
-      margin: "0",
-      padding: "0",
-      border: "0",
+    [ELEMENT_SELECTORS]: {
+      margin: 0,
+      padding: 0,
+      border: 0,
       fontSize: "100%",
       font: "inherit",
       verticalAlign: "baseline",
     },
     /* HTML5 display-role reset for older browsers */
-    [roleSelector]: {
+    [ROLE_SELECTORS]: {
       display: "block",
     },
     ":global(body)": {
       lineHeight: "1",
+      background: theme.semanticColors.bodyBackground,
+      color: theme.semanticColors.bodyText,
+      ...theme.fonts.xSmall,
     },
     ":global(ol, ul)": {
       listStyle: "none",
@@ -56,12 +58,10 @@ const useGlobalStyles = makeStyles((theme) => {
     },
 
     // Now our global styles
-    container: containerStyles,
     ":global(html, body, #root)": containerStyles,
     ":global(#root)": {
       // ensure portals are able to stack on top of the main app
       zIndex: 0,
-      overflow: "hidden",
     },
     // Make sure everything uses box-sizing: border-box.
     // Per https://www.paulirish.com/2012/box-sizing-border-box-ftw/
@@ -126,7 +126,7 @@ const useGlobalStyles = makeStyles((theme) => {
       padding: "0",
       backgroundColor: theme.semanticColors.bodyDivider,
     },
-  };
-});
+  });
 
-export default useGlobalStyles;
+  return ReactNull;
+}
