@@ -104,7 +104,11 @@ export default function ThemeProvider({
   }
 
   return (
-    <FluentThemeProvider as={ThemeContainer} applyTo="none" theme={theme}>
+    <FluentThemeProvider
+      as={ThemeContainer}
+      applyTo="none" // skip default global styles for now
+      theme={theme}
+    >
       <StyledThemeProvider
         // Expose the same theme to styled-components - see types/styled-components.d.ts for type definitions
         theme={theme}
