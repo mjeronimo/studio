@@ -14,17 +14,6 @@ const ROLE_SELECTORS: string =
 export default function CssBaseline(): ReactNull {
   const theme = useTheme();
 
-  const containerStyles = {
-    width: "100%",
-    height: "100%",
-    display: "flex",
-    flexDirection: "column",
-    position: "relative",
-    flex: "1 1 100%",
-    outline: "none",
-    overflow: "hidden",
-  };
-
   mergeStyles({
     // http://meyerweb.com/eric/tools/css/reset/
     // v2.0 | 20110126
@@ -58,7 +47,16 @@ export default function CssBaseline(): ReactNull {
     },
 
     // Now our global styles
-    ":global(html, body, #root)": containerStyles,
+    ":global(html, body, #root)": {
+      width: "100%",
+      height: "100%",
+      display: "flex",
+      flexDirection: "column",
+      position: "relative",
+      flex: "1 1 100%",
+      outline: "none",
+      overflow: "hidden",
+    },
     ":global(#root)": {
       // ensure portals are able to stack on top of the main app
       zIndex: 0,
