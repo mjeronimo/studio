@@ -3,7 +3,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/
 import styled from "styled-components";
 
-import { LegacyGlobalTable } from "@foxglove/studio-base/styles/legacyGlobalStyles";
+import { LegacyGlobalTable } from "@foxglove/studio-base/components/LegacyStyledComponents";
 import { colors } from "@foxglove/studio-base/util/sharedStyleConstants";
 
 export default styled(LegacyGlobalTable)`

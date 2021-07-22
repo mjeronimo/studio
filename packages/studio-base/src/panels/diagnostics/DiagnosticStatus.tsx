@@ -24,12 +24,12 @@ import styled from "styled-components";
 
 import Flex from "@foxglove/studio-base/components/Flex";
 import Icon from "@foxglove/studio-base/components/Icon";
+import { LegacyGlobalTable } from "@foxglove/studio-base/components/LegacyStyledComponents";
 import Tooltip from "@foxglove/studio-base/components/Tooltip";
 import { openSiblingPlotPanel } from "@foxglove/studio-base/panels/Plot";
 import { openSiblingStateTransitionsPanel } from "@foxglove/studio-base/panels/StateTransitions";
 import { Config } from "@foxglove/studio-base/panels/diagnostics/DiagnosticStatusPanel";
 import colors from "@foxglove/studio-base/styles/colors.module.scss";
-import { LegacyGlobalTable } from "@foxglove/studio-base/styles/legacyGlobalStyles";
 import { PanelConfig } from "@foxglove/studio-base/types/panels";
 import { nonEmptyOrUndefined } from "@foxglove/studio-base/util/emptyOrUndefined";
 

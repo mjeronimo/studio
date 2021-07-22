@@ -13,7 +13,7 @@
 
 import { PropsWithChildren } from "react";
 
-import { LegacyGlobalTable } from "@foxglove/studio-base/styles/legacyGlobalStyles";
+import { LegacyGlobalTable } from "@foxglove/studio-base/components/LegacyStyledComponents";
 import { formatTime } from "@foxglove/studio-base/util/formatTime";
 import { subtractTimes, toSec, formatTimeRaw } from "@foxglove/studio-base/util/time";
 

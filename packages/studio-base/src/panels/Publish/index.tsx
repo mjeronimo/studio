@@ -19,13 +19,13 @@ import { useDataSourceInfo } from "@foxglove/studio-base/PanelAPI";
 import Autocomplete from "@foxglove/studio-base/components/Autocomplete";
 import Button from "@foxglove/studio-base/components/Button";
 import Flex from "@foxglove/studio-base/components/Flex";
+import { LegacyTextarea } from "@foxglove/studio-base/components/LegacyStyledComponents";
 import Panel from "@foxglove/studio-base/components/Panel";
 import PanelToolbar from "@foxglove/studio-base/components/PanelToolbar";
 import PanelToolbarLabel from "@foxglove/studio-base/components/PanelToolbarLabel";
 import usePublisher from "@foxglove/studio-base/hooks/usePublisher";
 import { PlayerCapabilities, Topic } from "@foxglove/studio-base/players/types";
 import colors from "@foxglove/studio-base/styles/colors.module.scss";
-import { LegacyGlobalTextarea } from "@foxglove/studio-base/styles/legacyGlobalStyles";
 import { PanelConfigSchema } from "@foxglove/studio-base/types/panels";
 import { isNonEmptyOrUndefined } from "@foxglove/studio-base/util/emptyOrUndefined";
 
@@ -46,7 +46,7 @@ type Props = {
   saveConfig: (arg0: Partial<Config>) => void;
 };
 
-const STextArea = styled(LegacyGlobalTextarea)`
+const STextArea = styled(LegacyTextarea)`
   width: 100%;
   height: 100%;
   resize: none;

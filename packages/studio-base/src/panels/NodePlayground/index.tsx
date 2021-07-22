@@ -21,6 +21,7 @@ import { v4 as uuidv4 } from "uuid";
 import Button from "@foxglove/studio-base/components/Button";
 import Flex from "@foxglove/studio-base/components/Flex";
 import Icon from "@foxglove/studio-base/components/Icon";
+import { LegacyInput } from "@foxglove/studio-base/components/LegacyStyledComponents";
 import Panel from "@foxglove/studio-base/components/Panel";
 import PanelToolbar from "@foxglove/studio-base/components/PanelToolbar";
 import SpinningLoadingIcon from "@foxglove/studio-base/components/SpinningLoadingIcon";
@@ -33,7 +34,6 @@ import { useUserNodeState } from "@foxglove/studio-base/context/UserNodeStateCon
 import BottomBar from "@foxglove/studio-base/panels/NodePlayground/BottomBar";
 import Sidebar from "@foxglove/studio-base/panels/NodePlayground/Sidebar";
 import Playground from "@foxglove/studio-base/panels/NodePlayground/playground-icon.svg";
-import { LegacyGlobalInput } from "@foxglove/studio-base/styles/legacyGlobalStyles";
 import { PanelConfigSchema, UserNodes } from "@foxglove/studio-base/types/panels";
 import { DEFAULT_STUDIO_NODE_PREFIX } from "@foxglove/studio-base/util/globalConstants";
 import { colors } from "@foxglove/studio-base/util/sharedStyleConstants";
@@ -288,7 +288,7 @@ function NodePlayground(props: Props) {
             )}
             {selectedNodeId != undefined && selectedNode && (
               <div style={{ position: "relative" }}>
-                <LegacyGlobalInput
+                <LegacyInput
                   type="text"
                   placeholder="node name"
                   value={inputTitle}

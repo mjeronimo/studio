@@ -17,11 +17,11 @@ import { Time } from "@foxglove/rostime";
 import Dropdown from "@foxglove/studio-base/components/Dropdown";
 import DropdownItem from "@foxglove/studio-base/components/Dropdown/DropdownItem";
 import Flex from "@foxglove/studio-base/components/Flex";
+import { LegacyInput } from "@foxglove/studio-base/components/LegacyStyledComponents";
 import {
   useCurrentLayoutActions,
   useCurrentLayoutSelector,
 } from "@foxglove/studio-base/context/CurrentLayoutContext";
-import { LegacyGlobalInput } from "@foxglove/studio-base/styles/legacyGlobalStyles";
 import {
   formatDate,
   formatTime,
@@ -32,7 +32,7 @@ import { formatTimeRaw, isTimeInRangeInclusive } from "@foxglove/studio-base/uti
 
 import styles from "./index.module.scss";
 
-const SInput = styled(LegacyGlobalInput)`
+const SInput = styled(LegacyInput)`
   padding: 8px 4px;
   width: calc(100% - 4px);
 `;

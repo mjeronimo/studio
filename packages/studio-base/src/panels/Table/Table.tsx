@@ -29,10 +29,10 @@ import styled from "styled-components";
 import EmptyState from "@foxglove/studio-base/components/EmptyState";
 import Icon from "@foxglove/studio-base/components/Icon";
 import {
-  LegacyGlobalButton,
+  LegacyButton,
   LegacyGlobalTable,
-  LegacyGlobalSelect,
-} from "@foxglove/studio-base/styles/legacyGlobalStyles";
+  LegacySelect,
+} from "@foxglove/studio-base/components/LegacyStyledComponents";
 import { toolsColorScheme } from "@foxglove/studio-base/util/toolsColorScheme";
 
 import TableCell from "./TableCell";
@@ -241,25 +241,25 @@ export default function Table({
       </LegacyGlobalTable>
       {!isNested && (
         <div style={{ margin: "4px auto 0" }}>
-          <LegacyGlobalButton onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
+          <LegacyButton onClick={() => gotoPage(0)} disabled={!canPreviousPage}>
             {"<<"}
-          </LegacyGlobalButton>{" "}
-          <LegacyGlobalButton onClick={() => previousPage()} disabled={!canPreviousPage}>
+          </LegacyButton>{" "}
+          <LegacyButton onClick={() => previousPage()} disabled={!canPreviousPage}>
             {"<"}
-          </LegacyGlobalButton>{" "}
+          </LegacyButton>{" "}
           <span>
             Page{" "}
             <strong>
               {pageIndex + 1} of {pageOptions.length}
             </strong>{" "}
           </span>
-          <LegacyGlobalButton onClick={() => nextPage()} disabled={!canNextPage}>
+          <LegacyButton onClick={() => nextPage()} disabled={!canNextPage}>
             {">"}
-          </LegacyGlobalButton>{" "}
-          <LegacyGlobalButton onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
+          </LegacyButton>{" "}
+          <LegacyButton onClick={() => gotoPage(pageCount - 1)} disabled={!canNextPage}>
             {">>"}
-          </LegacyGlobalButton>{" "}
-          <LegacyGlobalSelect
+          </LegacyButton>{" "}
+          <LegacySelect
             value={pageSize}
             onChange={(e) => {
               setPageSize(Number(e.target.value));
@@ -270,7 +270,7 @@ export default function Table({
                 Show {size}
               </option>
             ))}
-          </LegacyGlobalSelect>
+          </LegacySelect>
         </div>
       )}
     </>

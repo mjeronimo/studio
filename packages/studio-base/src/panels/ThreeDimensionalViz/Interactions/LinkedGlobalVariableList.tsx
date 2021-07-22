@@ -15,7 +15,7 @@ import LinkPlusIcon from "@mdi/svg/svg/link-plus.svg";
 import styled from "styled-components";
 
 import Icon from "@foxglove/studio-base/components/Icon";
-import { LegacyGlobalTable } from "@foxglove/studio-base/styles/legacyGlobalStyles";
+import { LegacyGlobalTable } from "@foxglove/studio-base/components/LegacyStyledComponents";
 
 import GlobalVariableLink from "./GlobalVariableLink/index";
 import GlobalVariableName from "./GlobalVariableName";

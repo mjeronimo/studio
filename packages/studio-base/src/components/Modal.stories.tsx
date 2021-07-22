@@ -17,9 +17,9 @@ import { storiesOf } from "@storybook/react";
 import ChildToggle from "@foxglove/studio-base/components/ChildToggle";
 import DropdownItem from "@foxglove/studio-base/components/Dropdown/DropdownItem";
 import Dropdown from "@foxglove/studio-base/components/Dropdown/index";
+import { LegacyButton } from "@foxglove/studio-base/components/LegacyStyledComponents";
 import Modal from "@foxglove/studio-base/components/Modal";
 import TextContent from "@foxglove/studio-base/components/TextContent";
-import { LegacyGlobalButton } from "@foxglove/studio-base/styles/legacyGlobalStyles";
 
 function ContentStory({ showChildToggle = false }: { showChildToggle?: boolean }) {
   const renderedRef = React.useRef(false);
@@ -48,7 +48,7 @@ function ContentStory({ showChildToggle = false }: { showChildToggle?: boolean }
       >
         {showChildToggle ? (
           <ChildToggle position="below">
-            <LegacyGlobalButton>Toggle</LegacyGlobalButton>
+            <LegacyButton>Toggle</LegacyButton>
             <p>ChildToggle component inside a Modal</p>
           </ChildToggle>
         ) : (

@@ -49,6 +49,7 @@ import ErrorBoundary from "@foxglove/studio-base/components/ErrorBoundary";
 import Flex from "@foxglove/studio-base/components/Flex";
 import Icon from "@foxglove/studio-base/components/Icon";
 import KeyListener from "@foxglove/studio-base/components/KeyListener";
+import { LegacyButton } from "@foxglove/studio-base/components/LegacyStyledComponents";
 import MultiProvider from "@foxglove/studio-base/components/MultiProvider";
 import PanelContext from "@foxglove/studio-base/components/PanelContext";
 import {
@@ -59,7 +60,6 @@ import { usePanelCatalog } from "@foxglove/studio-base/context/PanelCatalogConte
 import { PanelIdContext } from "@foxglove/studio-base/context/PanelIdContext";
 import { usePanelSettings } from "@foxglove/studio-base/context/PanelSettingsContext";
 import usePanelDrag from "@foxglove/studio-base/hooks/usePanelDrag";
-import { LegacyGlobalButton } from "@foxglove/studio-base/styles/legacyGlobalStyles";
 import { TabPanelConfig } from "@foxglove/studio-base/types/layouts";
 import { PanelConfig, SaveConfig, PanelConfigSchema } from "@foxglove/studio-base/types/panels";
 import { TAB_PANEL_TYPE } from "@foxglove/studio-base/util/globalConstants";
@@ -545,13 +545,13 @@ export default function Panel<Config extends PanelConfig>(
               </div>
             )}
             {fullScreen && (
-              <LegacyGlobalButton
+              <LegacyButton
                 className={styles.exitFullScreen}
                 onClick={exitFullScreen}
                 data-panel-overlay-exit
               >
                 <CloseIcon /> <span>Exit fullscreen</span>
-              </LegacyGlobalButton>
+              </LegacyButton>
             )}
             <ErrorBoundary>
               {PanelComponent.supportsStrictMode ?? true ? (

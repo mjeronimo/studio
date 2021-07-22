@@ -14,10 +14,10 @@
 import React, { useCallback, ComponentType } from "react";
 
 import ErrorBoundary from "@foxglove/studio-base/components/ErrorBoundary";
+import { LegacyButton } from "@foxglove/studio-base/components/LegacyStyledComponents";
 import GridSettingsEditor from "@foxglove/studio-base/panels/ThreeDimensionalViz/TopicSettingsEditor/GridSettingsEditor";
 import { TopicSettingsEditorProps } from "@foxglove/studio-base/panels/ThreeDimensionalViz/TopicSettingsEditor/types";
 import { Topic } from "@foxglove/studio-base/players/types";
-import { LegacyGlobalButton } from "@foxglove/studio-base/styles/legacyGlobalStyles";
 import {
   FOXGLOVE_GRID_DATATYPE,
   NAV_MSGS_PATH_DATATYPE,
@@ -114,9 +114,7 @@ const TopicSettingsEditor = React.memo<Props>(function TopicSettingsEditor({
           onSettingsChange={onSettingsChange}
         />
       </ErrorBoundary>
-      <LegacyGlobalButton onClick={() => onSettingsChange({})}>
-        Reset to defaults
-      </LegacyGlobalButton>
+      <LegacyButton onClick={() => onSettingsChange({})}>Reset to defaults</LegacyButton>
     </div>
   );
 });

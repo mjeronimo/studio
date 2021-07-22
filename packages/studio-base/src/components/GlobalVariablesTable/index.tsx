@@ -18,6 +18,7 @@ import styled, { css, FlattenSimpleInterpolation, keyframes } from "styled-compo
 
 import Flex from "@foxglove/studio-base/components/Flex";
 import Icon from "@foxglove/studio-base/components/Icon";
+import { LegacyGlobalTable } from "@foxglove/studio-base/components/LegacyStyledComponents";
 import Menu, { Item } from "@foxglove/studio-base/components/Menu";
 import Tooltip from "@foxglove/studio-base/components/Tooltip";
 import { JSONInput } from "@foxglove/studio-base/components/input/JSONInput";
@@ -27,7 +28,6 @@ import useGlobalVariables, {
 } from "@foxglove/studio-base/hooks/useGlobalVariables";
 import { usePreviousValue } from "@foxglove/studio-base/hooks/usePreviousValue";
 import useLinkedGlobalVariables from "@foxglove/studio-base/panels/ThreeDimensionalViz/Interactions/useLinkedGlobalVariables";
-import { LegacyGlobalTable } from "@foxglove/studio-base/styles/legacyGlobalStyles";
 import { colors as sharedColors } from "@foxglove/studio-base/util/sharedStyleConstants";
 
 // The minimum amount of time to wait between showing the global variable update animation again

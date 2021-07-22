@@ -21,6 +21,7 @@ import Button from "@foxglove/studio-base/components/Button";
 import ExpandingToolbar, { ToolGroup } from "@foxglove/studio-base/components/ExpandingToolbar";
 import Flex from "@foxglove/studio-base/components/Flex";
 import Icon from "@foxglove/studio-base/components/Icon";
+import { LegacyInput } from "@foxglove/studio-base/components/LegacyStyledComponents";
 import { usePanelContext } from "@foxglove/studio-base/components/PanelContext";
 import Tooltip from "@foxglove/studio-base/components/Tooltip";
 import { JsonInput } from "@foxglove/studio-base/components/ValidatedInput";
@@ -35,7 +36,6 @@ import {
 } from "@foxglove/studio-base/panels/ThreeDimensionalViz/threeDimensionalVizUtils";
 import { ThreeDimensionalVizConfig } from "@foxglove/studio-base/panels/ThreeDimensionalViz/types";
 import colors from "@foxglove/studio-base/styles/colors.module.scss";
-import { LegacyGlobalInput } from "@foxglove/studio-base/styles/legacyGlobalStyles";
 import clipboard from "@foxglove/studio-base/util/clipboard";
 import { point2DValidator, cameraStateValidator } from "@foxglove/studio-base/util/validators";
 
@@ -203,7 +203,7 @@ export default function CameraInfo({
                     <SLabel>Auto sync:</SLabel>
                   </Tooltip>
                   <SValue>
-                    <LegacyGlobalInput
+                    <LegacyInput
                       type="checkbox"
                       checked={autoSyncCameraState}
                       onChange={() =>
@@ -221,7 +221,7 @@ export default function CameraInfo({
                     Show crosshair:
                   </SLabel>
                   <SValue>
-                    <LegacyGlobalInput
+                    <LegacyInput
                       type="checkbox"
                       disabled={cameraState.perspective}
                       checked={showCrosshair}

@@ -16,6 +16,7 @@ import { ReactElement, useEffect, useMemo, useRef, useState } from "react";
 
 import EmptyState from "@foxglove/studio-base/components/EmptyState";
 import { isActiveElementEditable } from "@foxglove/studio-base/components/GlobalVariablesTable";
+import { LegacyGlobalTable } from "@foxglove/studio-base/components/LegacyStyledComponents";
 import {
   MessagePipelineContext,
   useMessagePipeline,
@@ -25,7 +26,6 @@ import PanelToolbar from "@foxglove/studio-base/components/PanelToolbar";
 import { JSONInput } from "@foxglove/studio-base/components/input/JSONInput";
 import { usePreviousValue } from "@foxglove/studio-base/hooks/usePreviousValue";
 import { ParameterValue, PlayerCapabilities } from "@foxglove/studio-base/players/types";
-import { LegacyGlobalTable } from "@foxglove/studio-base/styles/legacyGlobalStyles";
 
 import AnimatedRow from "./AnimatedRow";
 import ParametersPanel from "./ParametersPanel";

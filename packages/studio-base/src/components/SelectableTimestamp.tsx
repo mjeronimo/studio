@@ -17,8 +17,8 @@ import styled from "styled-components";
 import { Time } from "@foxglove/rostime";
 import CopyText from "@foxglove/studio-base/components/CopyText";
 import Icon from "@foxglove/studio-base/components/Icon";
+import { LegacyInput } from "@foxglove/studio-base/components/LegacyStyledComponents";
 import colors from "@foxglove/studio-base/styles/colors.module.scss";
-import { LegacyGlobalInput } from "@foxglove/studio-base/styles/legacyGlobalStyles";
 import mixins from "@foxglove/studio-base/styles/mixins.module.scss";
 import { formatDate, formatTime, parseTimeStr } from "@foxglove/studio-base/util/formatTime";
 import { parseRosTimeStr, clampTime, formatTimeRaw } from "@foxglove/studio-base/util/time";
@@ -62,7 +62,7 @@ const ROSText = styled.div`
   color: rgba(255, 255, 255, 0.5);
 `;
 
-const SInput = styled(LegacyGlobalInput)`
+const SInput = styled(LegacyInput)`
   min-width: 160px;
   padding: 2px 4px;
   background-color: transparentize(${colors.textNormal}, 0.2);

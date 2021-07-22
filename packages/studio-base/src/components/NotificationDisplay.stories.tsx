@@ -15,11 +15,11 @@ import { storiesOf } from "@storybook/react";
 import moment from "moment";
 import { useRef } from "react";
 
+import { LegacyButton } from "@foxglove/studio-base/components/LegacyStyledComponents";
 import NotificationDisplay, {
   NotificationList,
 } from "@foxglove/studio-base/components/NotificationDisplay";
 import NotificationModal from "@foxglove/studio-base/components/NotificationModal";
-import { LegacyGlobalButton } from "@foxglove/studio-base/styles/legacyGlobalStyles";
 import sendNotification, { NotificationMessage } from "@foxglove/studio-base/util/sendNotification";
 
 const randomNum = () => Math.floor(Math.random() * 1000);
@@ -41,9 +41,9 @@ const NotificationDisplayWrapper = () => (
 
 const AddMoreButtons = () => (
   <div style={{ paddingTop: 20 }}>
-    <LegacyGlobalButton onClick={addInfo}>add info</LegacyGlobalButton>
-    <LegacyGlobalButton onClick={addWarning}>add warning</LegacyGlobalButton>
-    <LegacyGlobalButton onClick={addError}>add error</LegacyGlobalButton>
+    <LegacyButton onClick={addInfo}>add info</LegacyButton>
+    <LegacyButton onClick={addWarning}>add warning</LegacyButton>
+    <LegacyButton onClick={addError}>add error</LegacyButton>
   </div>
 );
 

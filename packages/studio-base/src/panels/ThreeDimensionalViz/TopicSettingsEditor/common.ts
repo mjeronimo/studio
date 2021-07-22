@@ -12,7 +12,7 @@
 //   You may not use this file except in compliance with the License.
 import styled from "styled-components";
 
-import { LegacyGlobalInput } from "@foxglove/studio-base/styles/legacyGlobalStyles";
+import { LegacyInput } from "@foxglove/studio-base/components/LegacyStyledComponents";
 
 export const SLabel = styled.label<{ strikethrough?: boolean }>`
   display: block;
@@ -27,7 +27,7 @@ export const SDescription = styled.label`
   line-height: 1.2;
 `;
 
-export const SInput = styled(LegacyGlobalInput)`
+export const SInput = styled(LegacyInput)`
   flex: 1 1 auto;
   margin-bottom: 8px;
 `;

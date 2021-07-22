@@ -21,11 +21,11 @@ import { useDataSourceInfo } from "@foxglove/studio-base/PanelAPI";
 import EmptyState from "@foxglove/studio-base/components/EmptyState";
 import Flex from "@foxglove/studio-base/components/Flex";
 import Icon from "@foxglove/studio-base/components/Icon";
+import { LegacyInput } from "@foxglove/studio-base/components/LegacyStyledComponents";
 import Panel from "@foxglove/studio-base/components/Panel";
 import { usePanelContext } from "@foxglove/studio-base/components/PanelContext";
 import PanelToolbar from "@foxglove/studio-base/components/PanelToolbar";
 import TopicToRenderMenu from "@foxglove/studio-base/components/TopicToRenderMenu";
-import { LegacyGlobalInput } from "@foxglove/studio-base/styles/legacyGlobalStyles";
 import { PanelConfigSchema } from "@foxglove/studio-base/types/panels";
 import filterMap from "@foxglove/studio-base/util/filterMap";
 import { DIAGNOSTIC_TOPIC } from "@foxglove/studio-base/util/globalConstants";
@@ -142,7 +142,7 @@ function DiagnosticSummary(props: Props): JSX.Element {
   );
 
   const hardwareFilter = (
-    <LegacyGlobalInput
+    <LegacyInput
       style={{ width: "100%", padding: "0", background: "transparent", opacity: "0.5" }}
       value={hardwareIdFilter}
       placeholder={"Filter hardware id"}
