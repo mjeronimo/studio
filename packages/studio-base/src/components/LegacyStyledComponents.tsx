@@ -16,6 +16,7 @@ export const LegacyButton = styled.button`
   border-radius: 4px;
   border: none;
   color: ${sharedColors.TEXT_CONTROL};
+  font: inherit;
   font-family: ${SANS_SERIF};
   font-size: 100%;
   margin: ${spacing.CONTROL_MARGIN};
@@ -63,6 +64,7 @@ export const LegacyInput = styled.input`
   border-radius: 4px;
   border: none;
   color: ${sharedColors.TEXT_CONTROL};
+  font: inherit;
   font-family: ${SANS_SERIF};
   font-size: 100%;
   margin: ${spacing.CONTROL_MARGIN};
@@ -88,6 +90,7 @@ export const LegacyTextarea = styled.textarea`
   border-radius: 4px;
   border: 2px solid ${sharedColors.TEXT_NORMAL};
   color: ${sharedColors.TEXT_NORMAL};
+  font: inherit;
   font-family: ${MONOSPACE};
   font-size: 100%;
   margin: ${spacing.CONTROL_MARGIN};
@@ -112,6 +115,7 @@ export const LegacySelect = styled.select`
   border-radius: 4px;
   border: none;
   color: ${sharedColors.TEXT_CONTROL};
+  font: inherit;
   font-family: ${SANS_SERIF};
   font-size: 100%;
   margin: ${spacing.CONTROL_MARGIN};
