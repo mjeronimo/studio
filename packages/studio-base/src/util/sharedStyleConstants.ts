@@ -88,7 +88,6 @@ export const colors = {
   DIFF_MODE_SOURCE_BOTH: robotStylesColors.DARK7,
   CYAN: "#00ffff",
 
-  // Re-homed from global.scss
   BACKGROUND: "#121217",
   BACKGROUND_CONTROL: "rgba(247, 247, 243, 0.1)",
   BACKGROUND_CONTROL_SELECTED: "rgba(59, 46, 118, 0.6)",
@@ -107,16 +106,10 @@ export const colors = {
 
   DIVIDER: "rgba(247, 247, 243, 0.1)",
 
-  LIGHT1: "#f0f0f0",
-  GREEN: "#05d27d",
-  LIGHT_GREEN: "#5cd6a9",
-  YELLOW: "#f5d358",
   LIGHT_PURPLE: "#b79dca",
   GREY: "#e7e9ef",
   TOOLBAR_FIXED: "#1f1e27",
   ACCENT: "#248eff",
-  ORANGE: "#ccb862",
-  RED: "#ff7c96",
 };
 
 export const spacing = {

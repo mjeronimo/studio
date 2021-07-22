@@ -29,13 +29,14 @@ $row-height: 24px;
 
 .input {
   // Re-homed from global.scss
-  background-color: rgba(255, 255, 255, 0.05);
-  border-radius: 4px;
+  background: transparent !important;
+  border-radius: 0;
   border: none;
-  color: $text-control;
+  color: inherit;
+  flex-grow: 1;
   font-size: 1rem;
-  margin: $control-margin;
-  padding: 8px 12px;
+  margin: 0;
+  padding: 0;
   text-align: left;
   @include ff-sans-serif;
 
@@ -43,18 +44,11 @@ $row-height: 24px;
     color: $text-input-disabled;
     background-color: rgba(255, 255, 255, 0.3);
   }
+
   &:focus {
     background-color: rgba(255, 255, 255, 0.075);
     outline: none;
   }
-
-  // styles for autocomplete
-  flex-grow: 1;
-  margin: 0;
-  padding: 0;
-  background: transparent !important;
-  color: inherit;
-  border-radius: 0;
 
   &::placeholder {
     color: $text-muted;
