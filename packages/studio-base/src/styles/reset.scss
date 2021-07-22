@@ -1,8 +1,21 @@
+/*
+  Make sure everything uses box-sizing: border-box.
+  Per https://www.paulirish.com/2012/box-sizing-border-box-ftw/
+  When changing this, be aware that Mosaic also adds this by default.
+*/
+html {
+  box-sizing: border-box;
+}
+*,
+*:before,
+*:after {
+  box-sizing: inherit;
+}
+
 /* http://meyerweb.com/eric/tools/css/reset/
    v2.0 | 20110126
    License: none (public domain)
 */
-
 html,
 body,
 div,
@@ -130,17 +143,21 @@ th {
   font: inherit;
   text-align: left;
 }
-
-/*
-  Make sure everything uses box-sizing: border-box.
-  Per https://www.paulirish.com/2012/box-sizing-border-box-ftw/
-  When changing this, be aware that Mosaic also adds this by default.
-*/
-html {
-  box-sizing: border-box;
+i,
+em {
+  font-style: italic;
 }
-*,
-*:before,
-*:after {
-  box-sizing: inherit;
+b,
+strong {
+  font-weight: bold;
+}
+p {
+  margin: 1em 0;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+code {
+  padding: 0 0.25em;
 }

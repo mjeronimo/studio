@@ -40,7 +40,6 @@ export default function CssBaseline(): ReactNull {
     ":global(code)": {
       backgroundColor: theme.semanticColors.bodyBackgroundHovered,
       borderRadius: "0.2em",
-      padding: "0 0.25em",
     },
     ":global(div)": {
       "::-webkit-scrollbar": {
@@ -60,20 +59,6 @@ export default function CssBaseline(): ReactNull {
 
       ":hover": {
         color: theme.semanticColors.linkHovered,
-      },
-    },
-    ":global(i, em)": {
-      fontStyle: "italic",
-    },
-    ":global(b, strong)": {
-      fontWeight: "bold",
-      letterSpacing: "0.4px",
-    },
-    "global(p)": {
-      margin: "1em 0",
-
-      ":last-child": {
-        marginBottom: "0",
       },
     },
     ":global(hr)": {
