@@ -17,7 +17,7 @@ export const LegacyButton = styled.button`
   border: none;
   color: ${sharedColors.TEXT_CONTROL};
   font-family: ${SANS_SERIF};
-  font-size: 1rem;
+  font-size: 100%;
   margin: ${spacing.CONTROL_MARGIN};
   padding: 8px 12px;
   position: relative;
@@ -64,7 +64,7 @@ export const LegacyInput = styled.input`
   border: none;
   color: ${sharedColors.TEXT_CONTROL};
   font-family: ${SANS_SERIF};
-  font-size: 1rem;
+  font-size: 100%;
   margin: ${spacing.CONTROL_MARGIN};
   padding: 8px 12px;
   text-align: left;
@@ -89,7 +89,7 @@ export const LegacyTextarea = styled.textarea`
   border: 2px solid ${sharedColors.TEXT_NORMAL};
   color: ${sharedColors.TEXT_NORMAL};
   font-family: ${MONOSPACE};
-  font-size: 1rem;
+  font-size: 100%;
   margin: ${spacing.CONTROL_MARGIN};
   padding: 8px 12px;
   text-align: left;
@@ -113,7 +113,7 @@ export const LegacySelect = styled.select`
   border: none;
   color: ${sharedColors.TEXT_CONTROL};
   font-family: ${SANS_SERIF};
-  font-size: 1rem;
+  font-size: 100%;
   margin: ${spacing.CONTROL_MARGIN};
   padding: 8px 12px;
   text-align: left;
