@@ -125,6 +125,11 @@ table {
   border-collapse: collapse;
   border-spacing: 0;
 }
+td,
+th {
+  font: inherit;
+  text-align: left;
+}
 
 /*
   Make sure everything uses box-sizing: border-box.
