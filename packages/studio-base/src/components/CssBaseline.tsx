@@ -23,8 +23,8 @@ export default function CssBaseline(): ReactNull {
       overflow: "hidden",
       background: theme.semanticColors.bodyBackground,
       color: theme.semanticColors.bodyText,
+      font: "inherit",
       ...theme.fonts.small,
-      fontSize: `${theme.fonts.small.fontSize} !important`,
     },
     ":global(#root)": {
       // ensure portals are able to stack on top of the main app
