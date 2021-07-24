@@ -31,11 +31,6 @@ const polygons = pointsToPolygons([
   ],
 ]);
 
-const containerStyle = {
-  margin: 8,
-  display: "inline-block",
-};
-
 const DEFAULT_PROPS = {
   expanded: true,
   onAlignXYAxis: () => {
@@ -62,11 +57,18 @@ const DEFAULT_PROPS = {
 
 storiesOf("panels/ThreeDimensionalViz/DrawingTools", module).add("Polygon", () => {
   return (
-    <div style={containerStyle}>
-      <div style={{ margin: 8 }}>
+    <div
+      style={{
+        margin: "8px",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-end",
+      }}
+    >
+      <div>
         <DrawingTools {...DEFAULT_PROPS} defaultSelectedTab={POLYGON_TAB_TYPE} />
       </div>
-      <div style={{ margin: 8 }}>
+      <div>
         <DrawingTools {...DEFAULT_PROPS} defaultSelectedTab={POLYGON_TAB_TYPE} />
       </div>
     </div>

@@ -86,7 +86,6 @@ export default function ExpandingToolbar<T extends string>({
         onClick={() => onSelectTab(selectedTabLocal)}
         styles={{
           root: {
-            margin: 0, // Remove this once global.scss is gone
             marginBottom: theme.spacing.s2,
             marginTop: theme.spacing.s2,
             backgroundColor: theme.semanticColors.buttonBackgroundHovered,
@@ -115,11 +114,10 @@ export default function ExpandingToolbar<T extends string>({
 
   return (
     <div className={cx(className, classes.root)}>
-      <Stack horizontal>
+      <Stack>
         <Pivot
           styles={{
             root: {
-              paddingLeft: theme.spacing.s2,
               paddingRight: `calc(${theme.spacing.l2} + ${theme.spacing.l2})`,
             },
             link: {
@@ -142,7 +140,7 @@ export default function ExpandingToolbar<T extends string>({
               position: "absolute",
               top: 0,
               right: 0,
-              margin: theme.spacing.s2,
+              margin: `${theme.spacing.s2} !important`,
             },
             icon: {
               height: 20,
