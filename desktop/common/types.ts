@@ -44,25 +44,31 @@ interface Storage {
 }
 
 type DesktopExtension = {
-  name: string;
+  id: string;
   packageJson: unknown;
-  source: string;
+  directory: string;
 };
 
 interface Desktop {
-  /**
-   * Initiate login in an external browser and return a parameter string sent back from the login
-   * flow
-   */
-  authenticateViaExternalBrowser: () => Promise<string>;
-
   handleToolbarDoubleClick: () => void;
+
+  debug_openFakeRemoteLayoutStorageDirectory: () => Promise<void>;
 
   // Get an array of deep links provided on app launch
   getDeepLinks: () => string[];
 
   // Get an array of available extensions and parsed package.json files
   getExtensions: () => Promise<DesktopExtension[]>;
+
+  // Load the source code for an extension
+  loadExtension: (id: string) => Promise<string>;
+
+  // Install a Foxglove Studio extension (.foxe file) locally. The extension id is returned
+  installExtension: (foxeFileData: Uint8Array) => Promise<DesktopExtension>;
+
+  // Uninstall an extension. Returns true if the extension was found and uninstalled, or false if it
+  // was not found (i.e. already uninstalled)
+  uninstallExtension: (id: string) => Promise<boolean>;
 }
 
 export type { NativeMenuBridge, Storage, StorageContent, Desktop, DesktopExtension };

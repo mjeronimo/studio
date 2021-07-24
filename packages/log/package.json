@@ -1,6 +1,5 @@
 {
   "name": "@foxglove/log",
-  "version": "0.0.0",
   "license": "MPL-2.0",
   "private": true,
   "repository": {
@@ -21,6 +20,6 @@
     "prepack": "tsc -b"
   },
   "devDependencies": {
-    "typescript": "4.3.2"
+    "typescript": "4.3.5"
   }
 }

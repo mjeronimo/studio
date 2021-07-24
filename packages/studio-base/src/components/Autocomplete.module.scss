@@ -1,0 +1,69 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/
+//
+// This file incorporates work covered by the following copyright and
+// permission notice:
+//
+//   Copyright 2018-2021 Cruise LLC
+//
+//   This source code is licensed under the Apache License, Version 2.0,
+//   found at http://www.apache.org/licenses/LICENSE-2.0
+//   You may not use this file except in compliance with the License.
+
+@import "@foxglove/studio-base/styles/mixins.module.scss";
+
+$row-height: 24px;
+
+.root {
+  border-radius: 3px;
+  border-top-left-radius: 0;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  overflow: auto;
+  background: $dark3;
+  z-index: 1;
+  margin-left: -6px;
+}
+
+.input {
+  flex-grow: 1;
+  margin: 0;
+  padding: 0;
+  background: transparent !important;
+  color: inherit;
+  border-radius: 0;
+
+  &::placeholder {
+    color: $text-muted;
+  }
+
+  // Add this because the placeholder selector doesn't seem well supported by screenshots.
+  &.placeholder {
+    color: $text-muted;
+  }
+
+  &.inputError {
+    color: $red;
+  }
+}
+
+.autocompleteItem {
+  padding: 6px;
+  cursor: pointer;
+  min-height: $row-height;
+  line-height: $row-height - 10px;
+  overflow-wrap: break-word;
+  color: $text-normal;
+}
+
+.selected {
+  background-color: $dark5;
+}
+.highlighted {
+  background-color: $dark4;
+}
+
+:export {
+  rowHeight: div($row-height, 1px);
+}

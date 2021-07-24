@@ -16,11 +16,13 @@
 // More detailed discussion at:
 // https://github.com/typescript-eslint/typescript-eslint/issues/1192#issuecomment-846491212
 {
-  "extends": "@foxglove/tsconfig/tsconfig.base.json",
-  "include": ["**/*", "app/.storybook/**/*"],
-  "exclude": ["node_modules"],
+  "extends": "@foxglove/tsconfig/base",
+  "include": ["**/*", "packages/studio-base/src/.storybook/**/*"],
   "compilerOptions": {
+    "jsx": "react-jsx",
     "lib": ["dom", "dom.iterable", "es2020"],
-    "jsx": "react-jsx"
+    "paths": {
+      "@foxglove/studio-base/*": ["./packages/studio-base/src/*"]
+    }
   }
 }

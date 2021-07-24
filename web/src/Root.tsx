@@ -2,9 +2,6 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/
 
-import type { FirebaseOptions } from "@firebase/app";
-import { useMemo } from "react";
-
 import {
   App,
   ErrorBoundary,
@@ -14,47 +11,63 @@ import {
   UserProfileLocalStorageProvider,
   StudioToastProvider,
 } from "@foxglove/studio-base";
-import { FirebaseAppProvider } from "@foxglove/studio-firebase";
 
-import AppConfigurationProvider from "./components/AppConfigurationProvider";
-import NoOpLayoutStorageProvider from "./components/NoOpLayoutStorageProvider";
+import LocalStorageAppConfigurationProvider from "./components/LocalStorageAppConfigurationProvider";
+import LocalStorageLayoutCacheProvider from "./components/LocalStorageLayoutCacheProvider";
 import ExtensionLoaderProvider from "./providers/ExtensionLoaderProvider";
-import FirebasePopupAuthProvider from "./providers/FirebasePopupAuthProvider";
 
-const DEMO_BAG_URL = "fixme"; //https://storage.googleapis.com/foxglove-public-assets/demo.bag";
+const DEMO_BAG_URL = "https://storage.googleapis.com/foxglove-public-assets/demo.bag";
 
-export default function Root(): JSX.Element {
+export function Root({ loadWelcomeLayout }: { loadWelcomeLayout: boolean }): JSX.Element {
   const playerSources: PlayerSourceDefinition[] = [
     {
+      name: "ROS 1",
+      type: "ros1-socket",
+      disabledReason: (
+        <>
+          ROS 1 Native connections are only available in our desktop app.&nbsp;
+          <a href="https://foxglove.dev/download" target="_blank" rel="noreferrer">
+            Download it here.
+          </a>
+        </>
+      ),
+    },
+    {
       name: "Rosbridge (WebSocket)",
-      type: "ws",
+      type: "ros-ws",
     },
     {
-      name: "Bag File (local)",
-      type: "file",
+      name: "ROS 1 Bag File (local)",
+      type: "ros1-local-bagfile",
     },
     {
-      name: "Bag File (HTTP)",
-      type: "http",
+      name: "ROS 1 Bag File (HTTP)",
+      type: "ros1-remote-bagfile",
+    },
+    {
+      name: "ROS 2 Bag Folder (local)",
+      type: "ros2-folder",
+    },
+    {
+      name: "Velodyne LIDAR",
+      type: "velodyne-device",
+      disabledReason: (
+        <>
+          Velodyne connections are only available in our desktop app.&nbsp;
+          <a href="https://foxglove.dev/download" target="_blank" rel="noreferrer">
+            Download it here.
+          </a>
+        </>
+      ),
     },
   ];
-
-  const firebaseConfig = useMemo(() => {
-    const config = process.env.FIREBASE_CONFIG;
-    if (config == undefined) {
-      throw new Error("Firebase is not configured");
-    }
-    return JSON.parse(config) as FirebaseOptions;
-  }, []);
 
   const providers = [
     /* eslint-disable react/jsx-key */
     <StudioToastProvider />,
-    <AppConfigurationProvider />,
-    <NoOpLayoutStorageProvider />,
+    <LocalStorageAppConfigurationProvider />,
+    <LocalStorageLayoutCacheProvider />,
     <UserProfileLocalStorageProvider />,
-    <FirebaseAppProvider config={firebaseConfig} />,
-    <FirebasePopupAuthProvider />,
     <ExtensionLoaderProvider />,
     /* eslint-enable react/jsx-key */
   ];
@@ -63,7 +76,11 @@ export default function Root(): JSX.Element {
     <ThemeProvider>
       <ErrorBoundary>
         <MultiProvider providers={providers}>
-          <App demoBagUrl={DEMO_BAG_URL} availableSources={playerSources} />
+          <App
+            loadWelcomeLayout={loadWelcomeLayout}
+            demoBagUrl={DEMO_BAG_URL}
+            availableSources={playerSources}
+          />
         </MultiProvider>
       </ErrorBoundary>
     </ThemeProvider>

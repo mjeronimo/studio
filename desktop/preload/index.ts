@@ -10,12 +10,12 @@ import { join as pathJoin } from "path";
 
 import { PreloaderSockets } from "@foxglove/electron-socket/preloader";
 import Logger from "@foxglove/log";
-import { NetworkInterface, OsContext } from "@foxglove/studio-base/OsContext";
+import { NetworkInterface, OsContext } from "@foxglove/studio-base/src/OsContext";
 
 import pkgInfo from "../../package.json";
 import { Desktop, ForwardedMenuEvent, NativeMenuBridge, Storage } from "../common/types";
 import LocalFileStorage from "./LocalFileStorage";
-import { loadExtensions } from "./extensions";
+import { getExtensions, loadExtension, installExtension, uninstallExtension } from "./extensions";
 
 const log = Logger.getLogger(__filename);
 
@@ -46,7 +46,9 @@ type IpcListener = (ev: unknown, ...args: unknown[]) => void;
 const menuClickListeners = new Map<string, IpcListener>();
 
 // Initialize the RPC channel for electron-socket asynchronously
-PreloaderSockets.Create();
+PreloaderSockets.Create().catch((err) => {
+  log.error("Failed to initialize preloader sockets", err);
+});
 
 window.addEventListener(
   "DOMContentLoaded",
@@ -60,7 +62,7 @@ window.addEventListener(
     document.body.appendChild(input);
 
     // let main know we are ready to accept open-file requests
-    ipcRenderer.invoke("load-pending-files");
+    void ipcRenderer.invoke("load-pending-files");
   },
   { once: true },
 );
@@ -92,8 +94,8 @@ const ctx: OsContext = {
     }
     return output;
   },
-  getMachineId: (): Promise<string> => {
-    return machineIdPromise;
+  getMachineId: async (): Promise<string> => {
+    return await machineIdPromise;
   },
   getAppVersion: (): string => {
     return pkgInfo.version;
@@ -101,24 +103,35 @@ const ctx: OsContext = {
 };
 
 const desktopBridge: Desktop = {
-  authenticateViaExternalBrowser: async (): Promise<string> => {
-    return ipcRenderer.invoke("authenticateViaExternalBrowser");
-  },
   handleToolbarDoubleClick() {
     ipcRenderer.send("window.toolbar-double-clicked");
   },
   getDeepLinks(): string[] {
     return window.process.argv.filter((arg) => arg.startsWith("foxglove://"));
   },
+  async debug_openFakeRemoteLayoutStorageDirectory(): Promise<void> {
+    return await ipcRenderer.invoke("debug_openFakeRemoteLayoutStorageDirectory");
+  },
   async getExtensions() {
-    const builtinRoot = pathJoin(__dirname, "..", "extensions");
-    const builtinExtensions = await loadExtensions(builtinRoot);
-
     const homePath = (await ipcRenderer.invoke("getHomePath")) as string;
     const userExtensionRoot = pathJoin(homePath, ".foxglove-studio", "extensions");
-    const userExtensions = await loadExtensions(userExtensionRoot);
-
-    return [...builtinExtensions, ...userExtensions];
+    const userExtensions = await getExtensions(userExtensionRoot);
+    return userExtensions;
+  },
+  async loadExtension(id: string) {
+    const homePath = (await ipcRenderer.invoke("getHomePath")) as string;
+    const userExtensionRoot = pathJoin(homePath, ".foxglove-studio", "extensions");
+    return await loadExtension(id, userExtensionRoot);
+  },
+  async installExtension(foxeFileData: Uint8Array) {
+    const homePath = (await ipcRenderer.invoke("getHomePath")) as string;
+    const userExtensionRoot = pathJoin(homePath, ".foxglove-studio", "extensions");
+    return await installExtension(foxeFileData, userExtensionRoot);
+  },
+  async uninstallExtension(id: string): Promise<boolean> {
+    const homePath = (await ipcRenderer.invoke("getHomePath")) as string;
+    const userExtensionRoot = pathJoin(homePath, ".foxglove-studio", "extensions");
+    return await uninstallExtension(id, userExtensionRoot);
   },
 };
 
@@ -156,7 +169,7 @@ const menuBridge: NativeMenuBridge = {
   },
   async menuRemoveInputSource(name: string) {
     const listener = menuClickListeners.get(name);
-    if (listener === undefined) {
+    if (listener == undefined) {
       return;
     }
     menuClickListeners.delete(name);

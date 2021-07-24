@@ -16,7 +16,7 @@ import {
 import path from "path";
 
 import Logger from "@foxglove/log";
-import colors from "@foxglove/studio-base/styles/colors.module.scss";
+import colors from "@foxglove/studio-base/src/styles/colors.module.scss";
 
 import pkgInfo from "../../package.json";
 import getDevModeIcon from "./getDevModeIcon";
@@ -97,7 +97,19 @@ function newStudioWindow(deepLinks: string[] = []): BrowserWindow {
   // but using that causes the app to freeze when a new window is opened.
   browserWindow.webContents.on("new-window", (event, url) => {
     event.preventDefault();
-    shell.openExternal(url);
+    void shell.openExternal(url);
+  });
+
+  browserWindow.webContents.on("will-navigate", (event, reqUrl) => {
+    // if the target url is not the same as our host then force open in a browser
+    // URL.host includes the port - so this works for localhost servers vs webpack dev server
+    const targetHost = new URL(reqUrl).host;
+    const currentHost = new URL(browserWindow.webContents.getURL()).host;
+    const isExternal = targetHost !== currentHost;
+    if (isExternal) {
+      event.preventDefault();
+      void shell.openExternal(reqUrl);
+    }
   });
 
   browserWindow.webContents.on("ipc-message", (_event: unknown, channel: string) => {
@@ -107,7 +119,11 @@ function newStudioWindow(deepLinks: string[] = []): BrowserWindow {
       if (action === "Minimize") {
         browserWindow.minimize();
       } else if (action === "Maximize") {
-        browserWindow.isMaximized() ? browserWindow.unmaximize() : browserWindow.maximize();
+        if (browserWindow.isMaximized()) {
+          browserWindow.unmaximize();
+        } else {
+          browserWindow.maximize();
+        }
       } else {
         // "None"
       }
@@ -251,7 +267,7 @@ function buildMenu(browserWindow: BrowserWindow): Menu {
   });
 
   const showAboutDialog = () => {
-    dialog.showMessageBox(browserWindow, {
+    void dialog.showMessageBox(browserWindow, {
       type: "info",
       title: `About ${pkgInfo.productName}`,
       message: pkgInfo.productName,
@@ -277,7 +293,7 @@ function buildMenu(browserWindow: BrowserWindow): Menu {
       },
       {
         label: "Learn More",
-        click: async () => shell.openExternal("https://foxglove.dev"),
+        click: async () => await shell.openExternal("https://foxglove.dev"),
       },
       ...(isMac
         ? []
@@ -351,9 +367,14 @@ class StudioWindow {
   load(): void {
     // load after setting windowsById so any ipc handlers with id lookup work
     log.info(`window.loadURL(${rendererPath})`);
-    this._window.loadURL(rendererPath).then(() => {
-      log.info("window URL loaded");
-    });
+    this._window
+      .loadURL(rendererPath)
+      .then(() => {
+        log.info("window URL loaded");
+      })
+      .catch((err) => {
+        log.error("loadURL error", err);
+      });
   }
 
   addInputSource(name: string): void {

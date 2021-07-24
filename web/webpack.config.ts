@@ -6,7 +6,6 @@ import ReactRefreshPlugin from "@pmmmwh/react-refresh-webpack-plugin";
 import SentryWebpackPlugin from "@sentry/webpack-plugin";
 import { CleanWebpackPlugin } from "clean-webpack-plugin";
 import CopyPlugin from "copy-webpack-plugin";
-import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin";
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import path from "path";
 import { Configuration, EnvironmentPlugin, WebpackPluginInstance } from "webpack";
@@ -14,8 +13,6 @@ import type { Configuration as WebpackDevServerConfiguration } from "webpack-dev
 
 import type { WebpackArgv } from "@foxglove/studio-base/WebpackArgv";
 import { makeConfig } from "@foxglove/studio-base/webpack";
-
-import extensions from "./webpack.extensions.config";
 
 interface WebpackConfiguration extends Configuration {
   devServer?: WebpackDevServerConfiguration;
@@ -91,8 +88,8 @@ const mainConfig = (env: unknown, argv: WebpackArgv): Configuration => {
     ...appWebpackConfig,
 
     target: "web",
-    context: path.resolve(__dirname),
-    entry: "./src/index.tsx",
+    context: path.resolve(__dirname, "src"),
+    entry: "./index.tsx",
     devtool: isDev ? "eval-cheap-module-source-map" : "source-map",
 
     output: {
@@ -109,22 +106,11 @@ const mainConfig = (env: unknown, argv: WebpackArgv): Configuration => {
         AMPLITUDE_API_KEY: process.env.AMPLITUDE_API_KEY ?? null, // eslint-disable-line no-restricted-syntax
         SIGNUP_API_URL: "https://foxglove.dev/api/signup",
         SLACK_INVITE_URL: "https://foxglove.dev/join-slack",
-        FIREBASE_CONFIG: JSON.stringify({
-          apiKey: "AIzaSyCNoiuCap8m0BYUde0wiiuP8k1cXmTpKN0",
-          authDomain: "foxglove-studio-testing.firebaseapp.com",
-          projectId: "foxglove-studio-testing",
-          storageBucket: "foxglove-studio-testing.appspot.com",
-          messagingSenderId: "667544771216",
-          appId: "1:667544771216:web:f8e6d9705a3c28e73a5615",
-        }),
-      }),
-      new ForkTsCheckerWebpackPlugin({
-        typescript: {
-          configFile: "src/tsconfig.json",
-        },
+        OAUTH_CLIENT_ID: process.env.OAUTH_CLIENT_ID ?? "oSJGEAQm16LNF09FSVTMYJO5aArQzq8o",
+        FOXGLOVE_API_URL: process.env.FOXGLOVE_API_URL ?? "http://api.foxglove.dev",
       }),
       new CopyPlugin({
-        patterns: [{ from: "public" }],
+        patterns: [{ from: "../public" }],
       }),
       new HtmlWebpackPlugin({
         templateContent: `
@@ -136,6 +122,11 @@ const mainConfig = (env: unknown, argv: WebpackArgv): Configuration => {
       <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
       <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
       <title>Foxglove Studio</title>
+      ${
+        isDev
+          ? ""
+          : '<script src="https://chicken.foxglove.dev/script.js" data-site="NJCSCNBX" defer></script>'
+      }
     </head>
     <script>
       global = globalThis;
@@ -157,4 +148,4 @@ const mainConfig = (env: unknown, argv: WebpackArgv): Configuration => {
   return config;
 };
 
-export default [devServerConfig, mainConfig, extensions];
+export default [devServerConfig, mainConfig];

@@ -2,7 +2,6 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/
 
-import type { FirebaseOptions } from "@firebase/app";
 import { ReactElement, useCallback, useMemo } from "react";
 
 import {
@@ -14,14 +13,13 @@ import {
   UserProfileLocalStorageProvider,
   StudioToastProvider,
 } from "@foxglove/studio-base";
-import { FirebaseAppProvider } from "@foxglove/studio-firebase";
 
 import { Desktop } from "../common/types";
 import NativeAppMenuProvider from "./components/NativeAppMenuProvider";
 import NativeStorageAppConfigurationProvider from "./components/NativeStorageAppConfigurationProvider";
-import NativeStorageLayoutStorageProvider from "./components/NativeStorageLayoutStorageProvider";
+import NativeStorageLayoutCacheProvider from "./components/NativeStorageLayoutCacheProvider";
 import ExtensionLoaderProvider from "./providers/ExtensionLoaderProvider";
-import ExternalBrowserFirebaseAuthProvider from "./providers/ExternalBrowserFirebaseAuthProvider";
+import FakeLayoutStorageProviders from "./providers/FakeLayoutStorageProviders";
 
 const DEMO_BAG_URL = "https://storage.googleapis.com/foxglove-public-assets/demo.bag";
 
@@ -30,40 +28,39 @@ const desktopBridge = (global as unknown as { desktopBridge: Desktop }).desktopB
 export default function Root(): ReactElement {
   const playerSources: PlayerSourceDefinition[] = [
     {
-      name: "ROS",
-      type: "ros1-core",
+      name: "ROS 1",
+      type: "ros1-socket",
     },
     {
       name: "Rosbridge (WebSocket)",
-      type: "ws",
+      type: "ros-ws",
     },
     {
-      name: "Bag File (local)",
-      type: "file",
+      name: "ROS 1 Bag File (local)",
+      type: "ros1-local-bagfile",
     },
     {
-      name: "Bag File (HTTP)",
-      type: "http",
+      name: "ROS 1 Bag File (HTTP)",
+      type: "ros1-remote-bagfile",
+    },
+    {
+      name: "ROS 2 Bag Folder (local)",
+      type: "ros2-folder",
+    },
+    {
+      name: "Velodyne LIDAR",
+      type: "velodyne-device",
     },
   ];
-
-  const firebaseConfig = useMemo(() => {
-    const config = process.env.FIREBASE_CONFIG;
-    if (config == undefined) {
-      throw new Error("Firebase is not configured");
-    }
-    return JSON.parse(config) as FirebaseOptions;
-  }, []);
 
   const providers = [
     /* eslint-disable react/jsx-key */
     <StudioToastProvider />,
     <NativeStorageAppConfigurationProvider />,
-    <NativeStorageLayoutStorageProvider />,
+    <NativeStorageLayoutCacheProvider />,
+    <FakeLayoutStorageProviders />,
     <NativeAppMenuProvider />,
     <UserProfileLocalStorageProvider />,
-    <FirebaseAppProvider config={firebaseConfig} />,
-    <ExternalBrowserFirebaseAuthProvider />,
     <ExtensionLoaderProvider />,
     /* eslint-enable react/jsx-key */
   ];

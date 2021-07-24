@@ -1,8 +1,33 @@
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/
+//
+// This file incorporates work covered by the following copyright and
+// permission notice:
+//
+//   Copyright 2018-2021 Cruise LLC
+//
+//   This source code is licensed under the Apache License, Version 2.0,
+//   found at http://www.apache.org/licenses/LICENSE-2.0
+//   You may not use this file except in compliance with the License.
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
+
+import type REGL from "regl";
+
+// Support for nested like "foo.length" in regl props
+type PropType<Props, Key> = Key extends `${infer K1}.${infer K2}`
+  ? PropType<PropType<Props, K1>, K2>
+  : Props[Key];
+
+// Overrides regl's definition of prop for better type inference
+declare module "regl" {
+  export interface Regl {
+    prop<Context extends REGL.DefaultContext, Props, K extends string>(
+      key: K,
+    ): REGL.MaybeDynamic<PropType<Props, K>, Context, Props>;
+  }
+}
 
 declare module "regl-worldview" {
   export interface Color {
@@ -12,19 +37,43 @@ declare module "regl-worldview" {
     a: number;
   }
 
+  type Point = { x: number; y: number; z: number };
+  type Position = Point;
+  type Orientation = { x: number; y: number; z: number; w: number };
+  type Pose = { position: Position; orientation: Orientation };
+
   class PolygonBuilder {
     polygons: any;
     onChange: any;
 
     constructor(polygons?: Polygon[]);
+
+    onMouseMove: MouseHandler;
+    onMouseUp: MouseHandler;
+    onDoubleClick: MouseHandler;
+    onMouseDown: MouseHandler;
   }
 
   interface CommonCommandProps {
     layerIndex?: any;
   }
 
+  export class Ray {
+    origin: Vec3;
+    dir: Vec3;
+    point: Vec3;
+    distanceToPoint(point: Vec3): number;
+    // eslint-disable-next-line no-restricted-syntax
+    planeIntersection(planeCoordinate: Vec3, planeNormal: Vec3): Vec3 | null;
+  }
+
+  type ClickedObject = {
+    object: unknown;
+    instanceIndex?: number;
+  };
   interface ReglClickInfo {
-    ray: any;
+    ray: Ray;
+    objects: ClickedObject[];
   }
 
   interface Arrow {
@@ -38,12 +87,22 @@ declare module "regl-worldview" {
   function pointToVec3(arg: any): any;
   function orientationToVec4(arg: any): any;
   function vec3ToPoint(arg: any): any;
-  function withPose(arg: any): any;
+  function withPose<Uniforms, Attributes, Props, OwnContext, ParentContext>(
+    arg: REGL.DrawConfig<Uniforms, Attributes, Props, OwnContext, ParentContext>,
+  ): REGL.DrawConfig<Uniforms, Attributes, Props, OwnContext, ParentContext>;
   function parseGLB(arg: any): any;
   function vec4ToRGBA(arg: any): any;
   function toRGBA(arg: any): any;
-  function nonInstancedGetChildrenForHitmap(arg: any): any;
-  function getChildrenForHitmapWithOriginalMarker(arg0: any, arg1: any, arg2: any): any;
+  function nonInstancedGetChildrenForHitmap<T>(
+    props: T,
+    assignNextColors: AssignNextColorsFn,
+    excludedObjects: MouseEventObject[],
+  ): T extends unknown[] ? T : T | undefined;
+  function getChildrenForHitmapWithOriginalMarker<T>(
+    props: T,
+    assignNextColors: AssignNextColorsFn,
+    excludedObjects: MouseEventObject[],
+  ): T extends unknown[] ? T : T | undefined;
   function shouldConvert(arg: any): any;
 
   // jsx elements
@@ -65,7 +124,7 @@ declare module "regl-worldview" {
   }
 
   type MouseEventObject = {
-    object: any;
+    object: BaseShape;
     instanceIndex?: number;
   };
   type Vec3 = readonly [number, number, number];
@@ -85,11 +144,20 @@ declare module "regl-worldview" {
   type CameraStateSelectors = any;
   type Scale = any;
   type Pose = any;
-  type Regl = any;
-  type AssignNextColorsFn = any;
-  type Line = any;
+  type Regl = REGL.Regl;
+  type AssignNextColorsFn = (object: unknown, count: number) => Vec4[];
+
+  export type BaseShape = {
+    pose: Pose;
+    scale: Scale;
+    color?: Color | Vec4;
+  };
+  type Line = BaseShape & {
+    points: readonly (Point | Vec3)[];
+    poses?: readonly Pose[];
+  };
   type TriangleList = any;
-  type MouseHandler = any;
+  type MouseHandler = (event: React.MouseEvent, clickInfo: ReglClickInfo) => void;
 
   // vars
   const DEFAULT_CAMERA_STATE: CameraState;
@@ -109,6 +177,19 @@ declare module "regl-worldview" {
       shiftKeys: boolean;
     }>
   >;
+
+  type Dimensions = { width: number; height: number; top: number; left: number };
+  class Overlay<T> extends React.Component<
+    {
+      renderItem: (_: {
+        item: T;
+        coordinates?: Vec3;
+        index: number;
+        dimension: Dimensions;
+      }) => React.ReactNode;
+    },
+    unknown
+  > {}
 
   export {
     DEFAULT_CAMERA_STATE,

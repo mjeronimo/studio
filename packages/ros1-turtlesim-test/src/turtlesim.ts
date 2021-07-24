@@ -11,7 +11,7 @@ import {
   TcpServerNode,
   TcpSocketNode,
 } from "@foxglove/ros1/src/nodejs";
-import { HttpServerNodejs } from "@foxglove/xmlrpc/src/HttpServerNodejs";
+import { HttpServerNodejs } from "@foxglove/xmlrpc/nodejs";
 
 const TURTLESIM_POSE_MSGDEF = `
 float32 x
@@ -51,7 +51,7 @@ async function main() {
       if (rosNode == undefined) {
         return;
       }
-      rosNode.publish("/turtle1/pose", {
+      void rosNode.publish("/turtle1/pose", {
         x: 1,
         y: 0,
         theta: Math.PI,
@@ -68,4 +68,4 @@ async function main() {
   }
 }
 
-main();
+void main();

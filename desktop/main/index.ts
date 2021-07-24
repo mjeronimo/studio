@@ -9,10 +9,12 @@ import { captureException, init as initSentry } from "@sentry/electron";
 import { app, BrowserWindow, ipcMain, Menu, session, nativeTheme, shell } from "electron";
 import { autoUpdater } from "electron-updater";
 import fs from "fs";
+import path from "path";
 
 import Logger from "@foxglove/log";
 
 import pkgInfo from "../../package.json";
+import { DATASTORES_DIR_NAME, FAKE_REMOTE_LAYOUT_STORE_NAME } from "../common/storage";
 import StudioWindow from "./StudioWindow";
 import getDevModeIcon from "./getDevModeIcon";
 import injectFilesToOpen from "./injectFilesToOpen";
@@ -153,9 +155,6 @@ function main() {
   });
 
   const openUrls: string[] = [];
-  let loginPromise:
-    | { resolve: (_: string | undefined) => void; reject: (_: Error) => void }
-    | undefined;
 
   // works on osx - even when app is closed
   // tho it is a bit strange since it isn't clear when this runs...
@@ -167,35 +166,21 @@ function main() {
 
     ev.preventDefault();
 
-    // Note that `new URL(url).pathname` is different between main & preload, so we just use startsWith
-    if (url.startsWith("foxglove://auth/login-complete?")) {
-      loginPromise?.resolve(new URL(url).search);
-      loginPromise = undefined;
+    if (app.isReady()) {
+      new StudioWindow([url]).load();
     } else {
-      if (app.isReady()) {
-        new StudioWindow([url]).load();
-      } else {
-        openUrls.push(url);
-      }
+      openUrls.push(url);
     }
   });
 
-  ipcMain.handle(
-    "authenticateViaExternalBrowser",
-    () =>
-      new Promise<string | undefined>((resolve, reject) => {
-        loginPromise?.resolve(undefined);
-        loginPromise = { resolve, reject };
-        if (process.env.AUTH_URL == undefined) {
-          reject(new Error("Authentication URL not configured."));
-          return;
-        }
-        shell.openExternal("https://foxglove.dev/auth?source=studio").catch((err) => {
-          reject(err);
-          loginPromise = undefined;
-        });
-      }),
-  );
+  ipcMain.handle("debug_openFakeRemoteLayoutStorageDirectory", async () => {
+    const msg = await shell.openPath(
+      path.join(app.getPath("userData"), DATASTORES_DIR_NAME, FAKE_REMOTE_LAYOUT_STORE_NAME),
+    );
+    if (msg !== "") {
+      throw new Error(msg);
+    }
+  });
 
   // support preload lookups for the user data path and home directory
   ipcMain.handle("getUserDataPath", () => app.getPath("userData"));

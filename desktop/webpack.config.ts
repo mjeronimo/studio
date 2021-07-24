@@ -9,16 +9,21 @@ import type { Configuration } from "webpack";
 import type { Configuration as WebpackDevServerConfiguration } from "webpack-dev-server";
 
 import packageJson from "../package.json";
-import extensions from "./webpack.extensions.config";
 import main from "./webpack.main.config";
 import preload from "./webpack.preload.config";
+import quicklook from "./webpack.quicklook.config";
 import renderer from "./webpack.renderer.config";
 
 interface WebpackConfiguration extends Configuration {
   devServer?: WebpackDevServerConfiguration;
 }
 
-// Use a single devServer configuration across all our multi-compiler configs
+const isRelease = process.env.RELEASE != undefined;
+
+// The appdata directory is derived from the product name. To have a separate directory
+// for our production and development builds we change the product name when using dev or serve.
+const productName = isRelease ? packageJson.productName : `${packageJson.productName} Dev`;
+
 const devServerConfig: WebpackConfiguration = {
   // Use empty entry to avoid webpack default fallback to /src
   entry: {},
@@ -44,17 +49,6 @@ const devServerConfig: WebpackConfiguration = {
     //  "[WDS] Disconnected!"
     // Since we are only connecting to localhost, DNS rebinding attacks are not a concern during dev
     disableHostCheck: true,
-
-    // Only renderer and preloader load in the browser and should receive devserver config and hot reloading
-    // main does not work with devserver or hot reloading
-    // (For now) extensions also do not work with hot reloading because we need load the extension as a module
-    // and injecting hot reloading breaks the "library" export we've setup in extensions.config.ts
-    injectClient: (compilerConfig) => {
-      return compilerConfig.name === "renderer" || compilerConfig.name === "preloader";
-    },
-    injectHot: (compilerConfig) => {
-      return compilerConfig.name === "renderer" || compilerConfig.name === "preloader";
-    },
   },
   plugins: [
     new CleanWebpackPlugin(),
@@ -65,7 +59,7 @@ const devServerConfig: WebpackConfiguration = {
       templateContent: JSON.stringify({
         main: "main/main.js",
         name: packageJson.name,
-        productName: packageJson.productName,
+        productName,
         version: packageJson.version,
         description: packageJson.description,
         productDescription: packageJson.productDescription,
@@ -76,4 +70,4 @@ const devServerConfig: WebpackConfiguration = {
   ],
 };
 
-export default [devServerConfig, extensions, main, preload, renderer];
+export default [devServerConfig, main, preload, renderer, quicklook];

@@ -1,10 +1,9 @@
 {
-  "extends": "@foxglove/tsconfig/tsconfig.base.json",
+  "extends": "@foxglove/tsconfig/base",
   "include": ["./src/**/*"],
   "compilerOptions": {
     "module": "commonjs",
     "rootDir": "./src",
     "outDir": "./dist"
-  },
-  "references": [{ "path": "../ros1" }, { "path": "../xmlrpc" }]
+  }
 }

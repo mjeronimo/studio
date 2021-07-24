@@ -6,28 +6,40 @@ import { PropsWithChildren } from "react";
 import { useAsync } from "react-use";
 
 import Logger from "@foxglove/log";
-import { ExtensionDetail, ExtensionLoader, ExtensionLoaderContext } from "@foxglove/studio-base";
+import { ExtensionInfo, ExtensionLoader, ExtensionLoaderContext } from "@foxglove/studio-base";
 
 const log = Logger.getLogger(__filename);
 
-export default function ExtensionRegistryProvider(props: PropsWithChildren<unknown>): JSX.Element {
+// example provider showing how to load extensions from a separate js file
+export default function ExtensionLoaderProvider(props: PropsWithChildren<unknown>): JSX.Element {
   const { value: registry, error } = useAsync(async () => {
     log.info("Fetching builtin extensions");
 
-    const builtinExtensionFetch = await fetch("/builtinextensions.js");
-    const source = await builtinExtensionFetch.text();
+    try {
+      const extensions: ExtensionInfo[] = [];
 
-    const extensions: ExtensionDetail[] = [
-      {
-        name: "builtin",
-        source: source,
-      },
-    ];
+      const loader: ExtensionLoader = {
+        getExtensions: async () => extensions,
+        loadExtension: async (_id: string) => {
+          throw new Error(`not implemented`);
+        },
+        downloadExtension,
+        installExtension,
+        uninstallExtension,
+      };
+      return loader;
+    } catch (err) {
+      log.error(err);
 
-    const loader: ExtensionLoader = {
-      getExtensions: () => Promise.resolve(extensions),
-    };
-    return loader;
+      const loader: ExtensionLoader = {
+        getExtensions: async () => [],
+        loadExtension: async () => "",
+        downloadExtension,
+        installExtension,
+        uninstallExtension,
+      };
+      return loader;
+    }
   }, []);
 
   if (error) {
@@ -43,4 +55,16 @@ export default function ExtensionRegistryProvider(props: PropsWithChildren<unkno
       {props.children}
     </ExtensionLoaderContext.Provider>
   );
+}
+
+async function downloadExtension(_url: string): Promise<Uint8Array> {
+  throw new Error("Please download the desktop app to use extensions");
+}
+
+async function installExtension(_foxeFileData: Uint8Array): Promise<ExtensionInfo> {
+  throw new Error("Please download the desktop app to use extensions");
+}
+
+async function uninstallExtension(_id: string): Promise<boolean> {
+  return false;
 }
