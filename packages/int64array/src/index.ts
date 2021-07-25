@@ -545,11 +545,10 @@ export class I64Array {
    */
   slice(start: number = 0, end: number = this.length): I64Array {
     return new I64Array(
-      new Uint32Array(
-        this.buffer,
-        this.byteOffset,
-        this.length * Uint32Array.BYTES_PER_ELEMENT,
-      ).slice(start * 2, end * 2).buffer,
+      new Uint32Array(this.buffer, this.byteOffset, this.length * 2).slice(
+        start * 2,
+        end * 2,
+      ).buffer,
     );
   }
 
@@ -568,22 +567,41 @@ export class I64Array {
     return this.findIndex(predicate, thisArg) !== -1;
   }
 
+  //FIXME
   //   /**
   //    * Sorts the array.
   //    * @param compareFn The function used to determine the order of the elements. If omitted, the elements are sorted in ascending order.
   //    */
   //   sort(compareFn?: (a: bigint, b: bigint) => number | bigint): this;
 
-  //   /**
-  //    * Gets a new BigInt64Array view of the ArrayBuffer store for this array, referencing the elements
-  //    * at begin, inclusive, up to end, exclusive.
-  //    * @param begin The index of the beginning of the array.
-  //    * @param end The index of the end of the array.
-  //    */
-  //   subarray(begin?: number, end?: number): BigInt64Array;
+  /**
+   * Gets a new BigInt64Array view of the ArrayBuffer store for this array, referencing the elements
+   * at begin, inclusive, up to end, exclusive.
+   * @param begin The index of the beginning of the array.
+   * @param end The index of the end of the array.
+   */
+  subarray(begin: number = 0, end: number = this.length): I64Array {
+    return new I64Array(
+      this.buffer,
+      this.byteOffset + begin * I64Array.BYTES_PER_ELEMENT,
+      end - begin,
+    );
+  }
 
-  //   /** Converts the array to a string by using the current locale. */
-  //   toLocaleString(): string;
+  /** Converts the array to a string by using the current locale. */
+  toLocaleString(...args: unknown[]): string {
+    let result = "";
+    let first = true;
+    for (const value of this) {
+      if (!first) {
+        result += ",";
+      }
+      first = false;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      result += value.toLocaleString(...(args as any));
+    }
+    return result;
+  }
 
   /** Returns a string representation of the array. */
   toString(): string {

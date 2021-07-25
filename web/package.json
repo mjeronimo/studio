@@ -2,6 +2,7 @@
   "name": "web",
   "private": true,
   "dependencies": {
+    "@foxglove/int64array": "workspace:*",
     "@foxglove/studio-base": "workspace:*"
   },
   "devDependencies": {
