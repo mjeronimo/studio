@@ -42,6 +42,34 @@ describe("BigInt64Array", () => {
     expect([...arr]).toEqual([1n, 2n, 3n]);
   });
 
+  it("at", () => {
+    const arr = new I64Array([1n, 2n, 3n]);
+    expect(arr.at(-4)).toBe(undefined);
+    expect(arr.at(-3)).toBe(1n);
+    expect(arr.at(-2)).toBe(2n);
+    expect(arr.at(-1)).toBe(3n);
+    expect(arr.at(0)).toBe(1n);
+    expect(arr.at(1)).toBe(2n);
+    expect(arr.at(2)).toBe(3n);
+    expect(arr.at(4)).toBe(undefined);
+  });
+
+  it("of", () => {
+    const arr = I64Array.of(1n, 2n, 3n);
+    expect(arr.length).toBe(3);
+    expect(arr[0]).toBe(1n);
+    expect(arr[1]).toBe(2n);
+    expect(arr[2]).toBe(3n);
+  });
+
+  it("from", () => {
+    expect(I64Array.from([1n, 2n, 3n] as any)).toEqual(new I64Array([1n, 2n, 3n]));
+    expect(I64Array.from([1, 2, 3] as any)).toEqual(new I64Array([1n, 2n, 3n]));
+    expect(I64Array.from("123" as any)).toEqual(new I64Array([1n, 2n, 3n]));
+  });
+
+  it("copyWithin", () => {});
+
   it("entries", () => {
     const arr = new I64Array([1n, 2n, 3n]);
     expect([...arr.entries()]).toEqual([
@@ -50,4 +78,29 @@ describe("BigInt64Array", () => {
       [2, 3n],
     ]);
   });
+  it("every", () => {});
+  it("fill", () => {});
+  it("filter", () => {});
+  it("find", () => {});
+  it("findIndex", () => {});
+  it("forEach", () => {});
+  it("includes", () => {});
+  it("indexOf", () => {});
+  it("join", () => {});
+  it("keys", () => {});
+  it("lastIndexOf", () => {});
+  it("length", () => {});
+  it("map", () => {});
+  it("reduce", () => {});
+  it("reduceRight", () => {});
+  it("reverse", () => {});
+  it("set", () => {});
+  it("slice", () => {});
+  it("some", () => {});
+  it("sort", () => {});
+  it("subarray", () => {});
+  it("toLocaleString", () => {});
+  it("toString", () => {});
+  it("valueOf", () => {});
+  it("values", () => {});
 });

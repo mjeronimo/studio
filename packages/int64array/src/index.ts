@@ -74,7 +74,7 @@ export class I64Array {
         if (typeof prop === "string" && prop.length > 0) {
           const idx = +prop;
           if (Number.isFinite(idx)) {
-            return target.at(idx);
+            return idx > 0 ? target.at(idx) : undefined;
           }
         }
         return Reflect.get(target, prop, receiver);
@@ -93,6 +93,9 @@ export class I64Array {
   }
 
   private setOne(index: number, value: bigint): void {
+    if (index < 0 || index >= this.length) {
+      return;
+    }
     this.dataView.setUint32(index * I64Array.BYTES_PER_ELEMENT, Number(value & 0xffffffffn));
     this.dataView.setUint32(
       index * I64Array.BYTES_PER_ELEMENT + Uint32Array.BYTES_PER_ELEMENT,
@@ -109,7 +112,11 @@ export class I64Array {
   }
 
   at(idx: number): bigint | undefined {
-    if (idx * I64Array.BYTES_PER_ELEMENT >= this.byteLength) {
+    if (idx < 0) {
+      // eslint-disable-next-line no-param-reassign
+      idx = this.length + idx;
+    }
+    if (idx < 0 || idx >= this.length) {
       return undefined;
     }
     const lo = this.dataView.getUint32(idx * I64Array.BYTES_PER_ELEMENT);
@@ -140,7 +147,7 @@ export class I64Array {
       }
     } else {
       for (let i = 0; i < arrayLike.length; i++) {
-        result.setOne(i, arrayLike[i]! as bigint);
+        result.setOne(i, BigInt(arrayLike[i]! as Parameters<BigIntConstructor>[0]));
       }
     }
     return result;
