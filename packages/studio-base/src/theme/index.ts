@@ -143,7 +143,6 @@ export default createTheme({
         },
       } as Partial<ISpinnerStyles>,
     },
-
     // Custom (non-Fluent) components
     Titlebar: {
       styles: {

@@ -258,6 +258,8 @@ const SearchText = React.memo<SearchTextComponentProps>(function SearchText({
     transforms,
   });
 
+  const hasMatches: boolean = searchTextMatches.length > 0;
+
   // FIXME: Register tooltip
   const searchButton = useTooltip({ contents: "Search text markers", placement: "left" });
 
@@ -304,16 +306,18 @@ const SearchText = React.memo<SearchTextComponentProps>(function SearchText({
         type="text"
         placeholder="Find in scene"
         spellCheck={false}
-        suffix={`${searchTextMatches.length > 0 ? selectedMatchIndex + 1 : "0"} of ${
-          searchTextMatches.length
-        }`}
+        suffix={`${hasMatches ? selectedMatchIndex + 1 : "0"} of ${searchTextMatches.length}`}
         value={searchText}
         styles={{
-          icon: { left: theme.spacing.s1, right: "auto" },
-          field: { padding: `0 ${theme.spacing.s1} 0 ${theme.spacing.l2}` },
+          icon: { left: theme.spacing.s1, right: "auto", height: 20 },
+          field: {
+            padding: `0 ${theme.spacing.s1} 0 ${theme.spacing.l2}`,
+
+            "::placeholder": { opacity: 0.6 },
+          },
           suffix: { backgroundColor: "transparent" },
         }}
-        onChange={(e) => setSearchText(e.target.value)}
+        onChange={(_, newValue) => setSearchText(newValue ?? "")}
         onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
           if (e.key !== "Enter") {
             return;
@@ -329,40 +333,31 @@ const SearchText = React.memo<SearchTextComponentProps>(function SearchText({
         horizontal
         verticalAlign="center"
         tokens={{
-          childrenGap: 2,
+          childrenGap: theme.spacing.s2,
           padding: `0 ${theme.spacing.s2}`,
         }}
       >
         <IconButton
           iconProps={{ iconName: "ChevronUpSmall" }}
           onClick={() => iterateCurrentIndex(-1)}
+          disabled={!hasMatches || searchTextMatches.length === selectedMatchIndex + 1}
           styles={{
-            icon: {
-              height: 18,
-              fontSize: 10,
-            },
-            root: {
-              width: 24,
-            },
+            icon: { height: 18, fontSize: 10 },
+            root: { width: 24 },
           }}
         />
         <IconButton
           iconProps={{ iconName: "ChevronDownSmall" }}
           onClick={() => iterateCurrentIndex(1)}
+          disabled={!hasMatches || selectedMatchIndex === 0}
           styles={{
-            icon: {
-              height: 18,
-              fontSize: 10,
-            },
-            root: {
-              width: 24,
-            },
+            icon: { height: 18, fontSize: 10 },
+            root: { width: 24 },
           }}
         />
       </Stack>
       <IconButton
         onClick={() => toggleSearchTextOpen(false)}
-        tooltip="[esc]"
         iconProps={{ iconName: "Clear" }}
         styles={{
           icon: {
