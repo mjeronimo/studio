@@ -19,11 +19,6 @@ import CameraInfo, {
   CAMERA_TAB_TYPE,
 } from "@foxglove/studio-base/panels/ThreeDimensionalViz/CameraInfo";
 
-const containerStyle = {
-  margin: 8,
-  display: "inline-block",
-};
-
 const DEFAULT_PROPS = {
   cameraState: DEFAULT_CAMERA_STATE,
   targetPose: undefined,
@@ -51,7 +46,14 @@ const DEFAULT_PROPS = {
 };
 
 const CameraInfoWrapper = (props: any) => (
-  <div style={containerStyle}>
+  <div
+    style={{
+      margin: 8,
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "flex-end",
+    }}
+  >
     <MockPanelContextProvider>
       <CameraInfo {...DEFAULT_PROPS} defaultSelectedTab={CAMERA_TAB_TYPE} {...props} />
     </MockPanelContextProvider>

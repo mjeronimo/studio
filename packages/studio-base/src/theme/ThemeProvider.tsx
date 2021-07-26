@@ -74,6 +74,7 @@ const icons: {
   LoopFilled: <LoopIcon strokeWidth={1.875} />,
   Refresh: <Icons.RefreshIcon />,
   Rename: <Icons.RenameIcon />,
+  Search: <Icons.SearchIcon />,
   Settings: <Icons.SettingsIcon />,
   Share: <Icons.ShareIcon />,
   SingleColumnEdit: <Icons.SingleColumnEditIcon />,

@@ -11,7 +11,7 @@
 //   found at http://www.apache.org/licenses/LICENSE-2.0
 //   You may not use this file except in compliance with the License.
 
-import cx from "classnames";
+import { Stack, useTheme } from "@fluentui/react";
 import { PolygonBuilder, MouseEventObject, Polygon } from "regl-worldview";
 
 import CameraInfo from "@foxglove/studio-base/panels/ThreeDimensionalViz/CameraInfo";
@@ -87,6 +87,7 @@ function LayoutToolbar({
   toggleSearchTextOpen,
   transforms,
 }: Props) {
+  const theme = useTheme();
   return (
     <>
       <MeasuringTool
@@ -95,24 +96,37 @@ function LayoutToolbar({
         measurePoints={measureInfo.measurePoints}
         onMeasureInfoChange={setMeasureInfo}
       />
-      <div className={cx(styles.toolbar, styles.right)}>
-        <div className={styles.buttons}>
-          <SearchText
-            searchTextOpen={searchTextOpen}
-            toggleSearchTextOpen={toggleSearchTextOpen}
-            searchText={searchText}
-            setSearchText={setSearchText}
-            setSearchTextMatches={setSearchTextMatches}
-            searchTextMatches={searchTextMatches}
-            searchInputRef={searchInputRef}
-            setSelectedMatchIndex={setSelectedMatchIndex}
-            selectedMatchIndex={selectedMatchIndex}
-            onCameraStateChange={onCameraStateChange}
-            cameraState={cameraState}
-            transforms={transforms}
-            rootTf={rootTf}
-          />
-        </div>
+      <Stack
+        horizontalAlign="end"
+        tokens={{
+          childrenGap: theme.spacing.s1,
+          padding: theme.spacing.s1,
+        }}
+        styles={{
+          root: {
+            position: "absolute",
+            top: theme.spacing.l2,
+            right: 0,
+            zIndex: 101,
+            pointerEvents: "none", // allow mouse events to pass through the empty space in this container element
+          },
+        }}
+      >
+        <SearchText
+          searchTextOpen={searchTextOpen}
+          toggleSearchTextOpen={toggleSearchTextOpen}
+          searchText={searchText}
+          setSearchText={setSearchText}
+          setSearchTextMatches={setSearchTextMatches}
+          searchTextMatches={searchTextMatches}
+          searchInputRef={searchInputRef}
+          setSelectedMatchIndex={setSelectedMatchIndex}
+          selectedMatchIndex={selectedMatchIndex}
+          onCameraStateChange={onCameraStateChange}
+          cameraState={cameraState}
+          transforms={transforms}
+          rootTf={rootTf}
+        />
         <div className={styles.buttons}>
           <FollowTFControl
             transforms={transforms}
@@ -151,7 +165,7 @@ function LayoutToolbar({
           showCrosshair={showCrosshair}
           autoSyncCameraState={autoSyncCameraState}
         />
-      </div>
+      </Stack>
       {!cameraState.perspective && showCrosshair && <Crosshair cameraState={cameraState} />}
       <MeasureMarker measurePoints={measureInfo.measurePoints} />
     </>

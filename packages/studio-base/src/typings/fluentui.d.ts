@@ -56,6 +56,7 @@ declare global {
     | "RectangularClipping"
     | "Refresh"
     | "Rename"
+    | "Search"
     | "Settings"
     | "Share"
     | "SingleColumnEdit"

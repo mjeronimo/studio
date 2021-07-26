@@ -11,25 +11,18 @@
 //   found at http://www.apache.org/licenses/LICENSE-2.0
 //   You may not use this file except in compliance with the License.
 
-import ArrowDownIcon from "@mdi/svg/svg/chevron-down.svg";
-import ArrowUpIcon from "@mdi/svg/svg/chevron-up.svg";
-import CloseIcon from "@mdi/svg/svg/close.svg";
-import SearchIcon from "@mdi/svg/svg/magnify.svg";
+import { IconButton, Stack, TextField, useTheme } from "@fluentui/react";
 import { vec3 } from "gl-matrix";
 import { range, throttle } from "lodash";
 import React, { useState, useRef, useEffect, useCallback, KeyboardEvent } from "react";
 import { CameraState, cameraStateSelectors } from "regl-worldview";
 
-import Button from "@foxglove/studio-base/components/Button";
-import Icon from "@foxglove/studio-base/components/Icon";
-import { LegacyInput } from "@foxglove/studio-base/components/LegacyStyledComponents";
+import { useTooltip } from "@foxglove/studio-base/components/Tooltip";
 import useDeepChangeDetector from "@foxglove/studio-base/hooks/useDeepChangeDetector";
 import { Interactive } from "@foxglove/studio-base/panels/ThreeDimensionalViz/Interactions/types";
-import styles from "@foxglove/studio-base/panels/ThreeDimensionalViz/Layout.module.scss";
 import Transforms from "@foxglove/studio-base/panels/ThreeDimensionalViz/Transforms";
 import { TextMarker, Color } from "@foxglove/studio-base/types/Messages";
 import { isNonEmptyOrUndefined } from "@foxglove/studio-base/util/emptyOrUndefined";
-import { colors } from "@foxglove/studio-base/util/sharedStyleConstants";
 
 export const YELLOW = { r: 1, b: 0, g: 1, a: 1 };
 export const ORANGE = { r: 0.97, g: 0.58, b: 0.02, a: 1 };
@@ -234,6 +227,7 @@ const SearchText = React.memo<SearchTextComponentProps>(function SearchText({
   transforms,
   rootTf,
 }: SearchTextComponentProps) {
+  const theme = useTheme();
   const currentMatch = searchTextMatches[selectedMatchIndex];
   const iterateCurrentIndex = useCallback(
     (iterator: number) => {
@@ -264,66 +258,125 @@ const SearchText = React.memo<SearchTextComponentProps>(function SearchText({
     transforms,
   });
 
+  // FIXME: Register tooltip
+  const searchButton = useTooltip({ contents: "Search text markers", placement: "left" });
+
   if (!searchTextOpen) {
     return (
-      <Button className={styles.iconButton} onClick={() => toggleSearchTextOpen(!searchTextOpen)}>
-        <Icon tooltip="search text markers">
-          <SearchIcon />
-        </Icon>
-      </Button>
+      <IconButton
+        iconProps={{ iconName: "Search" }}
+        onClick={() => toggleSearchTextOpen(!searchTextOpen)}
+        styles={{
+          root: {
+            pointerEvents: "auto",
+            backgroundColor: theme.semanticColors.buttonBackgroundHovered,
+          },
+          rootHovered: {
+            backgroundColor: theme.semanticColors.buttonBackgroundPressed,
+          },
+          icon: { height: 20 },
+        }}
+      />
     );
   }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        flexDirection: "row",
-        padding: "0 4px",
-        height: "36px",
-        /* Hack to match the heights of the other toolbar components */
+    <Stack
+      horizontal
+      verticalAlign="center"
+      tokens={{ padding: theme.spacing.s2 }}
+      styles={{
+        root: {
+          pointerEvents: "auto",
+          backgroundColor: theme.semanticColors.buttonBackgroundHovered,
+          borderRadius: theme.effects.roundedCorner2,
+          position: "relative",
+          marginTop: `-${theme.spacing.s2}`,
+          marginRight: `-${theme.spacing.s2}`,
+          marginBottom: `-${theme.spacing.s2}`,
+        },
       }}
     >
-      <div style={{ backgroundColor: "#1A191F", padding: "0px 4px 0px 8px", borderRadius: "4px" }}>
-        <Icon medium>
-          <SearchIcon />
-        </Icon>
-        <LegacyInput
-          autoFocus
-          ref={searchInputRef}
-          type="text"
-          placeholder="Find in scene"
-          spellCheck={false}
-          value={searchText}
-          style={{ backgroundColor: "transparent" }}
-          onChange={(e) => setSearchText(e.target.value)}
-          onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
-            if (e.key !== "Enter") {
-              return;
-            }
-            if (e.shiftKey) {
-              iterateCurrentIndex(-1);
-              return;
-            }
-            iterateCurrentIndex(1);
+      <TextField
+        autoFocus
+        iconProps={{ iconName: "Search" }}
+        elementRef={searchInputRef}
+        type="text"
+        placeholder="Find in scene"
+        spellCheck={false}
+        suffix={`${searchTextMatches.length > 0 ? selectedMatchIndex + 1 : "0"} of ${
+          searchTextMatches.length
+        }`}
+        value={searchText}
+        styles={{
+          icon: { left: theme.spacing.s1, right: "auto" },
+          field: { padding: `0 ${theme.spacing.s1} 0 ${theme.spacing.l2}` },
+          suffix: { backgroundColor: "transparent" },
+        }}
+        onChange={(e) => setSearchText(e.target.value)}
+        onKeyDown={(e: KeyboardEvent<HTMLInputElement>) => {
+          if (e.key !== "Enter") {
+            return;
+          }
+          if (e.shiftKey) {
+            iterateCurrentIndex(-1);
+            return;
+          }
+          iterateCurrentIndex(1);
+        }}
+      />
+      <Stack
+        horizontal
+        verticalAlign="center"
+        tokens={{
+          childrenGap: 2,
+          padding: `0 ${theme.spacing.s2}`,
+        }}
+      >
+        <IconButton
+          iconProps={{ iconName: "ChevronUpSmall" }}
+          onClick={() => iterateCurrentIndex(-1)}
+          styles={{
+            icon: {
+              height: 18,
+              fontSize: 10,
+            },
+            root: {
+              width: 24,
+            },
           }}
         />
-        <span style={{ color: colors.TEXT_MUTED, width: "50px", display: "inline-block" }}>
-          {searchTextMatches.length > 0 ? selectedMatchIndex + 1 : "0"} of{" "}
-          {searchTextMatches.length}
-        </span>
-      </div>
-      <Icon medium onClick={() => iterateCurrentIndex(-1)}>
-        <ArrowUpIcon />
-      </Icon>
-      <Icon medium onClick={() => iterateCurrentIndex(1)}>
-        <ArrowDownIcon />
-      </Icon>
-      <Icon onClick={() => toggleSearchTextOpen(false)} tooltip="[esc]" medium>
-        <CloseIcon />
-      </Icon>
-    </div>
+        <IconButton
+          iconProps={{ iconName: "ChevronDownSmall" }}
+          onClick={() => iterateCurrentIndex(1)}
+          styles={{
+            icon: {
+              height: 18,
+              fontSize: 10,
+            },
+            root: {
+              width: 24,
+            },
+          }}
+        />
+      </Stack>
+      <IconButton
+        onClick={() => toggleSearchTextOpen(false)}
+        tooltip="[esc]"
+        iconProps={{ iconName: "Clear" }}
+        styles={{
+          icon: {
+            height: 20,
+          },
+          root: {
+            backgroundColor: theme.semanticColors.buttonBackgroundHovered,
+          },
+          rootHovered: {
+            backgroundColor: theme.semanticColors.buttonBackgroundPressed,
+          },
+        }}
+      />
+    </Stack>
   );
 });
 
