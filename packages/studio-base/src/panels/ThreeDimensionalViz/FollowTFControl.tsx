@@ -11,19 +11,12 @@
 //   found at http://www.apache.org/licenses/LICENSE-2.0
 //   You may not use this file except in compliance with the License.
 
-import CrosshairsGpsIcon from "@mdi/svg/svg/crosshairs-gps.svg";
-import MenuDownIcon from "@mdi/svg/svg/menu-down.svg";
-import MenuLeftIcon from "@mdi/svg/svg/menu-left.svg";
-import CompassOutlineIcon from "@mdi/svg/svg/navigation.svg";
+import { IconButton, Stack, useTheme } from "@fluentui/react";
 import { sortBy, debounce } from "lodash";
 import React, { memo, createRef, useCallback, useState } from "react";
 import shallowequal from "shallowequal";
-import styled from "styled-components";
 
 import Autocomplete from "@foxglove/studio-base/components/Autocomplete";
-import Button from "@foxglove/studio-base/components/Button";
-import Icon from "@foxglove/studio-base/components/Icon";
-import styles from "@foxglove/studio-base/panels/ThreeDimensionalViz/Layout.module.scss";
 import colors from "@foxglove/studio-base/styles/colors.module.scss";
 import { isNonEmptyOrUndefined } from "@foxglove/studio-base/util/emptyOrUndefined";
 
@@ -105,13 +98,6 @@ function getItemText(node: TfTreeNode | { tf: { id: string }; depth: number }) {
   return "".padEnd(node.depth * 4) + node.tf.id;
 }
 
-const Container = styled.div`
-  display: flex;
-  flex: 1 1 auto;
-  align-items: center;
-  position: relative;
-`;
-
 const arePropsEqual = (prevProps: Props, nextProps: Props) => {
   if (!isNonEmptyOrUndefined(nextProps.tfToFollow)) {
     const tfTree = buildTfTree(nextProps.transforms.values());
@@ -128,6 +114,7 @@ const arePropsEqual = (prevProps: Props, nextProps: Props) => {
 };
 
 const FollowTFControl = memo<Props>((props: Props) => {
+  const theme = useTheme();
   const { transforms, tfToFollow, followOrientation, onFollowChange } = props;
   const [forceShowFrameList, setForceShowFrameList] = useState(false);
   const [hovering, setHovering] = useState(false);
@@ -221,10 +208,25 @@ const FollowTFControl = memo<Props>((props: Props) => {
     : undefined;
 
   return (
-    <Container
+    <Stack
+      grow
+      horizontal
+      verticalAlign="center"
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeaveDebounced}
-      style={{ color: isNonEmptyOrUndefined(tfToFollow) ? undefined : colors.textMuted }}
+      styles={{
+        root: {
+          pointerEvents: "auto",
+          borderRadius: theme.effects.roundedCorner2,
+          backgroundColor: theme.semanticColors.buttonBackgroundHovered,
+          position: "relative",
+          color: isNonEmptyOrUndefined(tfToFollow) ? undefined : colors.textMuted,
+
+          ":hover": {
+            backgroundColor: theme.semanticColors.buttonBackgroundPressed,
+          },
+        },
+      }}
     >
       {showFrameList && (
         <Autocomplete
@@ -252,30 +254,51 @@ const FollowTFControl = memo<Props>((props: Props) => {
         />
       )}
       {showFrameList ? (
-        <Icon onClick={openFrameList}>
-          <MenuDownIcon />
-        </Icon>
+        <IconButton
+          iconProps={{ iconName: "CaretDown" }}
+          onClick={openFrameList}
+          styles={{
+            icon: { color: theme.semanticColors.bodyText, height: 18, fontSize: 8 },
+            root: { width: 18, borderRadius: 0, backgroundColor: "transparent" },
+            rootHovered: { backgroundColor: "transparent" },
+          }}
+        />
       ) : hovering ? (
-        <Icon
+        <IconButton
           tooltip={"Select Another Frame\u2026"}
           onClick={openFrameList}
           tooltipProps={{ placement: "top" }}
-          style={{ color: "white" }}
-        >
-          <MenuLeftIcon />
-        </Icon>
+          iconProps={{ iconName: "CaretLeft" }}
+          styles={{
+            icon: { color: theme.semanticColors.bodyText, height: 18, fontSize: 8 },
+            root: {
+              width: 18,
+              borderTopLeftRadius: theme.effects.roundedCorner2,
+              borderBottomLeftRadius: theme.effects.roundedCorner2,
+              backgroundColor: "transparent",
+            },
+            rootHovered: { backgroundColor: "transparent" },
+          }}
+        />
       ) : undefined}
-      <Button
-        className={styles.iconButton}
-        tooltipProps={{ placement: "top" }}
+      <IconButton
         onClick={onClickFollowButton}
-        tooltip={getFollowButtonTooltip()}
-      >
-        <Icon style={{ color: isNonEmptyOrUndefined(tfToFollow) ? colors.accent : "white" }}>
-          {followOrientation ? <CompassOutlineIcon /> : <CrosshairsGpsIcon />}
-        </Icon>
-      </Button>
-    </Container>
+        // tooltip={getFollowButtonTooltip()}
+        iconProps={{
+          iconName: "Location",
+        }}
+        styles={{
+          icon: { height: 20 },
+          root: {
+            pointerEvents: "auto",
+            backgroundColor: "transparent",
+          },
+          rootHovered: {
+            backgroundColor: "transparent",
+          },
+        }}
+      />
+    </Stack>
   );
 }, arePropsEqual);
 export default FollowTFControl;

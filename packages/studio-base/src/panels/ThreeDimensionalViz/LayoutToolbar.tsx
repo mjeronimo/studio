@@ -127,14 +127,12 @@ function LayoutToolbar({
           transforms={transforms}
           rootTf={rootTf}
         />
-        <div className={styles.buttons}>
-          <FollowTFControl
-            transforms={transforms}
-            tfToFollow={typeof followTf === "string" && followTf.length > 0 ? followTf : undefined}
-            followOrientation={followOrientation}
-            onFollowChange={onFollowChange}
-          />
-        </div>
+        <FollowTFControl
+          transforms={transforms}
+          tfToFollow={typeof followTf === "string" && followTf.length > 0 ? followTf : undefined}
+          followOrientation={followOrientation}
+          onFollowChange={onFollowChange}
+        />
         <MainToolbar
           measureInfo={measureInfo}
           measuringTool={measuringElRef.current ?? undefined}
