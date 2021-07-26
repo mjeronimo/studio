@@ -286,16 +286,16 @@ const SearchText = React.memo<SearchTextComponentProps>(function SearchText({
     <Stack
       horizontal
       verticalAlign="center"
-      tokens={{ padding: theme.spacing.s2 }}
+      tokens={{ padding: 2 }}
       styles={{
         root: {
           pointerEvents: "auto",
           backgroundColor: theme.semanticColors.buttonBackgroundHovered,
           borderRadius: theme.effects.roundedCorner2,
           position: "relative",
-          marginTop: `-${theme.spacing.s2}`,
-          marginRight: `-${theme.spacing.s2}`,
-          marginBottom: `-${theme.spacing.s2}`,
+          marginTop: -2,
+          marginRight: -2,
+          marginBottom: -2,
         },
       }}
     >
