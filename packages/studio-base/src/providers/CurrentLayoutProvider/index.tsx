@@ -2,9 +2,10 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/
 import { isEqual } from "lodash";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useMemo, useRef } from "react";
 import { useToasts } from "react-toast-notifications";
-import { useAsync, useMountedState, useThrottle } from "react-use";
+import { useAsync, useMountedState } from "react-use";
+import { useDebouncedCallback } from "use-debounce";
 
 import Logger from "@foxglove/log";
 import { useAnalytics } from "@foxglove/studio-base/context/AnalyticsContext";
@@ -14,8 +15,8 @@ import CurrentLayoutContext, {
 import { PanelsState } from "@foxglove/studio-base/context/CurrentLayoutContext/actions";
 import { useLayoutStorage } from "@foxglove/studio-base/context/LayoutStorageContext";
 import { useUserProfileStorage } from "@foxglove/studio-base/context/UserProfileStorageContext";
-import welcomeLayout from "@foxglove/studio-base/layouts/welcomeLayout";
 import CurrentLayoutState from "@foxglove/studio-base/providers/CurrentLayoutProvider/CurrentLayoutState";
+import { LayoutID } from "@foxglove/studio-base/services/ILayoutStorage";
 
 const log = Logger.getLogger(__filename);
 
@@ -50,17 +51,21 @@ function CurrentLayoutProviderWithInitialState({
   const { setUserProfile } = useUserProfileStorage();
   const layoutStorage = useLayoutStorage();
 
-  const [layoutState, setLayoutState] = useState(() =>
-    stateInstance.actions.getCurrentLayoutState(),
-  );
-
   const isMounted = useMountedState();
 
-  // If the current layout is deleted, deselect it
-  useEffect(() => {
+  // If the current layout is not present in the layout store, deselect it
+  useLayoutEffect(() => {
     const listener = async () => {
       const selectedId = stateInstance.actions.getCurrentLayoutState().selectedLayout?.id;
-      if (!(await layoutStorage.getLayouts()).some(({ id }) => id === selectedId) && isMounted()) {
+      // if we don't have a selected layout then we won't be able to find it in the stored layouts
+      if (!selectedId) {
+        return;
+      }
+      const existing = await layoutStorage.getLayouts();
+      if (!isMounted()) {
+        return;
+      }
+      if (!existing.some(({ id }) => id === selectedId)) {
         stateInstance.actions.setSelectedLayout(undefined);
       }
     };
@@ -70,6 +75,28 @@ function CurrentLayoutProviderWithInitialState({
 
   const lastCurrentLayoutId = useRef(initialState.selectedLayout?.id);
   const previousSavedState = useRef<LayoutState | undefined>();
+  const pendingSaveLayouts = useRef(new Map<LayoutID, PanelsState>());
+
+  const queueSave = useDebouncedCallback(() => {
+    for (const [id, data] of pendingSaveLayouts.current) {
+      pendingSaveLayouts.current.delete(id);
+
+      log.debug("updateLayout");
+      layoutStorage
+        .updateLayout({
+          targetID: id,
+          data,
+          name: undefined,
+        })
+        .catch((error) => {
+          log.error(error);
+          addToast(`The current layout could not be saved. ${error.toString()}`, {
+            appearance: "error",
+            id: "CurrentLayoutProvider.layoutStorage.put",
+          });
+        });
+    }
+  }, 1_000 /* 1 second */);
 
   useLayoutEffect(() => {
     const currentState = stateInstance.actions.getCurrentLayoutState();
@@ -79,105 +106,51 @@ function CurrentLayoutProviderWithInitialState({
       previousSavedState.current = currentState;
     }
     const listener = (state: LayoutState) => {
-      // When a new layout is selected, we don't need to save it back to storage
+      // When a new layout is first selected, we don't need to save it back to storage
       if (state.selectedLayout?.id !== previousSavedState.current?.selectedLayout?.id) {
         previousSavedState.current = state;
+        return;
       }
-      log.debug("state changed");
-      setLayoutState(state);
+
+      if (state.selectedLayout) {
+        pendingSaveLayouts.current.set(state.selectedLayout.id, state.selectedLayout.data);
+        queueSave();
+      }
     };
     stateInstance.addLayoutStateListener(listener);
     return () => stateInstance.removeLayoutStateListener(listener);
-  }, [initialState, stateInstance]);
-
-  // Save the layout to LayoutStorage.
-  // Debounce the panel state to avoid persisting the layout constantly as the user is adjusting it
-  const throttledLayoutState = useThrottle(layoutState, 1000 /* 1 second */);
-  useEffect(() => {
-    if (throttledLayoutState === previousSavedState.current) {
-      // Don't save a layout that we just loaded
-      return;
-    }
-    previousSavedState.current = throttledLayoutState;
-    const { selectedLayout } = throttledLayoutState;
-    if (selectedLayout == undefined) {
-      return;
-    }
-    log.debug("updateLayout");
-    layoutStorage
-      .updateLayout({
-        targetID: selectedLayout.id,
-        data: selectedLayout.data,
-        name: undefined,
-      })
-      .catch((error) => {
-        log.error(error);
-        addToast(`The current layout could not be saved. ${error.toString()}`, {
-          appearance: "error",
-          id: "CurrentLayoutProvider.layoutStorage.put",
-        });
-      });
-  }, [addToast, layoutStorage, throttledLayoutState]);
+  }, [initialState, queueSave, stateInstance]);
 
   // Save the selected layout id to the UserProfile.
-  useEffect(() => {
-    if (layoutState.selectedLayout?.id === lastCurrentLayoutId.current) {
-      return;
-    }
-    lastCurrentLayoutId.current = layoutState.selectedLayout?.id;
-    log.debug("setUserProfile");
-    setUserProfile({ currentLayoutId: layoutState.selectedLayout?.id }).catch((error) => {
-      console.error(error);
-      addToast(`The current layout could not be saved. ${error.toString()}`, {
-        appearance: "error",
-        id: "CurrentLayoutProvider.setUserProfile",
+  useLayoutEffect(() => {
+    const listener = (layoutState: LayoutState) => {
+      if (layoutState.selectedLayout?.id === lastCurrentLayoutId.current) {
+        return;
+      }
+      lastCurrentLayoutId.current = layoutState.selectedLayout?.id;
+      log.debug("setUserProfile");
+      setUserProfile({ currentLayoutId: layoutState.selectedLayout?.id }).catch((error) => {
+        console.error(error);
+        addToast(`The current layout could not be saved. ${error.toString()}`, {
+          appearance: "error",
+          id: "CurrentLayoutProvider.setUserProfile",
+        });
       });
-    });
-  }, [setUserProfile, addToast, layoutState.selectedLayout?.id]);
+    };
+    stateInstance.addLayoutStateListener(listener);
+    return () => stateInstance.removeLayoutStateListener(listener);
+  }, [setUserProfile, addToast, stateInstance]);
 
   return (
     <CurrentLayoutContext.Provider value={stateInstance}>{children}</CurrentLayoutContext.Provider>
   );
 }
 
-function CurrentLayoutProviderWithoutAnalytics({
-  initialState,
-  children,
-}: React.PropsWithChildren<{ initialState: LayoutState }>) {
-  const [stateInstance] = useState(() => new CurrentLayoutState(initialState));
-  return (
-    <CurrentLayoutProviderWithInitialState
-      initialState={initialState}
-      stateInstance={stateInstance}
-    >
-      {children}
-    </CurrentLayoutProviderWithInitialState>
-  );
-}
-
-function CurrentLayoutProviderWithAnalytics({
-  initialState,
-  children,
-}: React.PropsWithChildren<{ initialState: LayoutState }>) {
-  const analytics = useAnalytics();
-  const [stateInstance] = useState(() => new CurrentLayoutState(initialState, analytics));
-  return (
-    <CurrentLayoutProviderWithInitialState
-      initialState={initialState}
-      stateInstance={stateInstance}
-    >
-      {children}
-    </CurrentLayoutProviderWithInitialState>
-  );
-}
-
 /**
  * Concrete implementation of CurrentLayoutContext.Provider which handles automatically saving and
- * restoring the current layout from LayoutStorage. Must be rendered inside a LayoutStorage
- * provider.
+ * restoring the current layout from LayoutStorage. Requires a LayoutStorage provider.
  */
 export default function CurrentLayoutProvider({
-  disableAnalyticsForTests,
   children,
 }: React.PropsWithChildren<{ disableAnalyticsForTests?: boolean }>): JSX.Element | ReactNull {
   const { addToast } = useToasts();
@@ -214,13 +187,6 @@ export default function CurrentLayoutProvider({
           return { selectedLayout: { id: layout.id, data: layout.data } };
         }
       }
-      // If none were available, load the welcome layout.
-      const newLayout = await layoutStorage.saveNewLayout({
-        name: welcomeLayout.name,
-        data: welcomeLayout.data,
-        permission: "creator_write",
-      });
-      return { selectedLayout: { id: newLayout.id, data: welcomeLayout.data } };
     } catch (error) {
       console.error(error);
       addToast(`The current layout could not be loaded. ${error.toString()}`, {
@@ -231,21 +197,29 @@ export default function CurrentLayoutProvider({
     return { selectedLayout: undefined };
   }, [addToast, getUserProfile, layoutStorage]);
 
-  if (loadInitialState.loading) {
+  const analytics = useAnalytics();
+  const initialState = useMemo(() => {
+    return loadInitialState.value ?? { selectedLayout: undefined };
+  }, [loadInitialState.value]);
+
+  const stateInstance = useMemo(() => {
+    if (loadInitialState.loading) {
+      return undefined;
+    }
+
+    return new CurrentLayoutState(initialState, analytics);
+  }, [analytics, initialState, loadInitialState.loading]);
+
+  if (!stateInstance) {
     return ReactNull;
   }
 
-  return disableAnalyticsForTests === true ? (
-    <CurrentLayoutProviderWithoutAnalytics
-      initialState={loadInitialState.value ?? { selectedLayout: undefined }}
+  return (
+    <CurrentLayoutProviderWithInitialState
+      initialState={initialState}
+      stateInstance={stateInstance}
     >
       {children}
-    </CurrentLayoutProviderWithoutAnalytics>
-  ) : (
-    <CurrentLayoutProviderWithAnalytics
-      initialState={loadInitialState.value ?? { selectedLayout: undefined }}
-    >
-      {children}
-    </CurrentLayoutProviderWithAnalytics>
+    </CurrentLayoutProviderWithInitialState>
   );
 }

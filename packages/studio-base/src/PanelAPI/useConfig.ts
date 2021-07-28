@@ -2,9 +2,10 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/
 
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 
 import {
+  LayoutState,
   useCurrentLayoutActions,
   useCurrentLayoutSelector,
 } from "@foxglove/studio-base/context/CurrentLayoutContext";
@@ -23,6 +24,10 @@ export function useConfig<Config extends Record<string, unknown>>(): [
   return useConfigById(panelId);
 }
 
+function configByIdSelector(state: LayoutState) {
+  return state.selectedLayout?.data.configById;
+}
+
 /**
  * Like `useConfig`, but for a specific panel id. This generally shouldn't be used by panels
  * directly, but is for use in internal code that's running outside of regular context providers.
@@ -32,13 +37,14 @@ export function useConfigById<Config extends Record<string, unknown>>(
 ): [Config | undefined, SaveConfig<Config>] {
   const { savePanelConfigs } = useCurrentLayoutActions();
 
-  // get the config from the current layout state
-  // if there is no config in the current layout state...then we would return undefined?
-  const config = useCurrentLayoutSelector((state) =>
-    panelId != undefined
-      ? (state.selectedLayout?.data.configById[panelId] as Config | undefined)
-      : undefined,
-  );
+  const configById = useCurrentLayoutSelector(configByIdSelector);
+
+  const config = useMemo(() => {
+    if (panelId == undefined) {
+      return undefined;
+    }
+    return configById?.[panelId] as Config | undefined;
+  }, [panelId, configById]);
 
   const saveConfig: SaveConfig<Config> = useCallback(
     (newConfig) => {

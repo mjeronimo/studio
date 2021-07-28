@@ -2,7 +2,7 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/
 
-import { createContext, useCallback, useLayoutEffect, useReducer, useRef, useState } from "react";
+import { createContext, useCallback, useLayoutEffect, useState } from "react";
 import { getLeaves } from "react-mosaic-component";
 
 import { useShallowMemo } from "@foxglove/hooks";
@@ -107,36 +107,32 @@ export function useCurrentLayoutActions(): CurrentLayoutActions {
 }
 export function useCurrentLayoutSelector<T>(selector: (layoutState: LayoutState) => T): T {
   const currentLayout = useGuaranteedContext(CurrentLayoutContext);
-  const [_, forceUpdate] = useReducer((x: number) => x + 1, 0);
 
-  const state = useRef<{ value: T; selector: typeof selector } | undefined>(undefined);
-  if (!state.current || selector !== state.current.selector) {
-    state.current = {
-      value: selectWithUnstableIdentityWarning(
-        currentLayout.actions.getCurrentLayoutState(),
-        selector,
-      ),
-      selector,
-    };
-  }
+  const [value, setValue] = useState(() => {
+    const layoutState = currentLayout.actions.getCurrentLayoutState();
+    return selectWithUnstableIdentityWarning(layoutState, selector);
+  });
+
   useLayoutEffect(() => {
+    let mounted = true;
     const listener = (layoutState: LayoutState) => {
-      const newValue = selectWithUnstableIdentityWarning(layoutState, selector);
-      if (newValue !== state.current?.value) {
-        forceUpdate();
+      // Note: Our removeLayoutStateListener is is too late if the layout state listeners are already
+      // being invoked. Our component might become unmounted during the state listener invocation
+      if (!mounted) {
+        return;
       }
-      state.current = {
-        value: newValue,
-        selector,
-      };
+      setValue(selectWithUnstableIdentityWarning(layoutState, selector));
     };
     // Update if necessary, i.e. if the state has changed between render and this effect
     listener(currentLayout.actions.getCurrentLayoutState());
     currentLayout.addLayoutStateListener(listener);
-    return () => currentLayout.removeLayoutStateListener(listener);
+    return () => {
+      mounted = false;
+      currentLayout.removeLayoutStateListener(listener);
+    };
   }, [currentLayout, selector]);
 
-  return state.current.value;
+  return value;
 }
 export function useSelectedPanels(): SelectedPanelActions {
   const currentLayout = useGuaranteedContext(CurrentLayoutContext);

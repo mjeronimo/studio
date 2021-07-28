@@ -22,7 +22,6 @@ import { PanelsState } from "@foxglove/studio-base/context/CurrentLayoutContext/
 import { useLayoutStorage } from "@foxglove/studio-base/context/LayoutStorageContext";
 import LayoutStorageDebuggingContext from "@foxglove/studio-base/context/LayoutStorageDebuggingContext";
 import { usePrompt } from "@foxglove/studio-base/hooks/usePrompt";
-import welcomeLayout from "@foxglove/studio-base/layouts/welcomeLayout";
 import { defaultPlaybackConfig } from "@foxglove/studio-base/providers/CurrentLayoutProvider/reducers";
 import { AppEvent } from "@foxglove/studio-base/services/IAnalytics";
 import { LayoutMetadata } from "@foxglove/studio-base/services/ILayoutStorage";
@@ -138,15 +137,11 @@ export default function LayoutBrowser({
           return;
         }
       }
-      // If no existing layout could be selected, use the welcome layout
-      const newLayout = await layoutStorage.saveNewLayout({
-        name: welcomeLayout.name,
-        data: welcomeLayout.data,
-        permission: "creator_write",
-      });
-      await onSelectLayout(newLayout);
+
+      // no layouts left to select, show empty layout
+      setSelectedLayout(undefined);
     },
-    [currentLayoutId, layoutStorage, setSelectedLayout, onSelectLayout],
+    [currentLayoutId, layoutStorage, setSelectedLayout],
   );
 
   const analytics = useAnalytics();

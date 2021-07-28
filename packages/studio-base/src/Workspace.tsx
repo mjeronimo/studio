@@ -202,6 +202,7 @@ export default function Workspace(props: WorkspaceProps): JSX.Element {
   const { setSelectedLayout } = useCurrentLayoutActions();
 
   const openWelcomeLayout = useCallback(async () => {
+    log.info("loading welcome layout");
     const newLayout = await layoutStorage.saveNewLayout({
       name: welcomeLayout.name,
       data: welcomeLayout.data,
