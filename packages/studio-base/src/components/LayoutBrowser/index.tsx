@@ -22,7 +22,6 @@ import { PanelsState } from "@foxglove/studio-base/context/CurrentLayoutContext/
 import { useLayoutStorage } from "@foxglove/studio-base/context/LayoutStorageContext";
 import LayoutStorageDebuggingContext from "@foxglove/studio-base/context/LayoutStorageDebuggingContext";
 import { usePrompt } from "@foxglove/studio-base/hooks/usePrompt";
-import welcomeLayout from "@foxglove/studio-base/layouts/welcomeLayout";
 import { defaultPlaybackConfig } from "@foxglove/studio-base/providers/CurrentLayoutProvider/reducers";
 import { AppEvent } from "@foxglove/studio-base/services/IAnalytics";
 import { LayoutMetadata } from "@foxglove/studio-base/services/ILayoutStorage";
@@ -124,31 +123,6 @@ export default function LayoutBrowser({
     [layoutStorage, onSelectLayout],
   );
 
-  const onDeleteLayout = useCallback(
-    async (item: LayoutMetadata) => {
-      await layoutStorage.deleteLayout({ id: item.id });
-      if (currentLayoutId !== item.id) {
-        return;
-      }
-      // If the layout was selected, select a different available layout
-      for (const { id } of await layoutStorage.getLayouts()) {
-        const layout = await layoutStorage.getLayout(id);
-        if (layout) {
-          setSelectedLayout(layout);
-          return;
-        }
-      }
-      // If no existing layout could be selected, use the welcome layout
-      const newLayout = await layoutStorage.saveNewLayout({
-        name: welcomeLayout.name,
-        data: welcomeLayout.data,
-        permission: "creator_write",
-      });
-      await onSelectLayout(newLayout);
-    },
-    [currentLayoutId, layoutStorage, setSelectedLayout, onSelectLayout],
-  );
-
   const analytics = useAnalytics();
 
   const createNewLayout = useCallback(async () => {
@@ -171,6 +145,27 @@ export default function LayoutBrowser({
 
     void analytics.logEvent(AppEvent.LAYOUT_CREATE);
   }, [currentDateForStorybook, layoutStorage, analytics, onSelectLayout]);
+
+  const onDeleteLayout = useCallback(
+    async (item: LayoutMetadata) => {
+      await layoutStorage.deleteLayout({ id: item.id });
+      if (currentLayoutId !== item.id) {
+        return;
+      }
+
+      // Select another layout if we have more layouts
+      for (const { id } of await layoutStorage.getLayouts()) {
+        const layout = await layoutStorage.getLayout(id);
+        if (layout) {
+          setSelectedLayout(layout);
+          return;
+        }
+      }
+
+      await createNewLayout();
+    },
+    [currentLayoutId, layoutStorage, setSelectedLayout, createNewLayout],
+  );
 
   const onExportLayout = useCallback(
     async (item: LayoutMetadata) => {

@@ -41,7 +41,6 @@ import ShortcutsModal from "@foxglove/studio-base/components/ShortcutsModal";
 import Sidebar, { SidebarItem } from "@foxglove/studio-base/components/Sidebar";
 import { SidebarContent } from "@foxglove/studio-base/components/SidebarContent";
 import Toolbar from "@foxglove/studio-base/components/Toolbar";
-import { useAppConfiguration } from "@foxglove/studio-base/context/AppConfigurationContext";
 import { useAssets } from "@foxglove/studio-base/context/AssetsContext";
 import { useCurrentLayoutActions } from "@foxglove/studio-base/context/CurrentLayoutContext";
 import { useExtensionLoader } from "@foxglove/studio-base/context/ExtensionLoaderContext";
@@ -279,15 +278,12 @@ export default function Workspace(props: WorkspaceProps): JSX.Element {
 
   useNativeAppMenuEvent("open-welcome-layout", openWelcomeLayout);
 
-  const appConfiguration = useAppConfiguration();
   const { addToast } = useToasts();
 
-  // Show welcome layout on first run
+  // Show welcome layout if requested
   useMount(() => {
     void (async () => {
-      const welcomeLayoutShown = appConfiguration.get("onboarding.welcome-layout.shown");
-      if (welcomeLayoutShown !== true || props.loadWelcomeLayout === true) {
-        await appConfiguration.set("onboarding.welcome-layout.shown", true);
+      if (props.loadWelcomeLayout === true) {
         await openWelcomeLayout();
       }
     })();
