@@ -16,41 +16,53 @@ import { bagConnectionsToDatatypes, bagConnectionsToTopics } from "./bagConnecti
 describe("bagConnectionsToDatatypes", () => {
   it("extracts one big list from multiple connections", () => {
     expect(
-      bagConnectionsToDatatypes([
-        {
-          type: "something/points",
-          messageDefinition: `
+      bagConnectionsToDatatypes(
+        [
+          {
+            type: "something/points",
+            messageDefinition: `
             Point[] points
             ============
             MSG: geometry_msgs/Point
             float64 x
           `,
-        },
-        {
-          type: "something/two_points",
-          messageDefinition: `
+          },
+          {
+            type: "something/two_points",
+            messageDefinition: `
             Point point1
             Point point2
             ============
             MSG: geometry_msgs/Point
             float64 x
           `,
-        },
-      ]),
-    ).toEqual({
-      "something/points": {
-        fields: [{ name: "points", type: "geometry_msgs/Point", isArray: true, isComplex: true }],
-      },
-      "something/two_points": {
-        fields: [
-          { name: "point1", type: "geometry_msgs/Point", isArray: false, isComplex: true },
-          { name: "point2", type: "geometry_msgs/Point", isArray: false, isComplex: true },
+          },
         ],
-      },
-      "geometry_msgs/Point": {
-        fields: [{ name: "x", type: "float64", isArray: false, isComplex: false }],
-      },
-    });
+        { ros2: false },
+      ),
+    ).toEqual(
+      new Map(
+        Object.entries({
+          "something/points": {
+            name: "something/points",
+            definitions: [
+              { name: "points", type: "geometry_msgs/Point", isArray: true, isComplex: true },
+            ],
+          },
+          "something/two_points": {
+            name: "something/two_points",
+            definitions: [
+              { name: "point1", type: "geometry_msgs/Point", isArray: false, isComplex: true },
+              { name: "point2", type: "geometry_msgs/Point", isArray: false, isComplex: true },
+            ],
+          },
+          "geometry_msgs/Point": {
+            name: "geometry_msgs/Point",
+            definitions: [{ name: "x", type: "float64", isArray: false, isComplex: false }],
+          },
+        }),
+      ),
+    );
   });
 });
 

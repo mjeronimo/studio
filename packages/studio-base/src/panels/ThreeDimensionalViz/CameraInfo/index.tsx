@@ -22,7 +22,7 @@ import ExpandingToolbar, { ToolGroup } from "@foxglove/studio-base/components/Ex
 import Icon from "@foxglove/studio-base/components/Icon";
 import { LegacyInput } from "@foxglove/studio-base/components/LegacyStyledComponents";
 import { usePanelContext } from "@foxglove/studio-base/components/PanelContext";
-import Tooltip, { useTooltip } from "@foxglove/studio-base/components/Tooltip";
+import Tooltip from "@foxglove/studio-base/components/Tooltip";
 import { JsonInput } from "@foxglove/studio-base/components/ValidatedInput";
 import {
   SValue,
@@ -154,20 +154,20 @@ export default function CameraInfo({
   } as Partial<IButtonStyles>;
 
   // FIXME: Use these tooltips
-  const autoSyncTooltip = useTooltip({
-    contents: "Automatically sync camera across all 3D panels",
-  });
-  const editTooltip = useTooltip({
-    contents: isPlaying
-      ? "Pause player to edit raw camera state object"
-      : "Edit raw camera state object",
-  });
-  const cameraStateTooltip = useTooltip({
-    contents: "Copy cameraState",
-  });
-  const syncTooltip = useTooltip({
-    contents: "Sync camera state across all 3D panels",
-  });
+  // const autoSyncTooltip = useTooltip({
+  //   contents: "Automatically sync camera across all 3D panels",
+  // });
+  // const editTooltip = useTooltip({
+  //   contents: isPlaying
+  //     ? "Pause player to edit raw camera state object"
+  //     : "Edit raw camera state object",
+  // });
+  // const cameraStateTooltip = useTooltip({
+  //   contents: "Copy cameraState",
+  // });
+  // const syncTooltip = useTooltip({
+  //   contents: "Sync camera state across all 3D panels",
+  // });
   return (
     <ExpandingToolbar
       tooltip="Camera"

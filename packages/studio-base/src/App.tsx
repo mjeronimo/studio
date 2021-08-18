@@ -48,8 +48,16 @@ export default function App(props: AppProps): JSX.Element {
     return new ConsoleApi(process.env.FOXGLOVE_API_URL!);
   }, []);
 
-  const [useFakeRemoteLayoutStorage = false] = useAppConfigurationValue<boolean>(
-    AppSetting.FAKE_REMOTE_LAYOUTS,
+  const [showRos2Rosbridge = false] = useAppConfigurationValue<boolean>(
+    AppSetting.SHOW_ROS2_ROSBRIDGE,
+  );
+
+  const filteredDataSources = useMemo(
+    () =>
+      showRos2Rosbridge
+        ? props.availableSources
+        : props.availableSources.filter((source) => source.type !== "ros2-rosbridge-websocket"),
+    [props.availableSources, showRos2Rosbridge],
   );
 
   const providers = [
@@ -57,7 +65,7 @@ export default function App(props: AppProps): JSX.Element {
     <AnalyticsProvider />,
     <ConsoleApiContext.Provider value={api} />,
     <CurrentUserProvider />,
-    !useFakeRemoteLayoutStorage && <ConsoleApiLayoutStorageProvider />,
+    <ConsoleApiLayoutStorageProvider />,
     <ModalHost />, // render modal elements inside the ThemeProvider
     <AssetsProvider loaders={assetLoaders} />,
     <HoverValueProvider />,
@@ -65,9 +73,9 @@ export default function App(props: AppProps): JSX.Element {
     <CurrentLayoutProvider />,
     <ExtensionMarketplaceProvider />,
     <ExtensionRegistryProvider />,
-    <PlayerManager playerSources={props.availableSources} />,
+    <PlayerManager playerSources={filteredDataSources} />,
     /* eslint-enable react/jsx-key */
-  ].filter((x): x is JSX.Element => x !== false);
+  ];
 
   return (
     <MultiProvider providers={providers}>

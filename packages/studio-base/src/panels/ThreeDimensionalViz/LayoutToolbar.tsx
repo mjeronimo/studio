@@ -25,7 +25,6 @@ import MeasuringTool, {
 import FollowTFControl from "@foxglove/studio-base/panels/ThreeDimensionalViz/FollowTFControl";
 import Interactions from "@foxglove/studio-base/panels/ThreeDimensionalViz/Interactions";
 import { TabType } from "@foxglove/studio-base/panels/ThreeDimensionalViz/Interactions/Interactions";
-import styles from "@foxglove/studio-base/panels/ThreeDimensionalViz/Layout.module.scss";
 import MainToolbar from "@foxglove/studio-base/panels/ThreeDimensionalViz/MainToolbar";
 import MeasureMarker from "@foxglove/studio-base/panels/ThreeDimensionalViz/MeasureMarker";
 import SearchText, {

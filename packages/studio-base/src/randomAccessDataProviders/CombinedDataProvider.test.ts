@@ -26,14 +26,18 @@
 //   You may not use this file except in compliance with the License.
 
 import { parse as parseMessageDefinition } from "@foxglove/rosmsg";
-import BagDataProvider from "@foxglove/studio-base/randomAccessDataProviders/BagDataProvider";
 import CombinedDataProvider, {
   mergedBlocks,
 } from "@foxglove/studio-base/randomAccessDataProviders/CombinedDataProvider";
 import MemoryDataProvider from "@foxglove/studio-base/randomAccessDataProviders/MemoryDataProvider";
 import RenameDataProvider from "@foxglove/studio-base/randomAccessDataProviders/RenameDataProvider";
 import { mockExtensionPoint } from "@foxglove/studio-base/randomAccessDataProviders/mockExtensionPoint";
-import { InitializationResult } from "@foxglove/studio-base/randomAccessDataProviders/types";
+import {
+  GetMessagesResult,
+  InitializationResult,
+  RandomAccessDataProvider,
+} from "@foxglove/studio-base/randomAccessDataProviders/types";
+import { RosDatatypes } from "@foxglove/studio-base/types/RosDatatypes";
 import delay from "@foxglove/studio-base/util/delay";
 import { SECOND_SOURCE_PREFIX } from "@foxglove/studio-base/util/globalConstants";
 import sendNotification from "@foxglove/studio-base/util/sendNotification";
@@ -50,7 +54,7 @@ function provider1(initiallyLoaded = false) {
       rosBinaryMessages: undefined,
     },
     topics: [{ name: "/some_topic1", datatype: "some_datatype" }],
-    datatypes: {},
+    datatypes: new Map(),
     initiallyLoaded,
     providesParsedMessages: true,
   });
@@ -66,7 +70,7 @@ function provider1Duplicate() {
       rosBinaryMessages: undefined,
     },
     topics: [{ name: "/some_topic1", datatype: "some_datatype" }],
-    datatypes: {},
+    datatypes: new Map(),
     providesParsedMessages: true,
   });
 }
@@ -80,7 +84,7 @@ function provider2() {
       rosBinaryMessages: undefined,
     },
     topics: [{ name: "/some_topic2", datatype: "some_datatype" }],
-    datatypes: {},
+    datatypes: new Map(),
     providesParsedMessages: true,
   });
 }
@@ -96,7 +100,7 @@ function provider3() {
       rosBinaryMessages: undefined,
     },
     topics: [{ name: "/some_topic3", datatype: "some_datatype" }],
-    datatypes: {},
+    datatypes: new Map(),
     providesParsedMessages: true,
   });
 }
@@ -115,13 +119,21 @@ function provider4() {
       { name: "/parsed", datatype: "some_datatype" },
       { name: "/rosbinary", datatype: "asdf" },
     ],
-    datatypes: {},
+    datatypes: new Map(),
     providesParsedMessages: true,
   });
 }
 
-function brokenProvider() {
-  return new BagDataProvider({ bagPath: { type: "file", file: "not a real file" } }, []);
+class BrokenProvider implements RandomAccessDataProvider {
+  async initialize(): Promise<InitializationResult> {
+    throw new Error("Dummy error in initialize()");
+  }
+  async getMessages(): Promise<GetMessagesResult> {
+    throw new Error("Dummy error in getMessages()");
+  }
+  async close(): Promise<void> {
+    throw new Error("Dummy error in close()");
+  }
 }
 
 function getCombinedDataProvider(data: any[]) {
@@ -162,7 +174,7 @@ describe("CombinedDataProvider", () => {
           rosBinaryMessages: undefined,
         },
         topics: [{ name: "/some_topic", datatype: "some_datatype" }],
-        datatypes: {},
+        datatypes: new Map(),
         providesParsedMessages: true,
       });
       const p2 = new MemoryDataProvider({
@@ -173,7 +185,7 @@ describe("CombinedDataProvider", () => {
           rosBinaryMessages: undefined,
         },
         topics: [{ name: "/generic_topic/some_topic", datatype: "some_datatype" }],
-        datatypes: {},
+        datatypes: new Map(),
         providesParsedMessages: true,
       });
       const combinedProvider = getCombinedDataProvider([
@@ -194,16 +206,18 @@ describe("CombinedDataProvider", () => {
           rosBinaryMessages: undefined,
         },
         topics: [{ name: "/some_topic", datatype: "some_datatype" }],
-        datatypes: {
-          some_datatype: {
-            fields: [
-              {
-                name: "some_string",
-                type: "string",
-              },
-            ],
-          },
-        },
+        datatypes: new Map(
+          Object.entries({
+            some_datatype: {
+              definitions: [
+                {
+                  name: "some_string",
+                  type: "string",
+                },
+              ],
+            },
+          }),
+        ),
         providesParsedMessages: true,
       });
 
@@ -215,16 +229,18 @@ describe("CombinedDataProvider", () => {
           rosBinaryMessages: undefined,
         },
         topics: [{ name: "/some_topic", datatype: "some_datatype" }],
-        datatypes: {
-          some_datatype: {
-            fields: [
-              {
-                name: "some_string",
-                type: "number",
-              },
-            ],
-          },
-        },
+        datatypes: new Map(
+          Object.entries({
+            some_datatype: {
+              definitions: [
+                {
+                  name: "some_string",
+                  type: "number",
+                },
+              ],
+            },
+          }),
+        ),
         providesParsedMessages: true,
       });
       const combinedProvider = getCombinedDataProvider([
@@ -237,7 +253,9 @@ describe("CombinedDataProvider", () => {
     });
 
     it("should not allow overlapping topics in messageDefinitionsByTopic", async () => {
-      const datatypes = { some_datatype: { fields: [{ name: "value", type: "int32" }] } };
+      const datatypes: RosDatatypes = new Map(
+        Object.entries({ some_datatype: { definitions: [{ name: "value", type: "int32" }] } }),
+      );
       const p1 = new MemoryDataProvider({
         messages: {
           parsedMessages: [
@@ -270,7 +288,9 @@ describe("CombinedDataProvider", () => {
     });
 
     it("should not mixed parsed and unparsed messaages", async () => {
-      const datatypes = { some_datatype: { fields: [{ name: "value", type: "int32" }] } };
+      const datatypes: RosDatatypes = new Map(
+        Object.entries({ some_datatype: { definitions: [{ name: "value", type: "int32" }] } }),
+      );
       const p1 = new MemoryDataProvider({
         messages: {
           parsedMessages: [
@@ -303,7 +323,9 @@ describe("CombinedDataProvider", () => {
     });
 
     it("should let users see results from one provider when another fails", async () => {
-      const datatypes = { some_datatype: { fields: [{ name: "value", type: "int32" }] } };
+      const datatypes: RosDatatypes = new Map(
+        Object.entries({ some_datatype: { definitions: [{ name: "value", type: "int32" }] } }),
+      );
       const message = {
         topic: "/some_topic",
         receiveTime: { sec: 101, nsec: 0 },
@@ -321,7 +343,7 @@ describe("CombinedDataProvider", () => {
         providesParsedMessages: true,
       });
 
-      const p2 = brokenProvider();
+      const p2 = new BrokenProvider();
       const combinedProvider = getCombinedDataProvider([{ provider: p1 }, { provider: p2 }]);
       const initResult = await combinedProvider.initialize(mockExtensionPoint().extensionPoint);
       expect(initResult).toEqual(
@@ -368,7 +390,7 @@ describe("CombinedDataProvider", () => {
         ],
         messageDefinitions: {
           type: "parsed",
-          datatypes: {},
+          datatypes: new Map(),
           messageDefinitionsByTopic: {},
           parsedMessageDefinitionsByTopic: {},
         },
@@ -388,7 +410,9 @@ describe("CombinedDataProvider", () => {
         topics: [{ name: "/some_topic", datatype: "some_datatype" }],
         messageDefinitionsByTopic: { "/some_topic": "int32 value" },
         parsedMessageDefinitionsByTopic: { "/some_topic": parseMessageDefinition("int32 value") },
-        datatypes: { some_datatype: { fields: [{ name: "value", type: "int32" }] } },
+        datatypes: new Map(
+          Object.entries({ some_datatype: { definitions: [{ name: "value", type: "int32" }] } }),
+        ),
         providesParsedMessages: true,
       });
 
@@ -402,7 +426,9 @@ describe("CombinedDataProvider", () => {
         topics: [{ name: "/some_topic_2", datatype: "some_datatype_2" }],
         messageDefinitionsByTopic: { "/some_topic_2": "int16 value" },
         parsedMessageDefinitionsByTopic: { "/some_topic_2": parseMessageDefinition("int16 value") },
-        datatypes: { some_datatype_2: { fields: [{ name: "value", type: "int16" }] } },
+        datatypes: new Map(
+          Object.entries({ some_datatype_2: { definitions: [{ name: "value", type: "int16" }] } }),
+        ),
         providesParsedMessages: true,
       });
 
@@ -418,7 +444,9 @@ describe("CombinedDataProvider", () => {
         parsedMessageDefinitionsByTopic: {
           "/some_topic_3": parseMessageDefinition("string value"),
         },
-        datatypes: { some_datatype_3: { fields: [{ name: "value", type: "string" }] } },
+        datatypes: new Map(
+          Object.entries({ some_datatype_3: { definitions: [{ name: "value", type: "string" }] } }),
+        ),
         providesParsedMessages: true,
       });
 
@@ -438,11 +466,13 @@ describe("CombinedDataProvider", () => {
         ],
         messageDefinitions: {
           type: "parsed",
-          datatypes: {
-            some_datatype: { fields: [{ name: "value", type: "int32" }] },
-            some_datatype_2: { fields: [{ name: "value", type: "int16" }] },
-            some_datatype_3: { fields: [{ name: "value", type: "string" }] },
-          },
+          datatypes: new Map(
+            Object.entries({
+              some_datatype: { definitions: [{ name: "value", type: "int32" }] },
+              some_datatype_2: { definitions: [{ name: "value", type: "int16" }] },
+              some_datatype_3: { definitions: [{ name: "value", type: "string" }] },
+            }),
+          ),
           messageDefinitionsByTopic: {
             "/some_topic": "int32 value",
             "/some_topic_2": "int16 value",
@@ -522,7 +552,7 @@ describe("CombinedDataProvider", () => {
           rosBinaryMessages: undefined,
         },
         topics: [{ name: "/some_topic", datatype: "some_datatype" }],
-        datatypes: {},
+        datatypes: new Map(),
         providesParsedMessages: true,
       });
       const getMessagesP1Spy = jest.spyOn(p1, "getMessages");
@@ -543,7 +573,7 @@ describe("CombinedDataProvider", () => {
           rosBinaryMessages: undefined,
         },
         topics: [{ name: "/some_topic2", datatype: "some_datatype" }],
-        datatypes: {},
+        datatypes: new Map(),
         providesParsedMessages: true,
       });
       const getMessagesP2Spy = jest.spyOn(p2, "getMessages");

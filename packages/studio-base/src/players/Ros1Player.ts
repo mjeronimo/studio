@@ -11,8 +11,9 @@ import { RosNode, TcpSocket } from "@foxglove/ros1";
 import { RosMsgDefinition } from "@foxglove/rosmsg";
 import { Time } from "@foxglove/rostime";
 import OsContextSingleton from "@foxglove/studio-base/OsContextSingleton";
+import PlayerProblemManager from "@foxglove/studio-base/players/PlayerProblemManager";
 import {
-  AdvertisePayload,
+  AdvertiseOptions,
   MessageEvent,
   ParameterValue,
   Player,
@@ -52,6 +53,7 @@ enum Problem {
   Parameters = "Parameters",
   Graph = "Graph",
   Publish = "Publish",
+  Node = "Node",
 }
 
 type Ros1PlayerOpts = {
@@ -70,7 +72,7 @@ export default class Ros1Player implements Player {
   private _listener?: (arg0: PlayerState) => Promise<void>; // Listener for _emitState().
   private _closed: boolean = false; // Whether the player has been completely closed using close().
   private _providerTopics?: Topic[]; // Topics as advertised by rosmaster.
-  private _providerDatatypes: RosDatatypes = {}; // All ROS message definitions received from subscriptions and set by publishers.
+  private _providerDatatypes: RosDatatypes = new Map(); // All ROS message definitions received from subscriptions and set by publishers.
   private _publishedTopics = new Map<string, Set<string>>(); // A map of topic names to the set of publisher IDs publishing each topic.
   private _subscribedTopics = new Map<string, Set<string>>(); // A map of topic names to the set of subscriber IDs subscribed to each topic.
   private _services = new Map<string, Set<string>>(); // A map of service names to service provider IDs that provide each service.
@@ -85,10 +87,7 @@ export default class Ros1Player implements Player {
   private _hasReceivedMessage = false;
   private _metricsCollector: PlayerMetricsCollectorInterface;
   private _presence: PlayerPresence = PlayerPresence.CONSTRUCTING;
-
-  // track issues within the player
-  private _problems: PlayerProblem[] = [];
-  private _problemsById = new Map<string, PlayerProblem>();
+  private _problems = new PlayerProblemManager();
 
   constructor({ url, hostname, metricsCollector }: Ros1PlayerOpts) {
     log.info(`initializing Ros1Player (url=${url})`);
@@ -136,6 +135,14 @@ export default class Ros1Player implements Player {
         log.debug("paramUpdate", key, value, prevValue, callerId);
         this._parameters = new Map(rosNode.parameters);
       });
+      rosNode.on("error", (error) => {
+        this._addProblem(Problem.Node, {
+          severity: "warn",
+          message: "ROS node error",
+          tip: `Connectivity will be automatically re-established`,
+          error,
+        });
+      });
     }
 
     await this._rosNode.start();
@@ -144,35 +151,30 @@ export default class Ros1Player implements Player {
   };
 
   private _addProblem(id: string, problem: PlayerProblem, skipEmit = false): void {
-    this._problemsById.set(id, problem);
-    this._problems = Array.from(this._problemsById.values());
+    this._problems.addProblem(id, problem);
     if (!skipEmit) {
       this._emitState();
     }
   }
 
   private _clearProblem(id: string, skipEmit = false): void {
-    if (!this._problemsById.delete(id)) {
-      return;
-    }
-    this._problems = Array.from(this._problemsById.values());
-    if (!skipEmit) {
-      this._emitState();
+    if (this._problems.removeProblem(id)) {
+      if (!skipEmit) {
+        this._emitState();
+      }
     }
   }
 
   private _clearPublishProblems(skipEmit = false) {
-    let modified = false;
-    for (const key of this._problemsById.keys()) {
-      if (key.startsWith("msgdef:") || key.startsWith("advertise:") || key.startsWith("publish:")) {
-        modified ||= this._problemsById.delete(key);
+    if (
+      this._problems.removeProblems(
+        (id) =>
+          id.startsWith("msgdef:") || id.startsWith("advertise:") || id.startsWith("publish:"),
+      )
+    ) {
+      if (!skipEmit) {
+        this._emitState();
       }
-    }
-    if (modified) {
-      this._problems = Array.from(this._problemsById.values());
-    }
-    if (!skipEmit) {
-      this._emitState();
     }
   }
 
@@ -261,7 +263,7 @@ export default class Ros1Player implements Player {
         progress: {},
         capabilities: CAPABILITIES,
         playerId: this._id,
-        problems: this._problems,
+        problems: this._problems.problems(),
         activeData: undefined,
       });
     }
@@ -280,7 +282,7 @@ export default class Ros1Player implements Player {
       progress: {},
       capabilities: CAPABILITIES,
       playerId: this._id,
-      problems: this._problems,
+      problems: this._problems.problems(),
 
       activeData: {
         messages,
@@ -346,16 +348,22 @@ export default class Ros1Player implements Player {
       const subscription = this._rosNode.subscribe({ topic: topicName, dataType: datatype });
 
       subscription.on("header", (_header, msgdef, _reader) => {
-        // We have to create a new object instead of just updating _providerDatatypes because it is
-        // later fed into a memoize() call
-        const typesByName: RosDatatypes = {};
-        Object.assign(typesByName, this._providerDatatypes);
-        Object.assign(typesByName, this._getRosDatatypes(datatype, msgdef));
-        this._providerDatatypes = typesByName;
+        // We have to create a new object instead of just updating _providerDatatypes to support
+        // shallow memo
+        const newDatatypes = this._getRosDatatypes(datatype, msgdef);
+        this._providerDatatypes = new Map([...this._providerDatatypes, ...newDatatypes]);
       });
       subscription.on("message", (message, _data, _pub) =>
         this._handleMessage(topicName, message, true),
       );
+      subscription.on("error", (error) => {
+        this._addProblem(`subscribe:${topicName}`, {
+          severity: "warn",
+          message: `Topic subscription error for "${topicName}"`,
+          tip: `The subscription to "${topicName}" will be automatically re-established`,
+          error,
+        });
+      });
     }
 
     // Unsubscribe from topics that we are subscribed to but shouldn't be.
@@ -387,7 +395,7 @@ export default class Ros1Player implements Player {
     this._emitState();
   };
 
-  setPublishers(publishers: AdvertisePayload[]): void {
+  setPublishers(publishers: AdvertiseOptions[]): void {
     if (!this._rosNode || this._closed) {
       return;
     }
@@ -414,7 +422,9 @@ export default class Ros1Player implements Player {
     }
 
     // Advertise new topics
-    for (const { topic, datatype: dataType, datatypes } of validPublishers) {
+    for (const advertiseOptions of validPublishers) {
+      const { topic, datatype: dataType, options } = advertiseOptions;
+
       if (this._rosNode.publications.has(topic)) {
         continue;
       }
@@ -425,6 +435,10 @@ export default class Ros1Player implements Player {
       // Try to retrieve the ROS message definition for this topic
       let msgdef: RosMsgDefinition[];
       try {
+        const datatypes = options?.["datatypes"] as RosDatatypes | undefined;
+        if (!datatypes || !(datatypes instanceof Map)) {
+          throw new Error("The datatypes option is required for publishing");
+        }
         msgdef = rosDatatypesToMessageDefinition(datatypes, dataType);
       } catch (error) {
         this._addProblem(msgdefProblemId, {
@@ -502,16 +516,15 @@ export default class Ros1Player implements Player {
     datatype: string,
     messageDefinition: RosMsgDefinition[],
   ): RosDatatypes => {
-    const typesByName: RosDatatypes = {};
-    messageDefinition.forEach(({ name, definitions }, index) => {
-      // The first definition usually doesn't have an explicit name,
-      // so we get the name from the connection.
-      if (index === 0) {
-        typesByName[datatype] = { fields: definitions };
-      } else if (name != undefined) {
-        typesByName[name] = { fields: definitions };
+    const typesByName: RosDatatypes = new Map();
+    for (const def of messageDefinition) {
+      // The first definition usually doesn't have an explicit name so we use the datatype
+      if (def.name == undefined) {
+        typesByName.set(datatype, def);
+      } else {
+        typesByName.set(def.name, def);
       }
-    });
+    }
     return typesByName;
   };
 
@@ -562,7 +575,7 @@ export default class Ros1Player implements Player {
         {
           severity: "warn",
           message: "Unable to update connection graph",
-          tip: `The connection graph contains information about publishers and subscribers. A 
+          tip: `The connection graph contains information about publishers and subscribers. A
 stale graph may result in missing topics you expect. Ensure that roscore is reachable at ${this._url}.`,
           error,
         },

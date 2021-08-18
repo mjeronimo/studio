@@ -22,8 +22,7 @@ import { useTooltip } from "@foxglove/studio-base/components/Tooltip";
 import { useLayoutStorage } from "@foxglove/studio-base/context/LayoutStorageContext";
 import LayoutStorageDebuggingContext from "@foxglove/studio-base/context/LayoutStorageDebuggingContext";
 import { useConfirm } from "@foxglove/studio-base/hooks/useConfirm";
-import { LayoutMetadata } from "@foxglove/studio-base/services/ILayoutStorage";
-import { nonEmptyOrUndefined } from "@foxglove/studio-base/util/emptyOrUndefined";
+import { ConflictResolution, LayoutMetadata } from "@foxglove/studio-base/services/ILayoutStorage";
 
 import { debugBorder } from "./styles";
 
@@ -70,16 +69,18 @@ export default function LayoutRow({
   onDelete,
   onShare,
   onExport,
+  onResolveConflict,
 }: {
   layout: LayoutMetadata;
   selected: boolean;
   onSave: (item: LayoutMetadata) => void;
-  onSelect: (item: LayoutMetadata) => void;
+  onSelect: (item: LayoutMetadata, selectedViaClick?: boolean) => void;
   onRename: (item: LayoutMetadata, newName: string) => void;
   onDuplicate: (item: LayoutMetadata) => void;
   onDelete: (item: LayoutMetadata) => void;
   onShare: (item: LayoutMetadata) => void;
   onExport: (item: LayoutMetadata) => void;
+  onResolveConflict: (item: LayoutMetadata, resolution: ConflictResolution) => void;
 }): JSX.Element {
   const styles = useStyles();
   const theme = useTheme();
@@ -103,7 +104,7 @@ export default function LayoutRow({
     if (selected) {
       renameAction();
     } else {
-      onSelect(layout);
+      onSelect(layout, true);
     }
   }, [layout, onSelect, renameAction, selected]);
 
@@ -118,8 +119,8 @@ export default function LayoutRow({
       if (!editingName) {
         return;
       }
-      const newName = nonEmptyOrUndefined(nameFieldValue);
-      if (newName != undefined && newName !== layout.name) {
+      const newName = nameFieldValue;
+      if (newName && newName !== layout.name) {
         onRename(layout, newName);
       }
       setEditingName(false);
@@ -166,15 +167,59 @@ export default function LayoutRow({
     });
   }, [confirm, isMounted, layout, onDelete]);
 
+  const confirmRevertLocal = useCallback(() => {
+    void confirm({
+      title: `Revert “${layout.name}” to the latest version?`,
+      prompt: "Changes made on this device will be lost.",
+      ok: "Revert",
+      variant: "danger",
+    }).then((response) => {
+      if (response === "ok" && isMounted()) {
+        onResolveConflict(layout, "revert-local");
+      }
+    });
+  }, [confirm, isMounted, layout, onResolveConflict]);
+
+  const confirmDeleteLocal = useCallback(() => {
+    void confirm({
+      title: `Delete “${layout.name}”?`,
+      prompt: "Changes made on this device will be lost.",
+      ok: "Delete",
+      variant: "danger",
+    }).then((response) => {
+      if (response === "ok" && isMounted()) {
+        onResolveConflict(layout, "delete-local");
+      }
+    });
+  }, [confirm, isMounted, layout, onResolveConflict]);
+
+  const confirmOverwriteRemote = useCallback(() => {
+    void confirm({
+      title: `Overwrite “${layout.name}” with local changes?`,
+      prompt: "Changes made by others will be lost.",
+      ok: "Overwrite",
+      variant: "danger",
+    }).then((response) => {
+      if (response === "ok" && isMounted()) {
+        onResolveConflict(layout, "overwrite-remote");
+      }
+    });
+  }, [confirm, isMounted, layout, onResolveConflict]);
+
+  const confirmDeleteRemote = useCallback(() => {
+    void confirm({
+      title: `Delete “${layout.name}”?`,
+      prompt: "Changes made by others will be lost.",
+      ok: "Delete",
+      variant: "danger",
+    }).then((response) => {
+      if (response === "ok" && isMounted()) {
+        onResolveConflict(layout, "delete-remote");
+      }
+    });
+  }, [confirm, isMounted, layout, onResolveConflict]);
+
   const menuItems: (boolean | IContextualMenuItem)[] = [
-    layoutStorage.supportsSyncing && {
-      key: "save",
-      text: layout.hasUnsyncedChanges ? "Save changes" : "No unsaved changes",
-      iconProps: { iconName: "Upload" },
-      onClick: saveAction,
-      ["data-test"]: "save-layout",
-      disabled: !layout.hasUnsyncedChanges,
-    },
     {
       key: "rename",
       text: "Rename",
@@ -215,12 +260,103 @@ export default function LayoutRow({
     },
   ];
 
+  if (layoutStorage.supportsSyncing) {
+    if (layout.conflict != undefined) {
+      let conflictItems: IContextualMenuItem[];
+      switch (layout.conflict) {
+        case "local-delete-remote-update":
+          conflictItems = [
+            {
+              key: "revert-local",
+              text: "Revert to latest version",
+              iconProps: { iconName: "RemoveFromTrash" },
+              onClick: confirmRevertLocal,
+            },
+            {
+              key: "delete-remote",
+              text: "Delete for everyone",
+              iconProps: { iconName: "Delete" },
+              styles: { root: { color: theme.semanticColors.errorText } },
+              onClick: confirmDeleteRemote,
+            },
+          ];
+          break;
+        case "local-update-remote-delete":
+          conflictItems = [
+            {
+              key: "overwrite-remote",
+              text: "Use my version instead",
+              iconProps: { iconName: "Upload" },
+              onClick: confirmOverwriteRemote,
+            },
+            {
+              key: "delete-local",
+              text: "Delete my version",
+              iconProps: { iconName: "Delete" },
+              styles: { root: { color: theme.semanticColors.errorText } },
+              onClick: confirmDeleteLocal,
+            },
+          ];
+          break;
+        case "both-update":
+          conflictItems = [
+            {
+              key: "overwrite-remote",
+              text: "Use my version instead",
+              iconProps: { iconName: "Upload" },
+              onClick: confirmOverwriteRemote,
+            },
+            {
+              key: "revert-local",
+              text: "Revert to latest version",
+              iconProps: { iconName: "Download" },
+              styles: { root: { color: theme.semanticColors.errorText } },
+              onClick: confirmRevertLocal,
+            },
+          ];
+          break;
+        case "name-collision":
+          // Only course of action is renaming the layout
+          conflictItems = [];
+          break;
+      }
+
+      menuItems.unshift({
+        key: "conflicts",
+        itemType: ContextualMenuItemType.Section,
+        sectionProps: {
+          bottomDivider: true,
+          title: conflictTypeToString(layout.conflict),
+          items: conflictItems,
+        },
+      });
+    } else {
+      menuItems.unshift({
+        key: "sync",
+        text: layout.hasUnsyncedChanges ? "Sync changes" : "No unsynced changes",
+        iconProps: { iconName: "Upload" },
+        onClick: saveAction,
+        disabled: !layout.hasUnsyncedChanges,
+      });
+    }
+  }
+
   if (layoutDebug) {
     menuItems.push(
       { key: "debug_divider", itemType: ContextualMenuItemType.Divider },
       {
         key: "debug_id",
         text: layout.id,
+        disabled: true,
+        itemProps: {
+          styles: {
+            root: { ...debugBorder, borderRight: "none", borderTop: "none", borderBottom: "none" },
+          },
+        },
+      },
+      {
+        key: "debug_updated_at",
+        text: `Updated at: ${layout.updatedAt ?? "unknown"}`,
         disabled: true,
         itemProps: {
           styles: {

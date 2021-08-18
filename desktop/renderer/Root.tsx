@@ -12,6 +12,8 @@ import {
   ThemeProvider,
   UserProfileLocalStorageProvider,
   StudioToastProvider,
+  CssBaseline,
+  GlobalCss,
 } from "@foxglove/studio-base";
 
 import { Desktop } from "../common/types";
@@ -19,7 +21,6 @@ import NativeAppMenuProvider from "./components/NativeAppMenuProvider";
 import NativeStorageAppConfigurationProvider from "./components/NativeStorageAppConfigurationProvider";
 import NativeStorageLayoutCacheProvider from "./components/NativeStorageLayoutCacheProvider";
 import ExtensionLoaderProvider from "./providers/ExtensionLoaderProvider";
-import FakeLayoutStorageProviders from "./providers/FakeLayoutStorageProviders";
 
 const DEMO_BAG_URL = "https://storage.googleapis.com/foxglove-public-assets/demo.bag";
 
@@ -32,20 +33,24 @@ export default function Root(): ReactElement {
       type: "ros1-socket",
     },
     {
-      name: "Rosbridge (WebSocket)",
-      type: "ros-ws",
+      name: "ROS 1 Rosbridge (WebSocket)",
+      type: "ros1-rosbridge-websocket",
     },
     {
-      name: "ROS 1 Bag File (local)",
+      name: "ROS 2 Rosbridge (WebSocket)",
+      type: "ros2-rosbridge-websocket",
+    },
+    {
+      name: "ROS 1 Bag (local)",
       type: "ros1-local-bagfile",
     },
     {
-      name: "ROS 1 Bag File (HTTP)",
+      name: "ROS 1 Bag (HTTP)",
       type: "ros1-remote-bagfile",
     },
     {
-      name: "ROS 2 Bag Folder (local)",
-      type: "ros2-folder",
+      name: "ROS 2 Bag (local)",
+      type: "ros2-local-bagfile",
     },
     {
       name: "Velodyne LIDAR",
@@ -58,7 +63,6 @@ export default function Root(): ReactElement {
     <StudioToastProvider />,
     <NativeStorageAppConfigurationProvider />,
     <NativeStorageLayoutCacheProvider />,
-    <FakeLayoutStorageProviders />,
     <NativeAppMenuProvider />,
     <UserProfileLocalStorageProvider />,
     <ExtensionLoaderProvider />,
@@ -71,16 +75,19 @@ export default function Root(): ReactElement {
 
   return (
     <ThemeProvider>
-      <ErrorBoundary>
-        <MultiProvider providers={providers}>
-          <App
-            demoBagUrl={DEMO_BAG_URL}
-            deepLinks={deepLinks}
-            onFullscreenToggle={handleToolbarDoubleClick}
-            availableSources={playerSources}
-          />
-        </MultiProvider>
-      </ErrorBoundary>
+      <GlobalCss />
+      <CssBaseline>
+        <ErrorBoundary>
+          <MultiProvider providers={providers}>
+            <App
+              demoBagUrl={DEMO_BAG_URL}
+              deepLinks={deepLinks}
+              onFullscreenToggle={handleToolbarDoubleClick}
+              availableSources={playerSources}
+            />
+          </MultiProvider>
+        </ErrorBoundary>
+      </CssBaseline>
     </ThemeProvider>
   );
 }

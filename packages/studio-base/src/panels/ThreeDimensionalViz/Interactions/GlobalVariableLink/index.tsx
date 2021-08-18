@@ -14,8 +14,6 @@
 import { CSSProperties } from "react";
 import styled from "styled-components";
 
-import { isNonEmptyOrUndefined } from "@foxglove/studio-base/util/emptyOrUndefined";
-
 import { getLinkedGlobalVariable } from "../interactionUtils";
 import useLinkedGlobalVariables, { LinkedGlobalVariable } from "../useLinkedGlobalVariables";
 import LinkToGlobalVariable from "./LinkToGlobalVariable";
@@ -26,11 +24,6 @@ import UnlinkWrapper from "./UnlinkWrapper";
 const SWrapper = styled.span`
   display: inline-flex;
   align-items: center;
-`;
-
-export const SP = styled.p`
-  line-height: 1.4;
-  margin-bottom: 12px;
 `;
 
 const SValue = styled.span`
@@ -66,7 +59,7 @@ export default function GlobalVariableLink({
 }: Props): JSX.Element | ReactNull {
   const { linkedGlobalVariables } = useLinkedGlobalVariables();
   let linkedGlobalVariableLocal: LinkedGlobalVariable | undefined = linkedGlobalVariable;
-  if (!linkedGlobalVariableLocal && isNonEmptyOrUndefined(topic) && markerKeyPath) {
+  if (!linkedGlobalVariableLocal && topic && markerKeyPath) {
     linkedGlobalVariableLocal = getLinkedGlobalVariable({
       topic,
       markerKeyPath,
@@ -77,9 +70,7 @@ export default function GlobalVariableLink({
   const isArrayBuffer = ArrayBuffer.isView(variableValue);
   const renderUnlink = !!linkedGlobalVariableLocal;
   const addToLinkedGlobalVariable =
-    isNonEmptyOrUndefined(topic) && markerKeyPath
-      ? { topic, markerKeyPath, variableValue }
-      : undefined;
+    topic && markerKeyPath ? { topic, markerKeyPath, variableValue } : undefined;
   const renderAddLink = !renderUnlink && !isArrayBuffer && addToLinkedGlobalVariable != undefined;
   if (!renderUnlink && !renderAddLink) {
     return ReactNull;
@@ -91,7 +82,7 @@ export default function GlobalVariableLink({
 
   return (
     <SWrapper>
-      {isNonEmptyOrUndefined(label) && <SValue>{label}</SValue>}
+      {label && <SValue>{label}</SValue>}
       <SGlobalVariableLink style={wrapperStyle}>
         {linkedGlobalVariableLocal && !onlyRenderAddLink && (
           <UnlinkWrapper linkedGlobalVariable={linkedGlobalVariableLocal} tooltip={unlinkTooltip}>

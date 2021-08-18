@@ -24,7 +24,7 @@ import { PanelConfigSchemaEntry } from "@foxglove/studio-base/types/panels";
 
 import PanelLayout from "./PanelLayout";
 
-const allPanels: PanelInfo[] = [
+const allPanels: readonly PanelInfo[] = [
   { title: "Some Panel", type: "Sample1", module: async () => await new Promise(() => {}) },
   {
     title: "Broken Panel",
@@ -53,11 +53,11 @@ class MockPanelCatalog implements PanelCatalog {
     const module = await info?.module();
     return module.default.configSchema;
   }
-  getPanels(): PanelInfo[] {
+  getPanels(): readonly PanelInfo[] {
     return allPanels;
   }
   getPanelByType(type: string): PanelInfo | undefined {
-    return allPanels.find((panel) => panel.type === type);
+    return allPanels.find((panel) => panel.preconfigured !== true && panel.type === type);
   }
 }
 
@@ -76,7 +76,7 @@ export const PanelNotFound = (): JSX.Element => {
             (document.querySelectorAll("[data-test=panel-settings]")[0] as any).click();
           }, DEFAULT_CLICK_DELAY);
         }}
-        fixture={{ topics: [], datatypes: {}, frame: {}, layout: "UnknownPanel!4co6n9d" }}
+        fixture={{ topics: [], datatypes: new Map(), frame: {}, layout: "UnknownPanel!4co6n9d" }}
         omitDragAndDrop
       >
         <PanelLayout />
@@ -98,7 +98,7 @@ export const PanelWithError = (): JSX.Element => {
         <PanelToolbarShown />
         <PanelSetup
           panelCatalog={new MockPanelCatalog()}
-          fixture={{ topics: [], datatypes: {}, frame: {}, layout: "Sample2!4co6n9d" }}
+          fixture={{ topics: [], datatypes: new Map(), frame: {}, layout: "Sample2!4co6n9d" }}
           omitDragAndDrop
         >
           <PanelLayout />
@@ -118,7 +118,7 @@ export const RemoveUnknownPanel = (): JSX.Element => {
             (document.querySelectorAll("[data-test=panel-settings-remove]")[0] as any).click();
           }, DEFAULT_CLICK_DELAY);
         }}
-        fixture={{ topics: [], datatypes: {}, frame: {}, layout: "UnknownPanel!4co6n9d" }}
+        fixture={{ topics: [], datatypes: new Map(), frame: {}, layout: "UnknownPanel!4co6n9d" }}
         omitDragAndDrop
       >
         <MockPanelContextProvider>
@@ -134,7 +134,7 @@ export const PanelLoading = (): JSX.Element => {
     <DndProvider backend={HTML5Backend}>
       <PanelSetup
         panelCatalog={new MockPanelCatalog()}
-        fixture={{ topics: [], datatypes: {}, frame: {}, layout: "Sample1!4co6n9d" }}
+        fixture={{ topics: [], datatypes: new Map(), frame: {}, layout: "Sample1!4co6n9d" }}
         omitDragAndDrop
       >
         <MockPanelContextProvider>

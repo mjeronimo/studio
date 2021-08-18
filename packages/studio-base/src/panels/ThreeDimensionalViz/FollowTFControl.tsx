@@ -18,7 +18,6 @@ import shallowequal from "shallowequal";
 
 import Autocomplete from "@foxglove/studio-base/components/Autocomplete";
 import colors from "@foxglove/studio-base/styles/colors.module.scss";
-import { isNonEmptyOrUndefined } from "@foxglove/studio-base/util/emptyOrUndefined";
 
 import Transforms, { Transform } from "./Transforms";
 
@@ -99,7 +98,7 @@ function getItemText(node: TfTreeNode | { tf: { id: string }; depth: number }) {
 }
 
 const arePropsEqual = (prevProps: Props, nextProps: Props) => {
-  if (!isNonEmptyOrUndefined(nextProps.tfToFollow)) {
+  if (!nextProps.tfToFollow) {
     const tfTree = buildTfTree(nextProps.transforms.values());
     const allNodes = Array.from(getDescendants(tfTree.roots));
     // As a result of various refactors this code does not make sense anymore and is in need of
@@ -134,21 +133,21 @@ const FollowTFControl = memo<Props>((props: Props) => {
     return nodesWithoutDefaultFollowTfFrame !== 0 ? newFollowTfFrame : undefined;
   }, [nodesWithoutDefaultFollowTfFrame, newFollowTfFrame]);
 
-  const getFollowButtonTooltip = useCallback(() => {
-    if (!isNonEmptyOrUndefined(tfToFollow)) {
-      if (isNonEmptyOrUndefined(lastSelectedFrame)) {
-        return `Follow ${lastSelectedFrame}`;
-      }
-      return `Follow ${getDefaultFollowTransformFrame()}`;
-    } else if (!followOrientation) {
-      return "Follow Orientation";
-    }
-    return "Unfollow";
-  }, [tfToFollow, followOrientation, lastSelectedFrame, getDefaultFollowTransformFrame]);
+  // const getFollowButtonTooltip = useCallback(() => {
+  //   if (!tfToFollow) {
+  //     if (lastSelectedFrame) {
+  //       return `Follow ${lastSelectedFrame}`;
+  //     }
+  //     return `Follow ${getDefaultFollowTransformFrame()}`;
+  //   } else if (!followOrientation) {
+  //     return "Follow Orientation";
+  //   }
+  //   return "Unfollow";
+  // }, [tfToFollow, followOrientation, lastSelectedFrame, getDefaultFollowTransformFrame]);
 
   const onClickFollowButton = useCallback(() => {
-    if (!isNonEmptyOrUndefined(tfToFollow)) {
-      if (isNonEmptyOrUndefined(lastSelectedFrame)) {
+    if (!tfToFollow) {
+      if (lastSelectedFrame) {
         return onFollowChange(lastSelectedFrame);
       }
       return onFollowChange(getDefaultFollowTransformFrame());
@@ -173,16 +172,12 @@ const FollowTFControl = memo<Props>((props: Props) => {
     [setLastSelectedFrame, getDefaultFollowTransformFrame, onFollowChange, followOrientation],
   );
 
-  const openFrameList = useCallback(
-    (event: React.SyntheticEvent<Element>) => {
-      event.preventDefault();
-      setForceShowFrameList(true);
-      if (autocomplete.current) {
-        autocomplete.current.focus();
-      }
-    },
-    [setForceShowFrameList, autocomplete],
-  );
+  const openFrameList = useCallback(() => {
+    setForceShowFrameList(true);
+    if (autocomplete.current) {
+      autocomplete.current.focus();
+    }
+  }, [setForceShowFrameList, autocomplete]);
 
   // slight delay to prevent the arrow from disappearing when you're trying to click it
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -198,12 +193,11 @@ const FollowTFControl = memo<Props>((props: Props) => {
     setHovering(true);
   }, [onMouseLeaveDebounced, setHovering]);
 
-  const followingCustomFrame =
-    isNonEmptyOrUndefined(tfToFollow) && tfToFollow !== getDefaultFollowTransformFrame();
+  const followingCustomFrame = !!tfToFollow && tfToFollow !== getDefaultFollowTransformFrame();
   const showFrameList =
     lastSelectedFrame != undefined || forceShowFrameList || followingCustomFrame;
   const selectedFrameId = tfToFollow ?? lastSelectedFrame;
-  const selectedItem: TfTreeNode | undefined = isNonEmptyOrUndefined(selectedFrameId)
+  const selectedItem: TfTreeNode | undefined = selectedFrameId
     ? { tf: new Transform(selectedFrameId), children: [], depth: 0 }
     : undefined;
 
@@ -220,7 +214,7 @@ const FollowTFControl = memo<Props>((props: Props) => {
           borderRadius: theme.effects.roundedCorner2,
           backgroundColor: theme.semanticColors.buttonBackgroundHovered,
           position: "relative",
-          color: isNonEmptyOrUndefined(tfToFollow) ? undefined : colors.textMuted,
+          color: tfToFollow ? undefined : colors.textMuted,
 
           ":hover": {
             backgroundColor: theme.semanticColors.buttonBackgroundPressed,
@@ -265,9 +259,9 @@ const FollowTFControl = memo<Props>((props: Props) => {
         />
       ) : hovering ? (
         <IconButton
-          tooltip={"Select Another Frame\u2026"}
+          // tooltip={"Select Another Frame\u2026"}
           onClick={openFrameList}
-          tooltipProps={{ placement: "top" }}
+          // tooltipProps={{ placement: "top" }}
           iconProps={{ iconName: "CaretLeft" }}
           styles={{
             icon: { color: theme.semanticColors.bodyText, height: 18, fontSize: 8 },
@@ -301,4 +295,5 @@ const FollowTFControl = memo<Props>((props: Props) => {
     </Stack>
   );
 }, arePropsEqual);
+
 export default FollowTFControl;

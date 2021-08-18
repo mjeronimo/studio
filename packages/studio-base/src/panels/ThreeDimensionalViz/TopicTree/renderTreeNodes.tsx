@@ -18,7 +18,6 @@ import styled from "styled-components";
 import { LinkedGlobalVariable } from "@foxglove/studio-base/panels/ThreeDimensionalViz/Interactions/useLinkedGlobalVariables";
 import { canEditNamespaceOverrideColorDatatype } from "@foxglove/studio-base/panels/ThreeDimensionalViz/TopicSettingsEditor/index";
 import { TOPIC_DISPLAY_MODES } from "@foxglove/studio-base/panels/ThreeDimensionalViz/TopicTree/TopicViewModeSelector";
-import { isNonEmptyOrUndefined } from "@foxglove/studio-base/util/emptyOrUndefined";
 import filterMap from "@foxglove/studio-base/util/filterMap";
 import { SECOND_SOURCE_PREFIX } from "@foxglove/studio-base/util/globalConstants";
 import naturalSort from "@foxglove/studio-base/util/naturalSort";
@@ -46,15 +45,6 @@ import {
 import { generateNodeKey } from "./useTopicTree";
 
 export const SWITCHER_WIDTH = 24;
-
-export const SToggles = styled.div`
-  display: flex;
-  align-items: center;
-`;
-export const SToggle = styled.div`
-  width: 24px;
-  height: 24px;
-`;
 
 const TooltipDescription = styled(TooltipRow)`
   line-height: 1.3;
@@ -228,7 +218,7 @@ export default function renderTreeNodes({
         ? getNamespaceNodes({
             availableNamespacesByTopic,
             canEditNamespaceOverrideColor: !!(
-              isNonEmptyOrUndefined(datatype) && canEditNamespaceOverrideColorDatatype(datatype)
+              datatype && canEditNamespaceOverrideColorDatatype(datatype)
             ),
             checkedKeysSet,
             derivedCustomSettingsByKey,

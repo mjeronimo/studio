@@ -296,10 +296,26 @@ async function rosbridgeSource(options: FactoryOptions) {
     return undefined;
   }
 
+  let rosVersion: 1 | 2;
+  switch (options.source.type) {
+    case "ros1-rosbridge-websocket":
+      rosVersion = 1;
+      break;
+    case "ros2-rosbridge-websocket":
+      rosVersion = 2;
+      break;
+    default:
+      throw new Error(`Invalid source type for rosbridge: ${options.source.type}`);
+  }
+
   const url = maybeUrl;
   options.storage.setItem(storageCacheKey, url);
   return async (playerOptions: BuildPlayerOptions) => ({
-    player: new RosbridgePlayer(url, playerOptions.metricsCollector),
+    player: new RosbridgePlayer({
+      url,
+      rosVersion,
+      metricsCollector: playerOptions.metricsCollector,
+    }),
     sources: [url],
   });
 }
@@ -316,10 +332,11 @@ async function roscoreSource(options: FactoryOptions) {
   } else {
     const value = options.storage.getItem<string>(storageCacheKey);
 
+    const os = OsContextSingleton; // workaround for https://github.com/webpack/webpack/issues/12960
     maybeUrl = await options.prompt({
       title: "ROS 1 TCP connection",
       placeholder: "localhost:11311",
-      value: value ?? OsContextSingleton?.getEnvVar("ROS_MASTER_URI") ?? "localhost:11311",
+      value: value ?? os?.getEnvVar("ROS_MASTER_URI") ?? "localhost:11311",
       transformer: (str) => {
         const result = parseInputUrl(str, "ros:", {
           "http:": { port: 80 },
@@ -427,9 +444,7 @@ export default function PlayerManager({
   const [initialMessageOrder] = useState(messageOrder);
 
   const analytics = useAnalytics();
-  const metricsCollector = useMemo(() => {
-    return new AnalyticsMetricsCollector(analytics);
-  }, [analytics]);
+  const metricsCollector = useMemo(() => new AnalyticsMetricsCollector(analytics), [analytics]);
 
   const [unlimitedMemoryCache = false] = useAppConfigurationValue<boolean>(
     AppSetting.UNLIMITED_MEMORY_CACHE,
@@ -486,11 +501,12 @@ export default function PlayerManager({
     switch (definition.type) {
       case "ros1-local-bagfile":
         return localBagFileSource;
-      case "ros2-folder":
+      case "ros2-local-bagfile":
         return localRosbag2FolderSource;
       case "ros1-socket":
         return roscoreSource;
-      case "ros-ws":
+      case "ros1-rosbridge-websocket":
+      case "ros2-rosbridge-websocket":
         return rosbridgeSource;
       case "ros1-remote-bagfile":
         return remoteBagFileSource;

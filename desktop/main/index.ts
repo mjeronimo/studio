@@ -6,15 +6,13 @@
 
 import "colors";
 import { captureException, init as initSentry } from "@sentry/electron";
-import { app, BrowserWindow, ipcMain, Menu, session, nativeTheme, shell } from "electron";
+import { app, BrowserWindow, ipcMain, Menu, session, nativeTheme } from "electron";
 import { autoUpdater } from "electron-updater";
 import fs from "fs";
-import path from "path";
 
 import Logger from "@foxglove/log";
 
 import pkgInfo from "../../package.json";
-import { DATASTORES_DIR_NAME, FAKE_REMOTE_LAYOUT_STORE_NAME } from "../common/storage";
 import StudioWindow from "./StudioWindow";
 import getDevModeIcon from "./getDevModeIcon";
 import injectFilesToOpen from "./injectFilesToOpen";
@@ -110,7 +108,6 @@ function main() {
           return integration.name !== "Breadcrumbs";
         });
       },
-      maxBreadcrumbs: 10,
     });
   }
 
@@ -170,15 +167,6 @@ function main() {
       new StudioWindow([url]).load();
     } else {
       openUrls.push(url);
-    }
-  });
-
-  ipcMain.handle("debug_openFakeRemoteLayoutStorageDirectory", async () => {
-    const msg = await shell.openPath(
-      path.join(app.getPath("userData"), DATASTORES_DIR_NAME, FAKE_REMOTE_LAYOUT_STORE_NAME),
-    );
-    if (msg !== "") {
-      throw new Error(msg);
     }
   });
 

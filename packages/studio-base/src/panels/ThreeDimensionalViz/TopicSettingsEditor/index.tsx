@@ -11,29 +11,16 @@
 //   found at http://www.apache.org/licenses/LICENSE-2.0
 //   You may not use this file except in compliance with the License.
 
-import React, { useCallback, ComponentType } from "react";
+import { ComponentType } from "react";
 
-import ErrorBoundary from "@foxglove/studio-base/components/ErrorBoundary";
-import { LegacyButton } from "@foxglove/studio-base/components/LegacyStyledComponents";
 import GridSettingsEditor from "@foxglove/studio-base/panels/ThreeDimensionalViz/TopicSettingsEditor/GridSettingsEditor";
 import { TopicSettingsEditorProps } from "@foxglove/studio-base/panels/ThreeDimensionalViz/TopicSettingsEditor/types";
-import { Topic } from "@foxglove/studio-base/players/types";
-import {
-  FOXGLOVE_GRID_DATATYPE,
-  NAV_MSGS_PATH_DATATYPE,
-  POINT_CLOUD_DATATYPE,
-  POSE_STAMPED_DATATYPE,
-  SENSOR_MSGS_LASER_SCAN_DATATYPE,
-  VELODYNE_SCAN_DATATYPE,
-  VISUALIZATION_MSGS_MARKER_ARRAY_DATATYPE,
-  VISUALIZATION_MSGS_MARKER_DATATYPE,
-} from "@foxglove/studio-base/util/globalConstants";
+import { FOXGLOVE_GRID_DATATYPE } from "@foxglove/studio-base/util/globalConstants";
 
 import LaserScanSettingsEditor from "./LaserScanSettingsEditor";
 import MarkerSettingsEditor from "./MarkerSettingsEditor";
 import PointCloudSettingsEditor from "./PointCloudSettingsEditor";
 import PoseSettingsEditor from "./PoseSettingsEditor";
-import styles from "./TopicSettingsEditor.module.scss";
 
 export type { TopicSettingsEditorProps } from "./types";
 
@@ -44,13 +31,20 @@ export function topicSettingsEditorForDatatype(datatype: string):
   | undefined {
   const editors = new Map<string, unknown>([
     [FOXGLOVE_GRID_DATATYPE, GridSettingsEditor],
-    [POINT_CLOUD_DATATYPE, PointCloudSettingsEditor],
-    [VELODYNE_SCAN_DATATYPE, PointCloudSettingsEditor],
-    [POSE_STAMPED_DATATYPE, PoseSettingsEditor],
-    [SENSOR_MSGS_LASER_SCAN_DATATYPE, LaserScanSettingsEditor],
-    [VISUALIZATION_MSGS_MARKER_DATATYPE, MarkerSettingsEditor],
-    [VISUALIZATION_MSGS_MARKER_ARRAY_DATATYPE, MarkerSettingsEditor],
-    [NAV_MSGS_PATH_DATATYPE, MarkerSettingsEditor],
+    ["sensor_msgs/PointCloud2", PointCloudSettingsEditor],
+    ["sensor_msgs/msg/PointCloud2", PointCloudSettingsEditor],
+    ["velodyne_msgs/VelodyneScan", PointCloudSettingsEditor],
+    ["velodyne_msgs/msg/VelodyneScan", PointCloudSettingsEditor],
+    ["geometry_msgs/PoseStamped", PoseSettingsEditor],
+    ["geometry_msgs/msg/PoseStamped", PoseSettingsEditor],
+    ["sensor_msgs/LaserScan", LaserScanSettingsEditor],
+    ["sensor_msgs/msg/LaserScan", LaserScanSettingsEditor],
+    ["visualization_msgs/Marker", MarkerSettingsEditor],
+    ["visualization_msgs/msg/Marker", MarkerSettingsEditor],
+    ["visualization_msgs/MarkerArray", MarkerSettingsEditor],
+    ["visualization_msgs/msg/MarkerArray", MarkerSettingsEditor],
+    ["nav_msgs/Path", MarkerSettingsEditor],
+    ["nav_msgs/msg/Path", MarkerSettingsEditor],
   ]);
 
   return editors.get(datatype) as
@@ -68,53 +62,3 @@ export function canEditNamespaceOverrideColorDatatype(datatype: string): boolean
   const editor = topicSettingsEditorForDatatype(datatype);
   return editor?.canEditNamespaceOverrideColor === true;
 }
-
-type Props = {
-  topic: Topic;
-  message: unknown;
-  settings?: Record<string, unknown>;
-  onSettingsChange: (
-    arg0:
-      | Record<string, unknown>
-      | ((prevSettings: Record<string, unknown>) => Record<string, unknown>),
-  ) => void;
-};
-
-const TopicSettingsEditor = React.memo<Props>(function TopicSettingsEditor({
-  topic,
-  message,
-  settings,
-  onSettingsChange,
-}: Props) {
-  const onFieldChange = useCallback(
-    (fieldName: string, value: unknown) => {
-      onSettingsChange((newSettings) => ({ ...newSettings, [fieldName]: value }));
-    },
-    [onSettingsChange],
-  );
-
-  const Editor = topicSettingsEditorForDatatype(topic.datatype);
-  if (!Editor) {
-    throw new Error(`No topic settings editor available for ${topic.datatype}`);
-  }
-
-  return (
-    <div className={styles.container}>
-      <h3 className={styles.topicName}>{topic.name}</h3>
-      <h4 className={styles.datatype}>
-        <code>{topic.datatype}</code>
-      </h4>
-      <ErrorBoundary>
-        <Editor
-          message={message}
-          settings={settings ?? {}}
-          onFieldChange={onFieldChange}
-          onSettingsChange={onSettingsChange}
-        />
-      </ErrorBoundary>
-      <LegacyButton onClick={() => onSettingsChange({})}>Reset to defaults</LegacyButton>
-    </div>
-  );
-});
-
-export default TopicSettingsEditor;

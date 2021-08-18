@@ -55,6 +55,7 @@ function makeMockLayoutStorage() {
     saveNewLayout: jest.fn().mockImplementation(mockThrow("saveNewLayout")),
     updateLayout: jest.fn().mockImplementation(mockThrow("updateLayout")),
     syncLayout: jest.fn().mockImplementation(mockThrow("syncLayout")),
+    resolveConflict: jest.fn().mockImplementation(mockThrow("resolveConflict")),
     deleteLayout: jest.fn().mockImplementation(mockThrow("deleteLayout")),
   };
 }
@@ -85,7 +86,7 @@ function renderTest({
     <ToastProvider>
       <LayoutStorageContext.Provider value={mockLayoutStorage}>
         <UserProfileStorageContext.Provider value={mockUserProfile}>
-          <CurrentLayoutProvider>
+          <CurrentLayoutProvider disableAnalyticsForTests={true}>
             <Child />
           </CurrentLayoutProvider>
         </UserProfileStorageContext.Provider>

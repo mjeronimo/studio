@@ -15,8 +15,8 @@ import { debounce, isEqual } from "lodash";
 import decompressLZ4 from "wasm-lz4";
 
 import Logger from "@foxglove/log";
-import Bag, { open, BagReader } from "@foxglove/rosbag";
-import ReadResult from "@foxglove/rosbag/dist/ReadResult";
+import { Bag, BagReader } from "@foxglove/rosbag";
+import { BlobReader } from "@foxglove/rosbag/web";
 import { Time, add, compare } from "@foxglove/rostime";
 import { MessageEvent } from "@foxglove/studio-base/players/types";
 import BrowserHttpReader from "@foxglove/studio-base/randomAccessDataProviders/BrowserHttpReader";
@@ -34,17 +34,18 @@ import { getReportMetadataForChunk } from "@foxglove/studio-base/randomAccessDat
 import CachedFilelike, { FileReader } from "@foxglove/studio-base/util/CachedFilelike";
 import { bagConnectionsToTopics } from "@foxglove/studio-base/util/bagConnectionsHelper";
 import { getBagChunksOverlapCount } from "@foxglove/studio-base/util/bags";
-import { isNonEmptyOrUndefined } from "@foxglove/studio-base/util/emptyOrUndefined";
 import { UserError } from "@foxglove/studio-base/util/errors";
 import sendNotification from "@foxglove/studio-base/util/sendNotification";
 import { fromMillis, subtractTimes } from "@foxglove/studio-base/util/time";
 import Bzip2 from "@foxglove/wasm-bz2";
 
-type BagPath = { type: "file"; file: File | string } | { type: "remoteBagUrl"; url: string };
+type BagPath = { type: "file"; file: Blob } | { type: "remoteBagUrl"; url: string };
 
 type Options = { bagPath: BagPath; cacheSizeInBytes?: number };
 
 const log = Logger.getLogger(__filename);
+
+type ReadResult = Parameters<Parameters<Bag["readMessages"]>[1]>[0];
 
 function reportMalformedError(operation: string, error: Error): void {
   sendNotification(
@@ -144,11 +145,11 @@ export default class BagDataProvider implements RandomAccessDataProvider {
           await remoteReader.open(); // Important that we call this first, because it might throw an error if the file can't be read.
         } catch (err) {
           sendNotification("Fetching remote bag failed", (err as Error).message, "user", "error");
-          return new Promise(() => {}); // Just never finish initializing.
+          return await new Promise(() => {}); // Just never finish initializing.
         }
         if (remoteReader.size() === 0) {
           sendNotification("Cannot play invalid bag", "Bag is 0 bytes in size.", "user", "error");
-          return new Promise(() => {}); // Just never finish initializing.
+          return await new Promise(() => {}); // Just never finish initializing.
         }
 
         this._bag = new Bag(new BagReader(remoteReader));
@@ -157,20 +158,11 @@ export default class BagDataProvider implements RandomAccessDataProvider {
           await this._bag.open();
         } catch (err) {
           sendNotification("Opening remote bag failed", (err as Error).message, "user", "error");
-          return new Promise(() => {}); // Just never finish initializing.
+          return await new Promise(() => {}); // Just never finish initializing.
         }
       } else {
-        if (process.env.NODE_ENV === "test" && typeof bagPath.file !== "string") {
-          // Rosbag's `Bag.open` does not accept files in the "node" environment.
-          this._bag = await open(bagPath.file.name);
-        } else {
-          if (process.env.NODE_ENV === "test" && typeof bagPath.file !== "string") {
-            // Rosbag's `Bag.open` does not accept files in the "node" environment.
-            this._bag = await open(bagPath.file.name);
-          } else {
-            this._bag = await open(bagPath.file);
-          }
-        }
+        this._bag = new Bag(new BagReader(new BlobReader(bagPath.file)));
+        await this._bag.open();
       }
     } catch (err) {
       // Errors in this section come from invalid user data, so we don't want them to be reported as
@@ -186,11 +178,7 @@ export default class BagDataProvider implements RandomAccessDataProvider {
     }[] = [];
     for (const [connId, connection] of this._bag.connections) {
       const { messageDefinition, md5sum, topic, type, callerid } = connection;
-      if (
-        isNonEmptyOrUndefined(md5sum) &&
-        isNonEmptyOrUndefined(topic) &&
-        isNonEmptyOrUndefined(type)
-      ) {
+      if (md5sum && topic && type) {
         connections.push({
           messageDefinition,
           md5sum,
@@ -216,7 +204,7 @@ export default class BagDataProvider implements RandomAccessDataProvider {
     if (!startTime || !endTime || connections.length === 0) {
       // This will abort video generation:
       sendNotification("Cannot play invalid bag", "Bag is empty or corrupt.", "user", "error");
-      return new Promise(() => {
+      return await new Promise(() => {
         // no-op
       }); // Just never finish initializing.
     }
@@ -294,7 +282,7 @@ export default class BagDataProvider implements RandomAccessDataProvider {
     let totalSizeOfMessages = 0;
     let numberOfMessages = 0;
     const messages: MessageEvent<ArrayBuffer>[] = [];
-    const onMessage = (msg: ReadResult<unknown>) => {
+    const onMessage = (msg: ReadResult) => {
       const { data, topic, timestamp } = msg;
       messages.push({
         topic,
@@ -310,12 +298,12 @@ export default class BagDataProvider implements RandomAccessDataProvider {
       endTime: end,
       noParse: true,
       decompress: {
-        bz2: (buffer: Buffer, size: number) => {
+        bz2: (buffer: Uint8Array, size: number) => {
           if (!this.bzip2) {
             throw new Error("bzip2 not initialized");
           }
           try {
-            return Buffer.from(this.bzip2.decompress(buffer, size, { small: false }));
+            return this.bzip2.decompress(buffer, size, { small: false });
           } catch (error) {
             reportMalformedError("bz2 decompression", error);
             throw error;

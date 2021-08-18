@@ -22,7 +22,6 @@ import useDeepChangeDetector from "@foxglove/studio-base/hooks/useDeepChangeDete
 import { Interactive } from "@foxglove/studio-base/panels/ThreeDimensionalViz/Interactions/types";
 import Transforms from "@foxglove/studio-base/panels/ThreeDimensionalViz/Transforms";
 import { TextMarker, Color } from "@foxglove/studio-base/types/Messages";
-import { isNonEmptyOrUndefined } from "@foxglove/studio-base/util/emptyOrUndefined";
 
 export const YELLOW = { r: 1, b: 0, g: 1, a: 1 };
 export const ORANGE = { r: 0.97, g: 0.58, b: 0.02, a: 1 };
@@ -169,12 +168,7 @@ export const useSearchMatches = ({
 }): void => {
   const hasCurrentMatchChanged = useDeepChangeDetector([currentMatch], true);
   React.useEffect(() => {
-    if (
-      !currentMatch ||
-      !searchTextOpen ||
-      !isNonEmptyOrUndefined(rootTf) ||
-      !hasCurrentMatchChanged
-    ) {
+    if (!currentMatch || !searchTextOpen || !rootTf || !hasCurrentMatchChanged) {
       return;
     }
 

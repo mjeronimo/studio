@@ -1,7 +1,7 @@
 // This Source Code Form is subject to the terms of the Mozilla Public
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/
-import { DefaultButton, Stack, Text } from "@fluentui/react";
+import { DefaultButton, Stack, Text, Link } from "@fluentui/react";
 import CloseIcon from "@mdi/svg/svg/close.svg";
 import { useState, ReactElement } from "react";
 import styled from "styled-components";
@@ -25,7 +25,6 @@ const StyledBanner = styled.div<{
   justify-content: center;
   text-align: center;
   width: 100vw;
-  padding: 10px;
   color: white;
   background-color: rgba(99, 102, 241, 0.9);
   z-index: 100;
@@ -59,7 +58,7 @@ const VersionBanner = function ({
 
   return (
     <StyledBanner isDismissable={isDismissable}>
-      <Stack tokens={{ childrenGap: 8 }} horizontalAlign="center">
+      <Stack style={{ padding: "10px" }} tokens={{ childrenGap: 8 }} horizontalAlign="center">
         {isDismissable ? (
           <StyledIconWrapper onClick={() => setShowBanner(false)}>
             <CloseIcon />
@@ -68,14 +67,15 @@ const VersionBanner = function ({
           ReactNull
         )}
 
-        <Text styles={{ root: { color: "white" } }}>
-          {prompt} Foxglove Studio currently requires Chrome v{MINIMUM_CHROME_VERSION}+.
+        <Text styles={{ root: { color: "white", fontSize: "1.1em" } }}>
+          {prompt}
+          <br /> Foxglove Studio currently requires Chrome v{MINIMUM_CHROME_VERSION}+.
         </Text>
 
         {isChrome ? undefined : (
-          <Text styles={{ root: { color: "white" } }}>
+          <Text styles={{ root: { color: "white", fontSize: "1.1em" } }}>
             Check out our cross-browser support progress in GitHub issue{" "}
-            <a href="https://github.com/foxglove/studio/issues/1511">#1511</a>.
+            <Link href="https://github.com/foxglove/studio/issues/1511">#1511</Link>.
           </Text>
         )}
 
@@ -89,6 +89,7 @@ const VersionBanner = function ({
               backgroundColor: "rgba(255,255, 255, 0.1)",
               borderRadius: "4px",
               border: "none",
+              fontSize: "1em",
             },
             rootHovered: {
               color: "white",

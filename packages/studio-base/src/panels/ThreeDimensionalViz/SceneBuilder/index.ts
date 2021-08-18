@@ -13,11 +13,12 @@
 import _, { flatten, groupBy, isEqual, keyBy, mapValues, some, xor } from "lodash";
 import shallowequal from "shallowequal";
 
+import Log from "@foxglove/log";
 import { Time } from "@foxglove/rostime";
 import {
   InteractionData,
   Interactive,
-} from "@foxglove/studio-base/panels/ThreeDimensionalViz/Interactions";
+} from "@foxglove/studio-base/panels/ThreeDimensionalViz/Interactions/types";
 import MessageCollector from "@foxglove/studio-base/panels/ThreeDimensionalViz/SceneBuilder/MessageCollector";
 import { MarkerMatcher } from "@foxglove/studio-base/panels/ThreeDimensionalViz/ThreeDimensionalVizContext";
 import Transforms from "@foxglove/studio-base/panels/ThreeDimensionalViz/Transforms";
@@ -49,24 +50,13 @@ import {
 import { MarkerProvider, MarkerCollector, Scene } from "@foxglove/studio-base/types/Scene";
 import Bounds from "@foxglove/studio-base/util/Bounds";
 import { emptyPose } from "@foxglove/studio-base/util/Pose";
-import {
-  MARKER_ARRAY_DATATYPES,
-  VISUALIZATION_MSGS_MARKER_DATATYPE,
-  VISUALIZATION_MSGS_MARKER_ARRAY_DATATYPE,
-  POSE_STAMPED_DATATYPE,
-  NAV_MSGS_OCCUPANCY_GRID_DATATYPE,
-  NAV_MSGS_PATH_DATATYPE,
-  POINT_CLOUD_DATATYPE,
-  VELODYNE_SCAN_DATATYPE,
-  COLOR_RGBA_DATATYPE,
-  SENSOR_MSGS_LASER_SCAN_DATATYPE,
-  GEOMETRY_MSGS_POLYGON_STAMPED_DATATYPE,
-} from "@foxglove/studio-base/util/globalConstants";
 import naturalSort from "@foxglove/studio-base/util/naturalSort";
 import sendNotification from "@foxglove/studio-base/util/sendNotification";
 import { fromSec } from "@foxglove/studio-base/util/time";
 
 import { ThreeDimensionalVizHooks } from "./types";
+
+const log = Log.getLogger(__filename);
 
 export type TopicSettingsCollection = {
   [topicOrNamespaceKey: string]: Record<string, unknown>;
@@ -160,7 +150,7 @@ export function filterOutSupersededMessages<T extends Pick<MessageEvent<unknown>
   // Later messages take precedence over earlier messages, so iterate from latest to earliest to
   // find the last one that matters.
   const reversedMessages = messages.slice().reverse();
-  if (MARKER_ARRAY_DATATYPES.includes(datatype)) {
+  if (["visualization_msgs/MarkerArray", "visualization_msgs/msg/MarkerArray"].includes(datatype)) {
     // Many marker arrays begin with a command to "delete all markers on this topic". If we see
     // this, we can ignore any earlier messages on the topic.
     const earliestMessageToKeepIndex = reversedMessages.findIndex(({ message }) => {
@@ -823,6 +813,7 @@ export default class SceneBuilder implements MarkerProvider {
       try {
         this._consumeTopic(topic);
       } catch (error) {
+        log.error(error);
         this._setTopicError(topic, error.toString());
       }
     }
@@ -832,15 +823,18 @@ export default class SceneBuilder implements MarkerProvider {
   _consumeMessage = (topic: string, datatype: string, msg: MessageEvent<unknown>): void => {
     const { message } = msg;
     switch (datatype) {
-      case VISUALIZATION_MSGS_MARKER_DATATYPE:
+      case "visualization_msgs/Marker":
+      case "visualization_msgs/msg/Marker":
         this._consumeMarker(topic, message as BaseMarker);
 
         break;
-      case VISUALIZATION_MSGS_MARKER_ARRAY_DATATYPE:
+      case "visualization_msgs/MarkerArray":
+      case "visualization_msgs/msg/MarkerArray":
         this._consumeMarkerArray(topic, message as { markers: BaseMarker[] });
 
         break;
-      case POSE_STAMPED_DATATYPE: {
+      case "geometry_msgs/PoseStamped":
+      case "geometry_msgs/msg/PoseStamped": {
         // make synthetic arrow marker from the stamped pose
         const pose = (msg.message as PoseStamped).pose;
         this.collectors[topic]!.addNonMarker(
@@ -853,12 +847,14 @@ export default class SceneBuilder implements MarkerProvider {
         );
         break;
       }
-      case NAV_MSGS_OCCUPANCY_GRID_DATATYPE:
+      case "nav_msgs/OccupancyGrid":
+      case "nav_msgs/msg/OccupancyGrid":
         // flatten btn: set empty z values to be at the same level as the flattenedZHeightPose
         this._consumeOccupancyGrid(topic, message as NavMsgs$OccupancyGrid);
 
         break;
-      case NAV_MSGS_PATH_DATATYPE: {
+      case "nav_msgs/Path":
+      case "nav_msgs/msg/Path": {
         const topicSettings = this._settingsByKey[`t:${topic}`];
 
         const pathStamped = message as NavMsgs$Path;
@@ -876,23 +872,28 @@ export default class SceneBuilder implements MarkerProvider {
         this._consumeNonMarkerMessage(topic, newMessage, 4 /* line strip */, message);
         break;
       }
-      case POINT_CLOUD_DATATYPE:
+      case "sensor_msgs/PointCloud2":
+      case "sensor_msgs/msg/PointCloud2":
         this._consumeNonMarkerMessage(topic, message as StampedMessage, 102);
         break;
-      case VELODYNE_SCAN_DATATYPE: {
+      case "velodyne_msgs/VelodyneScan":
+      case "velodyne_msgs/msg/VelodyneScan": {
         const converted = this._velodyneCloudConverter.decode(message as VelodyneScan);
         if (converted) {
           this._consumeNonMarkerMessage(topic, converted, 102);
         }
         break;
       }
-      case SENSOR_MSGS_LASER_SCAN_DATATYPE:
+      case "sensor_msgs/LaserScan":
+      case "sensor_msgs/msg/LaserScan":
         this._consumeNonMarkerMessage(topic, message as StampedMessage, 104);
         break;
-      case COLOR_RGBA_DATATYPE:
+      case "std_msgs/ColorRGBA":
+      case "std_msgs/msg/ColorRGBA":
         this._consumeColor(msg as MessageEvent<Color>);
         break;
-      case GEOMETRY_MSGS_POLYGON_STAMPED_DATATYPE: {
+      case "geometry_msgs/PolygonStamped":
+      case "geometry_msgs/msg/PolygonStamped": {
         // convert Polygon to a line strip
         const polygonStamped = message as GeometryMsgs$PolygonStamped;
         const polygon = polygonStamped.polygon;
@@ -938,10 +939,14 @@ export default class SceneBuilder implements MarkerProvider {
     this.errors.topicsWithBadFrameIds.delete(topic);
     this.errors.topicsWithError.delete(topic);
     this.collectors[topic] ??= new MessageCollector();
-    (this.collectors[topic] as MessageCollector).setClock(this._clock ?? { sec: 0, nsec: 0 });
-    (this.collectors[topic] as MessageCollector).flush();
+    this.collectors[topic]?.setClock(this._clock ?? { sec: 0, nsec: 0 });
+    this.collectors[topic]?.flush();
 
-    const datatype = (this.topicsByName[topic] as Topic).datatype;
+    const datatype = this.topicsByName[topic]?.datatype;
+    if (datatype == undefined) {
+      return;
+    }
+
     // If topic has a decayTime set, markers with no lifetime will get one
     // later on, so we don't need to filter them. Note: A decayTime of zero is
     // defined as an infinite lifetime

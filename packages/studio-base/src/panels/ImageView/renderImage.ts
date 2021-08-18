@@ -20,7 +20,6 @@ import {
   CompressedImage,
   ImageMarkerArray,
 } from "@foxglove/studio-base/types/Messages";
-import { isNonEmptyOrUndefined } from "@foxglove/studio-base/util/emptyOrUndefined";
 import sendNotification from "@foxglove/studio-base/util/sendNotification";
 
 import PinholeCameraModel from "./PinholeCameraModel";
@@ -38,7 +37,13 @@ import {
 } from "./decodings";
 import { buildMarkerData, Dimensions, RawMarkerData, MarkerData, RenderOptions } from "./util";
 
-const IMAGE_DATATYPES = ["sensor_msgs/CompressedImage", "sensor_msgs/Image"];
+const UNCOMPRESSED_IMAGE_DATATYPES = ["sensor_msgs/Image", "sensor_msgs/msg/Image"];
+export const IMAGE_DATATYPES = [
+  "sensor_msgs/Image",
+  "sensor_msgs/msg/Image",
+  "sensor_msgs/CompressedImage",
+  "sensor_msgs/msg/CompressedImage",
+];
 
 // Just globally keep track of if we've shown an error in rendering, since typically when you get
 // one error, you'd then get a whole bunch more, which is spammy.
@@ -81,6 +86,12 @@ export async function renderImage({
 
   try {
     const bitmap = await decodeMessageToBitmap(imageMessage, imageMessageDatatype, options);
+
+    if (options?.resizeCanvas === true) {
+      canvas.width = bitmap.width;
+      canvas.height = bitmap.height;
+    }
+
     const dimensions = render(canvas, zoomMode, panZoom, bitmap, imageSmoothing, markerData);
     bitmap.close();
     return dimensions;
@@ -126,9 +137,9 @@ function decodeMessageToBitmap(
   // differ from the one recorded during initialization. So here we just check
   // for properties consistent with either datatype, and render accordingly.
   if (
-    datatype === "sensor_msgs/Image" &&
+    UNCOMPRESSED_IMAGE_DATATYPES.includes(datatype) &&
     "encoding" in imageMessage &&
-    isNonEmptyOrUndefined(imageMessage.encoding)
+    imageMessage.encoding
   ) {
     const { is_bigendian, width, height, encoding } = imageMessage as Image;
     image = new ImageData(width, height);
@@ -171,7 +182,7 @@ function decodeMessageToBitmap(
     }
   } else if (
     IMAGE_DATATYPES.includes(datatype) ||
-    ("format" in imageMessage && isNonEmptyOrUndefined(imageMessage.format))
+    ("format" in imageMessage && imageMessage.format)
   ) {
     const { format } = imageMessage as CompressedImage;
     image = new Blob([rawData], { type: `image/${format}` });

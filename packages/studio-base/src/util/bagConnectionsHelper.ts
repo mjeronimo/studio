@@ -11,7 +11,7 @@
 //   found at http://www.apache.org/licenses/LICENSE-2.0
 //   You may not use this file except in compliance with the License.
 
-import Bag from "@foxglove/rosbag";
+import type { Bag } from "@foxglove/rosbag";
 import { parse as parseMessageDefinition } from "@foxglove/rosmsg";
 import { Topic } from "@foxglove/studio-base/players/types";
 import { Connection } from "@foxglove/studio-base/randomAccessDataProviders/types";
@@ -25,17 +25,18 @@ type DatatypeDescription = {
 // Extract one big list of datatypes from the individual connections.
 export function bagConnectionsToDatatypes(
   connections: readonly DatatypeDescription[],
+  { ros2 }: { ros2: boolean },
 ): RosDatatypes {
-  const datatypes: RosDatatypes = {};
+  const datatypes: RosDatatypes = new Map();
   connections.forEach((connection) => {
-    const connectionTypes = parseMessageDefinition(connection.messageDefinition);
-    connectionTypes.forEach(({ name, definitions }, index) => {
+    const connectionDefinitions = parseMessageDefinition(connection.messageDefinition, { ros2 });
+    connectionDefinitions.forEach(({ name, definitions }, index) => {
       // The first definition usually doesn't have an explicit name,
-      // so we get the name from the connection.
+      // so we get the name from the datatype.
       if (index === 0) {
-        datatypes[connection.type] = { fields: definitions };
+        datatypes.set(connection.type, { name: connection.type, definitions });
       } else if (name != undefined) {
-        datatypes[name] = { fields: definitions };
+        datatypes.set(name, { name, definitions });
       }
     });
   });

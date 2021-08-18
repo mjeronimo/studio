@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
     overflowX: "hidden",
     overflowY: "auto",
     padding: theme.spacing.s1,
-    maxWidth: PANE_WIDTH - 28,
+    // maxWidth: PANE_WIDTH - 28,
     maxHeight: PANE_HEIGHT,
   },
 }));
@@ -57,7 +57,7 @@ type Props<T extends string> = {
   onSelectTab: (name: T | undefined) => void;
   selectedTab?: T; // collapse the toolbar if selectedTab is undefined
   tooltip: string;
-  style?: React.CSSProperties;
+  // style?: React.CSSProperties;
   dataTest?: string;
 };
 

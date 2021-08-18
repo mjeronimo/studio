@@ -2,6 +2,8 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/
 
+import { Link } from "@fluentui/react";
+
 import {
   App,
   ErrorBoundary,
@@ -10,6 +12,8 @@ import {
   ThemeProvider,
   UserProfileLocalStorageProvider,
   StudioToastProvider,
+  CssBaseline,
+  GlobalCss,
 } from "@foxglove/studio-base";
 
 import LocalStorageAppConfigurationProvider from "./components/LocalStorageAppConfigurationProvider";
@@ -26,27 +30,31 @@ export function Root({ loadWelcomeLayout }: { loadWelcomeLayout: boolean }): JSX
       disabledReason: (
         <>
           ROS 1 Native connections are only available in our desktop app.&nbsp;
-          <a href="https://foxglove.dev/download" target="_blank" rel="noreferrer">
+          <Link href="https://foxglove.dev/download" target="_blank" rel="noreferrer">
             Download it here.
-          </a>
+          </Link>
         </>
       ),
     },
     {
-      name: "Rosbridge (WebSocket)",
-      type: "ros-ws",
+      name: "ROS 1 Rosbridge (WebSocket)",
+      type: "ros1-rosbridge-websocket",
     },
     {
-      name: "ROS 1 Bag File (local)",
+      name: "ROS 2 Rosbridge (WebSocket)",
+      type: "ros2-rosbridge-websocket",
+    },
+    {
+      name: "ROS 1 Bag (local)",
       type: "ros1-local-bagfile",
     },
     {
-      name: "ROS 1 Bag File (HTTP)",
+      name: "ROS 1 Bag (HTTP)",
       type: "ros1-remote-bagfile",
     },
     {
-      name: "ROS 2 Bag Folder (local)",
-      type: "ros2-folder",
+      name: "ROS 2 Bag (local)",
+      type: "ros2-local-bagfile",
     },
     {
       name: "Velodyne LIDAR",
@@ -54,9 +62,9 @@ export function Root({ loadWelcomeLayout }: { loadWelcomeLayout: boolean }): JSX
       disabledReason: (
         <>
           Velodyne connections are only available in our desktop app.&nbsp;
-          <a href="https://foxglove.dev/download" target="_blank" rel="noreferrer">
+          <Link href="https://foxglove.dev/download" target="_blank" rel="noreferrer">
             Download it here.
-          </a>
+          </Link>
         </>
       ),
     },
@@ -74,15 +82,18 @@ export function Root({ loadWelcomeLayout }: { loadWelcomeLayout: boolean }): JSX
 
   return (
     <ThemeProvider>
-      <ErrorBoundary>
-        <MultiProvider providers={providers}>
-          <App
-            loadWelcomeLayout={loadWelcomeLayout}
-            demoBagUrl={DEMO_BAG_URL}
-            availableSources={playerSources}
-          />
-        </MultiProvider>
-      </ErrorBoundary>
+      <GlobalCss />
+      <CssBaseline>
+        <ErrorBoundary>
+          <MultiProvider providers={providers}>
+            <App
+              loadWelcomeLayout={loadWelcomeLayout}
+              demoBagUrl={DEMO_BAG_URL}
+              availableSources={playerSources}
+            />
+          </MultiProvider>
+        </ErrorBoundary>
+      </CssBaseline>
     </ThemeProvider>
   );
 }

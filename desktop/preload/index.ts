@@ -38,7 +38,6 @@ if (allowCrashReporting && typeof process.env.SENTRY_DSN === "string") {
         return integration.name !== "Breadcrumbs";
       });
     },
-    maxBreadcrumbs: 10,
   });
 }
 
@@ -108,9 +107,6 @@ const desktopBridge: Desktop = {
   },
   getDeepLinks(): string[] {
     return window.process.argv.filter((arg) => arg.startsWith("foxglove://"));
-  },
-  async debug_openFakeRemoteLayoutStorageDirectory(): Promise<void> {
-    return await ipcRenderer.invoke("debug_openFakeRemoteLayoutStorageDirectory");
   },
   async getExtensions() {
     const homePath = (await ipcRenderer.invoke("getHomePath")) as string;

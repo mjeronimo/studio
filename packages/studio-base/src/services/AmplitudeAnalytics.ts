@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from "uuid";
 
 import Logger from "@foxglove/log";
 import OsContextSingleton from "@foxglove/studio-base/OsContextSingleton";
+import IAnalytics, { AppEvent } from "@foxglove/studio-base/services/IAnalytics";
 import Storage from "@foxglove/studio-base/util/Storage";
 
 const UUID_ZERO = "00000000-0000-0000-0000-000000000000";
@@ -16,20 +17,9 @@ const USER_ID_KEY = "analytics_user_id";
 
 const log = Logger.getLogger(__filename);
 
-export enum AppEvent {
-  APP_INIT = "APP_INIT",
+const os = OsContextSingleton; // workaround for https://github.com/webpack/webpack/issues/12960
 
-  // PlayerMetricsCollectorInterface events
-  PLAYER_CONSTRUCTED = "PLAYER_CONSTRUCTED",
-  PLAYER_INITIALIZED = "PLAYER_INITIALIZED",
-  PLAYER_PLAY = "PLAYER_PLAY",
-  PLAYER_SEEK = "PLAYER_SEEK",
-  PLAYER_SET_SPEED = "PLAYER_SET_SPEED",
-  PLAYER_PAUSE = "PLAYER_PAUSE",
-  PLAYER_CLOSE = "PLAYER_CLOSE",
-}
-
-export class Analytics {
+export class AmplitudeAnalytics implements IAnalytics {
   private _amplitude: Promise<amplitude.AmplitudeClient | undefined>;
   private _crashReporting: boolean;
   private _storage = new Storage();
@@ -62,7 +52,7 @@ export class Analytics {
       log.info("Crash reporting is disabled");
     }
 
-    this.logEvent(AppEvent.APP_INIT);
+    void this.logEvent(AppEvent.APP_INIT);
   }
 
   private async createAmplitude(apiKey: string): Promise<amplitude.AmplitudeClient> {
@@ -83,7 +73,7 @@ export class Analytics {
   }
 
   getAppVersion(): string {
-    return OsContextSingleton?.getAppVersion() ?? "0.0.0";
+    return os?.getAppVersion() ?? "0.0.0";
   }
 
   getUserId(): string {
@@ -97,10 +87,9 @@ export class Analytics {
 
   // OsContextSingleton.getMachineId() can take 500-2000ms on macOS
   async getDeviceId(): Promise<string> {
-    return (await OsContextSingleton?.getMachineId()) ?? UUID_ZERO;
+    return (await os?.getMachineId()) ?? UUID_ZERO;
   }
 
-  logEvent(event: AppEvent, data?: { [key: string]: unknown }): void;
   async logEvent(event: AppEvent, data?: { [key: string]: unknown }): Promise<void> {
     const amp = await this._amplitude;
     if (amp != undefined) {

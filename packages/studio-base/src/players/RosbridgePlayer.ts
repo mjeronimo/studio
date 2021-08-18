@@ -19,9 +19,11 @@ import Log from "@foxglove/log";
 import type { RosGraph } from "@foxglove/ros1";
 import { parse as parseMessageDefinition } from "@foxglove/rosmsg";
 import { LazyMessageReader } from "@foxglove/rosmsg-serialization";
+import { MessageReader as ROS2MessageReader } from "@foxglove/rosmsg2-serialization";
 import { Time } from "@foxglove/rostime";
+import PlayerProblemManager from "@foxglove/studio-base/players/PlayerProblemManager";
 import {
-  AdvertisePayload,
+  AdvertiseOptions,
   MessageEvent,
   Player,
   PlayerCapabilities,
@@ -33,7 +35,6 @@ import {
   PlayerPresence,
   PlayerMetricsCollectorInterface,
   ParameterValue,
-  PlayerProblem,
 } from "@foxglove/studio-base/players/types";
 import { RosDatatypes } from "@foxglove/studio-base/types/RosDatatypes";
 import { bagConnectionsToDatatypes } from "@foxglove/studio-base/util/bagConnectionsHelper";
@@ -57,6 +58,7 @@ const CAPABILITIES = [PlayerCapabilities.advertise];
 // unmarshalls into plain JS objects.
 export default class RosbridgePlayer implements Player {
   private _url: string; // WebSocket URL.
+  private _rosVersion: 1 | 2;
   private _rosClient?: roslib.Ros; // The roslibjs client when we're connected.
   private _id: string = uuidv4(); // Unique ID for this player.
   private _listener?: (arg0: PlayerState) => Promise<void>; // Listener for _emitState().
@@ -67,7 +69,7 @@ export default class RosbridgePlayer implements Player {
   private _subscribedTopics = new Map<string, Set<string>>(); // A map of topic names to the set of subscriber IDs subscribed to each topic.
   private _services = new Map<string, Set<string>>(); // A map of service names to service provider IDs that provide each service.
   private _messageReadersByDatatype: {
-    [datatype: string]: LazyMessageReader;
+    [datatype: string]: LazyMessageReader | ROS2MessageReader;
   } = {};
   private _start?: Time; // The time at which we started playing.
   private _clockTime?: Time; // The most recent published `/clock` time, if available
@@ -81,19 +83,28 @@ export default class RosbridgePlayer implements Player {
   // active publishers for the current connection
   private _topicPublishers = new Map<string, roslib.Topic>();
   // which topics we want to advertise to other nodes
-  private _advertisements: AdvertisePayload[] = [];
+  private _advertisements: AdvertiseOptions[] = [];
   private _parsedMessageDefinitionsByTopic: ParsedMessageDefinitionsByTopic = {};
   private _parsedTopics: Set<string> = new Set();
   private _receivedBytes: number = 0;
   private _metricsCollector: PlayerMetricsCollectorInterface;
   private _hasReceivedMessage = false;
   private _presence: PlayerPresence = PlayerPresence.NOT_PRESENT;
-  private _problems: PlayerProblem[] = [];
+  private _problems = new PlayerProblemManager();
 
-  constructor(url: string, metricsCollector: PlayerMetricsCollectorInterface) {
+  constructor({
+    url,
+    rosVersion,
+    metricsCollector,
+  }: {
+    url: string;
+    rosVersion: 1 | 2;
+    metricsCollector: PlayerMetricsCollectorInterface;
+  }) {
     this._presence = PlayerPresence.CONSTRUCTING;
     this._metricsCollector = metricsCollector;
     this._url = url;
+    this._rosVersion = rosVersion;
     this._start = fromMillis(Date.now());
     this._metricsCollector.playerConstructed();
     this._open();
@@ -103,7 +114,7 @@ export default class RosbridgePlayer implements Player {
     if (this._closed) {
       return;
     }
-    this._problems = [];
+    this._problems.removeProblem("rosbridge:connection-failed");
     log.info(`Opening connection to ${this._url}`);
 
     // `workersocket` will open the actual WebSocket connection in a WebWorker.
@@ -114,7 +125,7 @@ export default class RosbridgePlayer implements Player {
         return;
       }
       this._presence = PlayerPresence.PRESENT;
-      this._problems = [];
+      this._problems.removeProblem("rosbridge:connection-failed");
       this._rosClient = rosClient;
 
       this._setupPublishers();
@@ -123,11 +134,12 @@ export default class RosbridgePlayer implements Player {
 
     rosClient.on("error", (err) => {
       if (err) {
-        this._problems.push({
+        this._problems.addProblem("rosbridge:error", {
           severity: "warn",
-          message: "Rosbridge issue",
+          message: "Rosbridge error",
           error: err,
         });
+        this._emitState();
       }
     });
 
@@ -141,9 +153,10 @@ export default class RosbridgePlayer implements Player {
         topic.unsubscribe();
         this._topicSubscriptions.delete(topicName);
       }
+      rosClient.close(); // ensure the underlying worker is cleaned up
       delete this._rosClient;
 
-      this._problems.push({
+      this._problems.addProblem("rosbridge:connection-failed", {
         severity: "error",
         message: "Connection failed",
         tip: `Check that the rosbridge WebSocket server at ${this._url} is reachable.`,
@@ -158,7 +171,7 @@ export default class RosbridgePlayer implements Player {
 
   _requestTopics = async (): Promise<void> => {
     // clear problems before each topics request so we don't have stale problems from previous failed requests
-    this._problems = [];
+    this._problems.removeProblems((id) => id.startsWith("requestTopics:"));
 
     if (this._requestTopicsTimeout) {
       clearTimeout(this._requestTopicsTimeout);
@@ -178,10 +191,10 @@ export default class RosbridgePlayer implements Player {
       const topicsMissingDatatypes: string[] = [];
       const topics = [];
       const datatypeDescriptions = [];
-      const messageReaders: Record<string, LazyMessageReader> = {};
+      const messageReaders: Record<string, LazyMessageReader | ROS2MessageReader> = {};
 
       for (let i = 0; i < result.topics.length; i++) {
-        const topicName = result.topics[i] as string;
+        const topicName = result.topics[i]!;
         const type = result.types[i];
         const messageDefinition = result.typedefs_full_text[i];
 
@@ -191,11 +204,13 @@ export default class RosbridgePlayer implements Player {
         }
         topics.push({ name: topicName, datatype: type });
         datatypeDescriptions.push({ type, messageDefinition });
-        const parsedDefinition =
-          typeof messageDefinition === "string"
-            ? parseMessageDefinition(messageDefinition)
-            : messageDefinition;
-        messageReaders[type] = messageReaders[type] ?? new LazyMessageReader(parsedDefinition);
+        const parsedDefinition = parseMessageDefinition(messageDefinition, {
+          ros2: this._rosVersion === 2,
+        });
+        messageReaders[type] ??=
+          this._rosVersion === 1
+            ? new LazyMessageReader(parsedDefinition)
+            : new ROS2MessageReader(parsedDefinition);
         this._parsedMessageDefinitionsByTopic[topicName] = parsedDefinition;
       }
 
@@ -206,7 +221,7 @@ export default class RosbridgePlayer implements Player {
       }
 
       if (topicsMissingDatatypes.length > 0) {
-        this._problems.push({
+        this._problems.addProblem("requestTopics:missing-types", {
           severity: "warn",
           message: "Could not resolve all message types",
           tip: `Message types could not be found for these topics: ${topicsMissingDatatypes.join(
@@ -220,7 +235,9 @@ export default class RosbridgePlayer implements Player {
       }
 
       this._providerTopics = sortedTopics;
-      this._providerDatatypes = bagConnectionsToDatatypes(datatypeDescriptions);
+      this._providerDatatypes = bagConnectionsToDatatypes(datatypeDescriptions, {
+        ros2: this._rosVersion === 2,
+      });
       this._messageReadersByDatatype = messageReaders;
 
       // Try subscribing again, since we might now be able to subscribe to some new topics.
@@ -233,22 +250,24 @@ export default class RosbridgePlayer implements Player {
         this._subscribedTopics = graph.subscribers;
         this._services = graph.services;
       } catch (error) {
-        this._problems.push({
+        this._problems.addProblem("requestTopics:system-state", {
           severity: "error",
           message: "Failed to fetch node details from rosbridge",
+          error,
         });
         this._publishedTopics = new Map();
         this._subscribedTopics = new Map();
         this._services = new Map();
       }
-
-      this._emitState();
     } catch (error) {
-      this._problems.push({
+      this._problems.addProblem("requestTopics:error", {
         severity: "error",
         message: "Failed to fetch topics from rosbridge",
+        error,
       });
     } finally {
+      this._emitState();
+
       // Regardless of what happens, request topics again in a little bit.
       this._requestTopicsTimeout = setTimeout(this._requestTopics, 3000);
     }
@@ -269,7 +288,7 @@ export default class RosbridgePlayer implements Player {
         capabilities: CAPABILITIES,
         playerId: this._id,
         activeData: undefined,
-        problems: this._problems,
+        problems: this._problems.problems(),
       });
     }
 
@@ -287,7 +306,7 @@ export default class RosbridgePlayer implements Player {
       progress: {},
       capabilities: CAPABILITIES,
       playerId: this._id,
-      problems: this._problems,
+      problems: this._problems.problems(),
 
       activeData: {
         messages,
@@ -364,28 +383,37 @@ export default class RosbridgePlayer implements Player {
         continue;
       }
 
+      const problemId = `message:${topicName}`;
       topic.subscribe((message) => {
         if (!this._providerTopics) {
           return;
         }
+        try {
+          const bytes = (message as { bytes: ArrayBuffer }).bytes;
+          const receiveTime = fromMillis(Date.now());
+          const innerMessage = messageReader.readMessage(Buffer.from(bytes));
 
-        const bytes = (message as { bytes: ArrayBuffer }).bytes;
-        const receiveTime = fromMillis(Date.now());
-        const innerMessage = messageReader.readMessage(Buffer.from(bytes));
+          if (!this._hasReceivedMessage) {
+            this._hasReceivedMessage = true;
+            this._metricsCollector.recordTimeToFirstMsgs();
+          }
 
-        if (!this._hasReceivedMessage) {
-          this._hasReceivedMessage = true;
-          this._metricsCollector.recordTimeToFirstMsgs();
-        }
-
-        if (this._parsedTopics.has(topicName)) {
-          const msg: MessageEvent<unknown> = {
-            topic: topicName,
-            receiveTime,
-            message: innerMessage as never,
-          };
-          this._parsedMessages.push(msg);
-          this._handleInternalMessage(msg);
+          if (this._parsedTopics.has(topicName)) {
+            const msg: MessageEvent<unknown> = {
+              topic: topicName,
+              receiveTime,
+              message: innerMessage,
+            };
+            this._parsedMessages.push(msg);
+            this._handleInternalMessage(msg);
+          }
+          this._problems.removeProblem(problemId);
+        } catch (error) {
+          this._problems.addProblem(problemId, {
+            severity: "error",
+            message: `Failed to parse message on ${topicName}`,
+            error,
+          });
         }
 
         this._emitState();
@@ -402,7 +430,7 @@ export default class RosbridgePlayer implements Player {
     }
   }
 
-  setPublishers(publishers: AdvertisePayload[]): void {
+  setPublishers(publishers: AdvertiseOptions[]): void {
     // Since `setPublishers` is rarely called, we can get away with just throwing away the old
     // Roslib.Topic objects and creating new ones.
     for (const publisher of this._topicPublishers.values()) {
@@ -525,7 +553,7 @@ export default class RosbridgePlayer implements Player {
       entries.add(value);
     };
 
-    return new Promise((resolve, reject) => {
+    return await new Promise((resolve, reject) => {
       this._rosClient?.getNodes(async (nodes) => {
         await Promise.all(
           nodes.map((node) => {

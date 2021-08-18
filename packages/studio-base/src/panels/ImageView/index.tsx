@@ -35,12 +35,12 @@ import { useMessagePipeline } from "@foxglove/studio-base/components/MessagePipe
 import Panel from "@foxglove/studio-base/components/Panel";
 import PanelToolbar from "@foxglove/studio-base/components/PanelToolbar";
 import useDeepMemo from "@foxglove/studio-base/hooks/useDeepMemo";
+import { IMAGE_DATATYPES } from "@foxglove/studio-base/panels/ImageView/renderImage";
 import { MessageEvent } from "@foxglove/studio-base/players/types";
 import inScreenshotTests from "@foxglove/studio-base/stories/inScreenshotTests";
 import colors from "@foxglove/studio-base/styles/colors.module.scss";
 import { CameraInfo, StampedMessage } from "@foxglove/studio-base/types/Messages";
 import { PanelConfigSchema, SaveConfig } from "@foxglove/studio-base/types/panels";
-import { nonEmptyOrUndefined } from "@foxglove/studio-base/util/emptyOrUndefined";
 import filterMap from "@foxglove/studio-base/util/filterMap";
 import naturalSort from "@foxglove/studio-base/util/naturalSort";
 import { getTopicsByTopicName } from "@foxglove/studio-base/util/selectors";
@@ -169,16 +169,16 @@ function renderEmptyState(
     <SEmptyStateWrapper>
       <EmptyState>
         Waiting for images {markerTopics.length > 0 && "and markers"} on:
-        <ul>
-          <li>
+        <div>
+          <div>
             <code>{cameraTopic}</code>
-          </li>
+          </div>
           {markerTopics.sort().map((m) => (
-            <li key={m}>
+            <div key={m}>
               <code>{m}</code>
-            </li>
+            </div>
           ))}
-        </ul>
+        </div>
         {shouldSynchronize && (
           <>
             <p>
@@ -280,9 +280,7 @@ function ImageView(props: Props) {
 
   // Namespaces represent marker topics based on the camera topic prefix (e.g. "/camera_front_medium")
   const { allCameraNamespaces, imageTopicsByNamespace } = useMemo(() => {
-    const imageTopics = (topics ?? []).filter(({ datatype }) =>
-      ["sensor_msgs/Image", "sensor_msgs/CompressedImage"].includes(datatype),
-    );
+    const imageTopics = (topics ?? []).filter(({ datatype }) => IMAGE_DATATYPES.includes(datatype));
     const topicsByNamespace = groupTopics(imageTopics);
     return {
       imageTopicsByNamespace: topicsByNamespace,
@@ -294,10 +292,14 @@ function ImageView(props: Props) {
     () => [
       // Single marker
       "visualization_msgs/ImageMarker",
+      "visualization_msgs/msg/ImageMarker",
       // Marker arrays
       "foxglove_msgs/ImageMarkerArray",
+      "foxglove_msgs/msg/ImageMarkerArray",
       "studio_msgs/ImageMarkerArray",
+      "studio_msgs/msg/ImageMarkerArray",
       "visualization_msgs/ImageMarkerArray",
+      "visualization_msgs/msg/ImageMarkerArray",
       // backwards compat with webviz
       "webviz_msgs/ImageMarkerArray",
     ],
@@ -353,7 +355,7 @@ function ImageView(props: Props) {
           toggleComponent={
             <ToggleComponent
               dataTest={"topics-dropdown"}
-              text={nonEmptyOrUndefined(cameraTopic) ?? "no image topics"}
+              text={cameraTopic ? cameraTopic : "no image topics"}
               disabled
             />
           }
@@ -479,8 +481,6 @@ function ImageView(props: Props) {
   );
 
   const markerDropdown = useMemo(() => {
-    const missingRequiredCameraInfo = !cameraInfo;
-
     return (
       <Dropdown
         dataTest={"markers-dropdown"}
@@ -488,13 +488,7 @@ function ImageView(props: Props) {
         onChange={onToggleMarkerName}
         value={enabledMarkerTopics}
         text={availableAndEnabledMarkerTopics.length > 0 ? "markers" : "no markers"}
-        tooltip={
-          missingRequiredCameraInfo
-            ? "camera_info is required when image resolution is set to less than 100%.\nResolution can be changed in the panel settings."
-            : undefined
-        }
         btnClassname={style.dropdown}
-        disabled={availableAndEnabledMarkerTopics.length === 0 || missingRequiredCameraInfo}
       >
         {availableAndEnabledMarkerTopics.map((topic) => (
           <Item
@@ -536,7 +530,6 @@ function ImageView(props: Props) {
   }, [
     addTopicsMenu,
     availableAndEnabledMarkerTopics,
-    cameraInfo,
     customMarkerTopicOptions,
     enabledMarkerTopics,
     onToggleMarkerName,

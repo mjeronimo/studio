@@ -13,6 +13,7 @@ import useAsyncFn from "react-use/lib/useAsyncFn";
 import conflictTypeToString from "@foxglove/studio-base/components/LayoutBrowser/conflictTypeToString";
 import { SidebarContent } from "@foxglove/studio-base/components/SidebarContent";
 import { useTooltip } from "@foxglove/studio-base/components/Tooltip";
+import { useAnalytics } from "@foxglove/studio-base/context/AnalyticsContext";
 import {
   useCurrentLayoutActions,
   useCurrentLayoutSelector,
@@ -23,7 +24,8 @@ import LayoutStorageDebuggingContext from "@foxglove/studio-base/context/LayoutS
 import { usePrompt } from "@foxglove/studio-base/hooks/usePrompt";
 import welcomeLayout from "@foxglove/studio-base/layouts/welcomeLayout";
 import { defaultPlaybackConfig } from "@foxglove/studio-base/providers/CurrentLayoutProvider/reducers";
-import { LayoutMetadata } from "@foxglove/studio-base/services/ILayoutStorage";
+import { AppEvent } from "@foxglove/studio-base/services/IAnalytics";
+import { ConflictResolution, LayoutMetadata } from "@foxglove/studio-base/services/ILayoutStorage";
 import { downloadTextFile } from "@foxglove/studio-base/util/download";
 
 import LayoutSection from "./LayoutSection";
@@ -40,6 +42,7 @@ export default function LayoutBrowser({
   const { addToast } = useToasts();
   const layoutStorage = useLayoutStorage();
   const prompt = usePrompt();
+  const analytics = useAnalytics();
 
   const currentLayoutId = useCurrentLayoutSelector((state) => state.selectedLayout?.id);
   const { setSelectedLayout } = useCurrentLayoutActions();
@@ -70,13 +73,16 @@ export default function LayoutBrowser({
   }, [reloadLayouts]);
 
   const onSelectLayout = useCallback(
-    async (item: Pick<LayoutMetadata, "id">) => {
+    async (item: Pick<LayoutMetadata, "id">, selectedViaClick?: boolean) => {
       const layout = await layoutStorage.getLayout(item.id);
       if (layout) {
         setSelectedLayout(layout);
+        if (selectedViaClick === true) {
+          void analytics.logEvent(AppEvent.LAYOUT_SELECT);
+        }
       }
     },
-    [layoutStorage, setSelectedLayout],
+    [analytics, layoutStorage, setSelectedLayout],
   );
 
   const onSaveLayout = useCallback(
@@ -90,11 +96,12 @@ export default function LayoutBrowser({
           break;
         case "conflict": {
           addToast(conflictTypeToString(result.type), { autoDismiss: true, appearance: "warning" });
+          void analytics.logEvent(AppEvent.LAYOUT_CONFLICT, { type: result.type });
           break;
         }
       }
     },
-    [addToast, layoutStorage, onSelectLayout],
+    [analytics, addToast, layoutStorage, onSelectLayout],
   );
 
   const onRenameLayout = useCallback(
@@ -102,9 +109,10 @@ export default function LayoutBrowser({
       await layoutStorage.updateLayout({ targetID: item.id, name: newName });
       if (currentLayoutId === item.id) {
         await onSelectLayout(item);
+        void analytics.logEvent(AppEvent.LAYOUT_RENAME);
       }
     },
-    [currentLayoutId, layoutStorage, onSelectLayout],
+    [analytics, currentLayoutId, layoutStorage, onSelectLayout],
   );
 
   const onDuplicateLayout = useCallback(
@@ -117,14 +125,17 @@ export default function LayoutBrowser({
           permission: "creator_write",
         });
         await onSelectLayout(newLayout);
+        void analytics.logEvent(AppEvent.LAYOUT_DUPLICATE);
       }
     },
-    [layoutStorage, onSelectLayout],
+    [analytics, layoutStorage, onSelectLayout],
   );
 
   const onDeleteLayout = useCallback(
     async (item: LayoutMetadata) => {
       await layoutStorage.deleteLayout({ id: item.id });
+      void analytics.logEvent(AppEvent.LAYOUT_DELETE);
+
       if (currentLayoutId !== item.id) {
         return;
       }
@@ -144,7 +155,7 @@ export default function LayoutBrowser({
       });
       await onSelectLayout(newLayout);
     },
-    [currentLayoutId, layoutStorage, setSelectedLayout, onSelectLayout],
+    [analytics, currentLayoutId, layoutStorage, setSelectedLayout, onSelectLayout],
   );
 
   const createNewLayout = useCallback(async () => {
@@ -164,7 +175,9 @@ export default function LayoutBrowser({
       permission: "creator_write",
     });
     void onSelectLayout(newLayout);
-  }, [currentDateForStorybook, layoutStorage, onSelectLayout]);
+
+    void analytics.logEvent(AppEvent.LAYOUT_CREATE);
+  }, [currentDateForStorybook, layoutStorage, analytics, onSelectLayout]);
 
   const onExportLayout = useCallback(
     async (item: LayoutMetadata) => {
@@ -172,9 +185,10 @@ export default function LayoutBrowser({
       if (layout) {
         const content = JSON.stringify(layout.data, undefined, 2);
         downloadTextFile(content, `${item.name}.json`);
+        void analytics.logEvent(AppEvent.LAYOUT_EXPORT);
       }
     },
-    [layoutStorage],
+    [layoutStorage, analytics],
   );
 
   const onShareLayout = useCallback(
@@ -200,9 +214,19 @@ export default function LayoutBrowser({
           data: layout.data,
           permission: "org_write",
         });
+        void analytics.logEvent(AppEvent.LAYOUT_SHARE);
       }
     },
-    [layoutStorage, layouts.value?.shared, prompt],
+    [analytics, layoutStorage, layouts.value?.shared, prompt],
+  );
+
+  const onResolveConflict = useCallback(
+    async (item: LayoutMetadata, resolution: ConflictResolution) => {
+      const result = await layoutStorage.resolveConflict(item.id, resolution);
+      // Since the layout may have changed, re-select it in order to load the latest data
+      await onSelectLayout({ id: result.newId ?? item.id });
+    },
+    [layoutStorage, onSelectLayout],
   );
 
   const importLayout = useCallback(async () => {
@@ -243,7 +267,8 @@ export default function LayoutBrowser({
       permission: "creator_write",
     });
     void onSelectLayout(newLayout);
-  }, [addToast, isMounted, layoutStorage, onSelectLayout]);
+    void analytics.logEvent(AppEvent.LAYOUT_IMPORT);
+  }, [addToast, isMounted, layoutStorage, analytics, onSelectLayout]);
 
   const createLayoutTooltip = useTooltip({ contents: "Create new layout" });
   const importLayoutTooltip = useTooltip({ contents: "Import layout" });
@@ -291,6 +316,7 @@ export default function LayoutBrowser({
             onDelete={onDeleteLayout}
             onShare={onShareLayout}
             onExport={onExportLayout}
+            onResolveConflict={onResolveConflict}
           />
         </Stack.Item>
         <Stack.Item>
@@ -307,6 +333,7 @@ export default function LayoutBrowser({
               onDelete={onDeleteLayout}
               onShare={onShareLayout}
               onExport={onExportLayout}
+              onResolveConflict={onResolveConflict}
             />
           )}
         </Stack.Item>
