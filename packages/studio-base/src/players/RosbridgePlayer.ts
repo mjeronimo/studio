@@ -52,6 +52,7 @@ import { TimestampMethod } from "@foxglove/studio-base/util/time";
 const log = Log.getLogger(__dirname);
 
 const CAPABILITIES = [PlayerCapabilities.advertise];
+const EPOCH_TIME: Time = { sec: 0, nsec: 0 };
 
 // Connects to `rosbridge_server` instance using `roslibjs`. Currently doesn't support seeking or
 // showing simulated time, so current time from Date.now() is always used instead. Also doesn't yet
@@ -295,8 +296,8 @@ export default class RosbridgePlayer implements Player {
       return Promise.resolve();
     }
 
-    const { _providerTopics, _providerDatatypes, _start } = this;
-    if (!_providerTopics || !_providerDatatypes || !_start) {
+    const { _providerTopics, _providerDatatypes } = this;
+    if (!_providerTopics || !_providerDatatypes) {
       return this._listener({
         name: this._url,
         presence: this._presence,
@@ -332,7 +333,7 @@ export default class RosbridgePlayer implements Player {
         messages,
         totalBytesReceived: this._receivedBytes,
         messageOrder: this._messageOrder,
-        startTime: _start,
+        startTime: this._start ?? EPOCH_TIME,
         endTime: currentTime,
         currentTime,
         isPlaying: true,
@@ -359,6 +360,10 @@ export default class RosbridgePlayer implements Player {
     this._closed = true;
     if (this._rosClient) {
       this._rosClient.close();
+    }
+    if (this._emitTimer != undefined) {
+      clearTimeout(this._emitTimer);
+      this._emitTimer = undefined;
     }
     this._metricsCollector.close();
     this._hasReceivedMessage = false;
@@ -573,7 +578,7 @@ export default class RosbridgePlayer implements Player {
   }
 
   private _getCurrentTime(): Time {
-    const lastTime = this._end ?? { sec: 0, nsec: 0 };
+    const lastTime = this._end ?? EPOCH_TIME;
     if (this._clockTime == undefined) {
       return lastTime;
     }

@@ -48,6 +48,7 @@ const CAPABILITIES = [
   PlayerCapabilities.getParameters,
   PlayerCapabilities.setParameters,
 ];
+const EPOCH_TIME: Time = { sec: 0, nsec: 0 };
 
 enum Problem {
   Connection = "Connection",
@@ -258,8 +259,7 @@ export default class Ros1Player implements Player {
     }
 
     const providerTopics = this._providerTopics;
-    const start = this._start;
-    if (!providerTopics || !start) {
+    if (!providerTopics) {
       return this._listener({
         name: this._url,
         presence: this._presence,
@@ -295,7 +295,7 @@ export default class Ros1Player implements Player {
         messages,
         totalBytesReceived: this._rosNode?.receivedBytes() ?? 0,
         messageOrder: this._messageOrder,
-        startTime: start,
+        startTime: this._start ?? EPOCH_TIME,
         endTime: currentTime,
         currentTime,
         isPlaying: true,
@@ -323,6 +323,10 @@ export default class Ros1Player implements Player {
     this._closed = true;
     if (this._rosNode) {
       this._rosNode.shutdown();
+    }
+    if (this._emitTimer != undefined) {
+      clearTimeout(this._emitTimer);
+      this._emitTimer = undefined;
     }
     this._metricsCollector.close();
     this._hasReceivedMessage = false;
@@ -602,7 +606,7 @@ stale graph may result in missing topics you expect. Ensure that roscore is reac
   }
 
   private _getCurrentTime(): Time {
-    const lastTime = this._end ?? { sec: 0, nsec: 0 };
+    const lastTime = this._end ?? EPOCH_TIME;
     if (this._clockTime == undefined) {
       return lastTime;
     }

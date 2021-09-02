@@ -36,6 +36,7 @@ const log = Logger.getLogger(__filename);
 const rosLog = Logger.getLogger("ROS2");
 
 const CAPABILITIES: string[] = [];
+const EPOCH_TIME: Time = { sec: 0, nsec: 0 };
 
 enum Problem {
   Connection = "Connection",
@@ -236,8 +237,7 @@ export default class Ros2Player implements Player {
     }
 
     const providerTopics = this._providerTopics;
-    const start = this._start;
-    if (!providerTopics || !start) {
+    if (!providerTopics) {
       return this._listener({
         presence: this._presence,
         progress: {},
@@ -271,7 +271,7 @@ export default class Ros2Player implements Player {
         messages,
         totalBytesReceived: this._rosNode?.receivedBytes() ?? 0,
         messageOrder: this._messageOrder,
-        startTime: start,
+        startTime: this._start ?? EPOCH_TIME,
         endTime: currentTime,
         currentTime,
         isPlaying: true,
@@ -299,6 +299,10 @@ export default class Ros2Player implements Player {
     this._closed = true;
     if (this._rosNode) {
       void this._rosNode.shutdown();
+    }
+    if (this._emitTimer != undefined) {
+      clearTimeout(this._emitTimer);
+      this._emitTimer = undefined;
     }
     this._metricsCollector.close();
     this._hasReceivedMessage = false;
@@ -558,7 +562,7 @@ export default class Ros2Player implements Player {
   }
 
   private _getCurrentTime(): Time {
-    const lastTime = this._end ?? { sec: 0, nsec: 0 };
+    const lastTime = this._end ?? EPOCH_TIME;
     return lastTime;
     // if (this._clockTime == undefined) {
     //   return lastTime;

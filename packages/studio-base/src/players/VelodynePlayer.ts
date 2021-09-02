@@ -68,6 +68,7 @@ const DATATYPES: RosDatatypes = new Map(
   }),
 );
 const CAPABILITIES: string[] = [];
+const EPOCH_TIME: Time = { sec: 0, nsec: 0 };
 
 type VelodynePlayerOpts = {
   port?: number;
@@ -208,18 +209,6 @@ export default class VelodynePlayer implements Player {
       return Promise.resolve();
     }
 
-    if (!this._start || !this._end) {
-      return this._listener({
-        name: "Velodyne",
-        presence: this._presence,
-        progress: {},
-        capabilities: CAPABILITIES,
-        playerId: this._id,
-        activeData: undefined,
-        problems: this._problems,
-      });
-    }
-
     // Time is always moving forward even if we don't get messages from the device.
     // If we are not connected, don't emit updates since we are not longer getting new data
     if (this._presence === PlayerPresence.PRESENT) {
@@ -229,7 +218,7 @@ export default class VelodynePlayer implements Player {
       this._emitTimer = setTimeout(this._emitState, 100);
     }
 
-    const currentTime = this._end;
+    const currentTime = this._end ?? EPOCH_TIME;
     const messages = this._parsedMessages;
     this._parsedMessages = [];
     return this._listener({
@@ -244,7 +233,7 @@ export default class VelodynePlayer implements Player {
         messages,
         totalBytesReceived: this._totalBytesReceived,
         messageOrder: "receiveTime",
-        startTime: this._start,
+        startTime: this._start ?? EPOCH_TIME,
         endTime: currentTime,
         currentTime,
         isPlaying: true,
@@ -273,6 +262,10 @@ export default class VelodynePlayer implements Player {
     if (this._socket) {
       void this._socket.dispose();
       this._socket = undefined;
+    }
+    if (this._emitTimer != undefined) {
+      clearTimeout(this._emitTimer);
+      this._emitTimer = undefined;
     }
     this._metricsCollector.close();
     this._totalBytesReceived = 0;
