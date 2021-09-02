@@ -26,6 +26,7 @@ import {
   fromMillis,
   subtract as subtractTimes,
   toSec,
+  isGreaterThan,
 } from "@foxglove/rostime";
 import PlayerProblemManager from "@foxglove/studio-base/players/PlayerProblemManager";
 import {
@@ -71,6 +72,7 @@ export default class RosbridgePlayer implements Player {
     [datatype: string]: LazyMessageReader | ROS2MessageReader;
   } = {};
   private _start?: Time; // The time at which we started playing.
+  private _end?: Time; // The latest observed message time.
   private _clockTime?: Time; // The most recent published `/clock` time, if available
   private _clockReceived: Time = { sec: 0, nsec: 0 }; // The local time when `_clockTime` was last received
   // active subscriptions
@@ -101,7 +103,6 @@ export default class RosbridgePlayer implements Player {
     this._presence = PlayerPresence.INITIALIZING;
     this._metricsCollector = metricsCollector;
     this._url = url;
-    this._start = fromMillis(Date.now());
     this._metricsCollector.playerConstructed();
     this._open();
   }
@@ -408,6 +409,13 @@ export default class RosbridgePlayer implements Player {
           const buffer = (message as { bytes: ArrayBuffer }).bytes;
           const bytes = new Uint8Array(buffer);
 
+          if (this._start == undefined || isGreaterThan(this._start, receiveTime)) {
+            this._start = receiveTime;
+          }
+          if (this._end == undefined || isGreaterThan(receiveTime, this._end)) {
+            this._end = receiveTime;
+          }
+
           // This conditional can be removed when the ROS2 deserializer supports size()
           if (messageReader instanceof LazyMessageReader) {
             const msgSize = messageReader.size(bytes);
@@ -561,12 +569,12 @@ export default class RosbridgePlayer implements Player {
   }
 
   private _getCurrentTime(): Time {
-    const now = fromMillis(Date.now());
+    const lastTime = this._end ?? { sec: 0, nsec: 0 };
     if (this._clockTime == undefined) {
-      return now;
+      return lastTime;
     }
 
-    const delta = subtractTimes(now, this._clockReceived);
+    const delta = subtractTimes(lastTime, this._clockReceived);
     return addTimes(this._clockTime, delta);
   }
 

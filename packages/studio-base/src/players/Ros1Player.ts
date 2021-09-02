@@ -15,6 +15,7 @@ import {
   fromMillis,
   subtract as subtractTimes,
   toSec,
+  isGreaterThan,
 } from "@foxglove/rostime";
 import OsContextSingleton from "@foxglove/studio-base/OsContextSingleton";
 import PlayerProblemManager from "@foxglove/studio-base/players/PlayerProblemManager";
@@ -78,6 +79,7 @@ export default class Ros1Player implements Player {
   private _services = new Map<string, Set<string>>(); // A map of service names to service provider IDs that provide each service.
   private _parameters = new Map<string, ParameterValue>(); // rosparams
   private _start?: Time; // The time at which we started playing.
+  private _end?: Time; // The latest observed message time.
   private _clockTime?: Time; // The most recent published `/clock` time, if available
   private _clockReceived: Time = { sec: 0, nsec: 0 }; // The local time when `_clockTime` was last received
   private _requestedSubscriptions: SubscribePayload[] = []; // Requested subscriptions by setSubscriptions()
@@ -94,7 +96,6 @@ export default class Ros1Player implements Player {
     this._metricsCollector = metricsCollector;
     this._url = url;
     this._hostname = hostname;
-    this._start = fromMillis(Date.now());
     this._metricsCollector.playerConstructed();
     void this._open();
   }
@@ -390,6 +391,13 @@ export default class Ros1Player implements Player {
       this._metricsCollector.recordTimeToFirstMsgs();
     }
 
+    if (this._start == undefined || isGreaterThan(this._start, receiveTime)) {
+      this._start = receiveTime;
+    }
+    if (this._end == undefined || isGreaterThan(receiveTime, this._end)) {
+      this._end = receiveTime;
+    }
+
     const msg: MessageEvent<unknown> = { topic, receiveTime, message };
     this._parsedMessages.push(msg);
     this._handleInternalMessage(msg);
@@ -590,12 +598,12 @@ stale graph may result in missing topics you expect. Ensure that roscore is reac
   }
 
   private _getCurrentTime(): Time {
-    const now = fromMillis(Date.now());
+    const lastTime = this._end ?? { sec: 0, nsec: 0 };
     if (this._clockTime == undefined) {
-      return now;
+      return lastTime;
     }
 
-    const delta = subtractTimes(now, this._clockReceived);
+    const delta = subtractTimes(lastTime, this._clockReceived);
     return addTimes(this._clockTime, delta);
   }
 }

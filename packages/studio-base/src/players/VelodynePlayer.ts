@@ -6,7 +6,15 @@ import { v4 as uuidv4 } from "uuid";
 
 import { Sockets, UdpRemoteInfo, UdpSocketRenderer } from "@foxglove/electron-socket/renderer";
 import Logger from "@foxglove/log";
-import { Time, fromMillis, add as addTimes, toDate, fromDate, fromMicros } from "@foxglove/rostime";
+import {
+  Time,
+  fromMillis,
+  add as addTimes,
+  toDate,
+  fromDate,
+  fromMicros,
+  isGreaterThan,
+} from "@foxglove/rostime";
 import { GlobalVariables } from "@foxglove/studio-base/hooks/useGlobalVariables";
 import {
   AdvertiseOptions,
@@ -74,7 +82,8 @@ export default class VelodynePlayer implements Player {
   private _seq = 0;
   private _totalBytesReceived = 0;
   private _closed: boolean = false; // Whether the player has been completely closed using close()
-  private _start: Time; // The time at which we started playing
+  private _start?: Time; // The time at which we started playing
+  private _end?: Time; // The latest observed message time
   private _packets: RawPacket[] = []; // Queue of packets that will form the next parsed message
   private _parsedMessages: MessageEvent<unknown>[] = []; // Queue of messages that we'll send in next _emitState() call
   private _metricsCollector: PlayerMetricsCollectorInterface;
@@ -88,7 +97,6 @@ export default class VelodynePlayer implements Player {
     this._port = port ?? DEFAULT_VELODYNE_PORT;
     log.info(`initializing VelodynePlayer on port ${this._port}`);
     this._metricsCollector = metricsCollector;
-    this._start = fromMillis(Date.now());
     this._metricsCollector.playerConstructed();
     void this._open();
   }
@@ -138,13 +146,20 @@ export default class VelodynePlayer implements Player {
     date.setMinutes(0, 0, 0);
     const topOfHour = fromDate(date);
 
-    this._totalBytesReceived += data.byteLength;
-    this._presence = PlayerPresence.PRESENT;
-    this._clearProblem(PROBLEM_SOCKET_ERROR, true);
-
     if (this._seq === 0) {
       this._metricsCollector.recordTimeToFirstMsgs();
     }
+
+    if (this._start == undefined || isGreaterThan(this._start, receiveTime)) {
+      this._start = receiveTime;
+    }
+    if (this._end == undefined || isGreaterThan(receiveTime, this._end)) {
+      this._end = receiveTime;
+    }
+
+    this._totalBytesReceived += data.byteLength;
+    this._presence = PlayerPresence.PRESENT;
+    this._clearProblem(PROBLEM_SOCKET_ERROR, true);
 
     const rawPacket = new RawPacket(data);
 
@@ -192,13 +207,25 @@ export default class VelodynePlayer implements Player {
       return Promise.resolve();
     }
 
+    if (!this._start || !this._end) {
+      return this._listener({
+        name: "Velodyne",
+        presence: this._presence,
+        progress: {},
+        capabilities: CAPABILITIES,
+        playerId: this._id,
+        activeData: undefined,
+        problems: this._problems,
+      });
+    }
+
     // Time is always moving forward even if we don't get messages from the device.
     // If we are not connected, don't emit updates since we are not longer getting new data
     if (this._presence === PlayerPresence.PRESENT) {
       setTimeout(this._emitState, 100);
     }
 
-    const currentTime = fromMillis(Date.now());
+    const currentTime = this._end;
     const messages = this._parsedMessages;
     this._parsedMessages = [];
     return this._listener({

@@ -11,7 +11,7 @@ import { RosNode } from "@foxglove/ros2";
 import { RosMsgDefinition } from "@foxglove/rosmsg";
 import { definitions as commonDefs } from "@foxglove/rosmsg-msgs-common";
 import { definitions as foxgloveDefs } from "@foxglove/rosmsg-msgs-foxglove";
-import { Time, fromMillis } from "@foxglove/rostime";
+import { Time, isGreaterThan } from "@foxglove/rostime";
 import OsContextSingleton from "@foxglove/studio-base/OsContextSingleton";
 import PlayerProblemManager from "@foxglove/studio-base/players/PlayerProblemManager";
 import {
@@ -63,6 +63,7 @@ export default class Ros2Player implements Player {
   // private _services = new Map<string, Set<string>>(); // A map of service names to service provider IDs that provide each service.
   // private _parameters = new Map<string, ParameterValue>(); // rosparams
   private _start?: Time; // The time at which we started playing.
+  private _end?: Time; // The latest observed message time.
   // private _clockTime?: Time; // The most recent published `/clock` time, if available
   // private _clockReceived: Time = { sec: 0, nsec: 0 }; // The local time when `_clockTime` was last received
   private _requestedSubscriptions: SubscribePayload[] = []; // Requested subscriptions by setSubscriptions()
@@ -78,7 +79,6 @@ export default class Ros2Player implements Player {
     log.info(`initializing Ros2Player (domainId=${domainId})`);
     this._domainId = domainId;
     this._metricsCollector = metricsCollector;
-    this._start = fromMillis(Date.now());
     this._metricsCollector.playerConstructed();
 
     // The ros1ToRos2Type() hack can be removed when @foxglove/rosmsg-msgs-* packages are updated to
@@ -367,6 +367,13 @@ export default class Ros2Player implements Player {
     // const receiveTime = fromMillis(Date.now());
     const receiveTime = timestamp;
 
+    if (this._start == undefined || isGreaterThan(this._start, receiveTime)) {
+      this._start = receiveTime;
+    }
+    if (this._end == undefined || isGreaterThan(receiveTime, this._end)) {
+      this._end = receiveTime;
+    }
+
     if (external && !this._hasReceivedMessage) {
       this._hasReceivedMessage = true;
       this._metricsCollector.recordTimeToFirstMsgs();
@@ -547,13 +554,13 @@ export default class Ros2Player implements Player {
   }
 
   private _getCurrentTime(): Time {
-    const now = fromMillis(Date.now());
-    return now;
+    const lastTime = this._end ?? { sec: 0, nsec: 0 };
+    return lastTime;
     // if (this._clockTime == undefined) {
-    //   return now;
+    //   return lastTime;
     // }
 
-    // const delta = subtractTimes(now, this._clockReceived);
+    // const delta = subtractTimes(lastTime, this._clockReceived);
     // return addTimes(this._clockTime, delta);
   }
 }
