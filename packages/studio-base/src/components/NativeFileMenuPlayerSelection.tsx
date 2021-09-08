@@ -9,7 +9,7 @@ import { usePlayerSelection } from "@foxglove/studio-base/context/PlayerSelectio
 
 // NativeFileMenuPlayerSelection adds available player selection items to the apps native OS menubar
 export function NativeFileMenuPlayerSelection(): ReactElement {
-  const { selectSource, availableSources } = usePlayerSelection();
+  const { setDataSource, availableDataSources } = usePlayerSelection();
 
   const nativeAppMenu = useNativeAppMenu();
 
@@ -18,18 +18,18 @@ export function NativeFileMenuPlayerSelection(): ReactElement {
       return;
     }
 
-    for (const item of availableSources) {
-      nativeAppMenu.addFileEntry(item.name, () => {
-        selectSource(item);
+    for (const item of availableDataSources) {
+      nativeAppMenu.addFileEntry(item.displayName, () => {
+        setDataSource(item);
       });
     }
 
     return () => {
-      for (const item of availableSources) {
-        nativeAppMenu.removeFileEntry(item.name);
+      for (const item of availableDataSources) {
+        nativeAppMenu.removeFileEntry(item.displayName);
       }
     };
-  }, [availableSources, nativeAppMenu, selectSource]);
+  }, [availableDataSources, nativeAppMenu, setDataSource]);
 
   return <></>;
 }

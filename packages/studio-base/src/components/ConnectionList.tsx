@@ -3,7 +3,7 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/
 
 import { ActionButton, Icon, makeStyles, Text, useTheme } from "@fluentui/react";
-import { useCallback, useContext } from "react";
+import { useCallback, useContext, useMemo } from "react";
 
 import {
   MessagePipelineContext,
@@ -12,7 +12,7 @@ import {
 import NotificationModal from "@foxglove/studio-base/components/NotificationModal";
 import ModalContext from "@foxglove/studio-base/context/ModalContext";
 import {
-  PlayerSourceDefinition,
+  DataSource,
   usePlayerSelection,
 } from "@foxglove/studio-base/context/PlayerSelectionContext";
 import { useConfirm } from "@foxglove/studio-base/hooks/useConfirm";
@@ -39,7 +39,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function ConnectionList(): JSX.Element {
-  const { selectSource, availableSources } = usePlayerSelection();
+  const { setDataSource, currentDataSource, availableDataSources } = usePlayerSelection();
   const confirm = useConfirm();
   const modalHost = useContext(ModalContext);
   const styles = useStyles();
@@ -51,7 +51,7 @@ export default function ConnectionList(): JSX.Element {
   const theme = useTheme();
 
   const onSourceClick = useCallback(
-    (source: PlayerSourceDefinition) => {
+    (source: DataSource) => {
       if (source.disabledReason != undefined) {
         void confirm({
           title: "Unsupported Connection",
@@ -62,9 +62,9 @@ export default function ConnectionList(): JSX.Element {
         return;
       }
 
-      selectSource(source);
+      setDataSource(source);
     },
-    [confirm, selectSource],
+    [confirm, setDataSource],
   );
 
   const showProblemModal = useCallback(
@@ -84,8 +84,17 @@ export default function ConnectionList(): JSX.Element {
     [modalHost],
   );
 
+  const dataSourceUi = useMemo(() => {
+    if (!currentDataSource) {
+      return;
+    }
+
+    return currentDataSource.ui();
+  }, [currentDataSource]);
+
   return (
     <>
+      {dataSourceUi}
       <Text
         block
         styles={{ root: { color: theme.palette.neutralTertiary, marginBottom: theme.spacing.l1 } }}
@@ -94,31 +103,10 @@ export default function ConnectionList(): JSX.Element {
           ? "Not connected. Choose a data source below to get started."
           : playerName}
       </Text>
-      {availableSources.map((source) => {
-        let iconName: RegisteredIconNames;
-        switch (source.type) {
-          case "ros1-local-bagfile":
-            iconName = "OpenFile";
-            break;
-          case "ros2-local-bagfile":
-            iconName = "OpenFolder";
-            break;
-          case "ros1-socket":
-          case "ros2-socket":
-            iconName = "studio.ROS";
-            break;
-          case "rosbridge-websocket":
-            iconName = "Flow";
-            break;
-          case "ros1-remote-bagfile":
-            iconName = "FileASPX";
-            break;
-          case "velodyne-device":
-            iconName = "GenericScan";
-            break;
-        }
+      {availableDataSources.map((source) => {
+        const iconName: RegisteredIconNames = source.iconName as RegisteredIconNames;
         return (
-          <div key={source.name}>
+          <div key={source.id}>
             <ActionButton
               styles={{
                 root: {
@@ -137,7 +125,7 @@ export default function ConnectionList(): JSX.Element {
               }}
               onClick={() => onSourceClick(source)}
             >
-              {source.name}
+              {source.displayName}
               {source.badgeText && <span className={styles.badge}>{source.badgeText}</span>}
             </ActionButton>
           </div>

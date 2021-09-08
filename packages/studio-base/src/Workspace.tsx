@@ -129,7 +129,7 @@ const selectPlayerProblems = ({ playerState }: MessagePipelineContext) => player
 export default function Workspace(props: WorkspaceProps): JSX.Element {
   const classes = useStyles();
   const containerRef = useRef<HTMLDivElement>(ReactNull);
-  const { selectSource } = usePlayerSelection();
+  const { setDataSource } = usePlayerSelection();
   const playerPresence = useMessagePipeline(selectPlayerPresence);
   const playerCapabilities = useMessagePipeline(selectPlayerCapabilities);
   const playerProblems = useMessagePipeline(selectPlayerProblems);
@@ -181,15 +181,18 @@ export default function Workspace(props: WorkspaceProps): JSX.Element {
     if (isMounted()) {
       setSelectedLayoutId(newLayout.id);
       if (props.demoBagUrl) {
+        /*
+        // fixme- what to do about selecting a demo bag? should we have a demo bag source that is hidden?
         selectSource(
           { name: "Demo Bag", type: "ros1-remote-bagfile" },
           {
             url: props.demoBagUrl,
           },
         );
+        */
       }
     }
-  }, [layoutStorage, isMounted, setSelectedLayoutId, props.demoBagUrl, selectSource]);
+  }, [layoutStorage, isMounted, setSelectedLayoutId, props.demoBagUrl]);
 
   const handleInternalLink = useCallback((event: React.MouseEvent, href: string) => {
     if (href === "#help:message-path-syntax") {
@@ -284,15 +287,19 @@ export default function Workspace(props: WorkspaceProps): JSX.Element {
         } else {
           previousFiles.current = otherFiles;
         }
+        // fixme - how to select the bag file source? maybe the answer is to let all data sources have
+        // a chance to load the file?
+        /*
         selectSource(
           { name: "ROS 1 Bag File (local)", type: "ros1-local-bagfile" },
           {
             files: previousFiles.current,
           },
         );
+        */
       }
     },
-    [addToast, extensionLoader, loadFromFile, selectSource],
+    [addToast, extensionLoader, loadFromFile],
   );
 
   // files the main thread told us to open
@@ -324,6 +331,10 @@ export default function Workspace(props: WorkspaceProps): JSX.Element {
       if (type !== "rosbag" || bagUrl == undefined) {
         return;
       }
+      // fixme - how to select the data source and the arguments for the data source?
+      // maybe we should have a way for the data source to instantiate a player without the UI?
+      // or should the connection sidebar open?
+      /*
       selectSource(
         {
           name: "ROS 1 Bag File (HTTP)",
@@ -331,10 +342,11 @@ export default function Workspace(props: WorkspaceProps): JSX.Element {
         },
         { url: bagUrl },
       );
+      */
     } catch (err) {
       log.error(err);
     }
-  }, [props.deepLinks, selectSource]);
+  }, [props.deepLinks]);
 
   const dropHandler = useCallback(
     ({ files, shiftPressed }: { files: FileList; shiftPressed: boolean }) => {

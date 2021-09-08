@@ -8,7 +8,6 @@ import {
   App,
   ErrorBoundary,
   MultiProvider,
-  PlayerSourceDefinition,
   ThemeProvider,
   UserProfileLocalStorageProvider,
   StudioToastProvider,
@@ -18,6 +17,8 @@ import {
   ConsoleApiContext,
   CurrentUserProvider,
   ConsoleApiRemoteLayoutStorageProvider,
+  Ros1Native,
+  DataSource,
 } from "@foxglove/studio-base";
 
 import { Desktop } from "../common/types";
@@ -29,45 +30,11 @@ import ExtensionLoaderProvider from "./providers/ExtensionLoaderProvider";
 
 const DEMO_BAG_URL = "https://storage.googleapis.com/foxglove-public-assets/demo.bag";
 
+const dataSources: DataSource[] = [Ros1Native];
+
 const desktopBridge = (global as unknown as { desktopBridge: Desktop }).desktopBridge;
 
 export default function Root(): ReactElement {
-  const playerSources: PlayerSourceDefinition[] = [
-    {
-      name: "ROS 1",
-      type: "ros1-socket",
-    },
-    {
-      name: "ROS 1 Rosbridge",
-      type: "rosbridge-websocket",
-    },
-    {
-      name: "ROS 1 Bag (local)",
-      type: "ros1-local-bagfile",
-    },
-    {
-      name: "ROS 1 Bag (remote)",
-      type: "ros1-remote-bagfile",
-    },
-    {
-      name: "ROS 2",
-      type: "ros2-socket",
-      badgeText: "beta",
-    },
-    {
-      name: "ROS 2 Rosbridge",
-      type: "rosbridge-websocket",
-    },
-    {
-      name: "ROS 2 Bag (local)",
-      type: "ros2-local-bagfile",
-    },
-    {
-      name: "Velodyne LIDAR",
-      type: "velodyne-device",
-    },
-  ];
-
   const api = useMemo(() => new ConsoleApi(process.env.FOXGLOVE_API_URL!), []);
 
   const providers = [
@@ -93,7 +60,7 @@ export default function Root(): ReactElement {
       <CssBaseline>
         <ErrorBoundary>
           <MultiProvider providers={providers}>
-            <App demoBagUrl={DEMO_BAG_URL} deepLinks={deepLinks} availableSources={playerSources} />
+            <App demoBagUrl={DEMO_BAG_URL} deepLinks={deepLinks} availableSources={dataSources} />
           </MultiProvider>
         </ErrorBoundary>
       </CssBaseline>

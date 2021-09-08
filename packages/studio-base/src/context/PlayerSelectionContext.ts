@@ -4,54 +4,36 @@
 
 import { createContext, useContext } from "react";
 
-type SourceTypes =
-  | "ros1-local-bagfile"
-  | "ros2-local-bagfile"
-  | "ros1-socket"
-  | "ros2-socket"
-  | "rosbridge-websocket"
-  | "ros1-remote-bagfile"
-  | "velodyne-device";
+import { Player } from "@foxglove/studio-base/players/types";
 
-export type PlayerSourceDefinition = {
-  name: string;
-  type: SourceTypes;
+export type DataSource = {
+  id: string;
+  displayName: string;
+  iconName?: string;
   disabledReason?: string | JSX.Element;
   badgeText?: string;
+
+  // Return the UI element for the data source
+  ui: () => JSX.Element;
 };
 
-type FileSourceParams = {
-  files?: File[];
-};
-
-type FolderSourceParams = {
-  folder?: string;
-};
-
-type HttpSourceParams = {
-  url?: string;
-};
-
-type SpecializedPlayerSource<T extends SourceTypes> = Omit<PlayerSourceDefinition, "type"> & {
-  type: T;
-};
-
-interface SelectSourceFunction {
-  (definition: SpecializedPlayerSource<"ros1-local-bagfile">, params?: FileSourceParams): void;
-  (definition: SpecializedPlayerSource<"ros2-local-bagfile">, params?: FolderSourceParams): void;
-  (definition: SpecializedPlayerSource<"ros1-remote-bagfile">, params?: HttpSourceParams): void;
-  (definition: PlayerSourceDefinition, params?: never): void;
-}
-
-// PlayerSelection provides the user with a select function and the items to select
 export interface PlayerSelection {
-  selectSource: SelectSourceFunction;
-  availableSources: PlayerSourceDefinition[];
+  /** Set the current data source */
+  setDataSource: (source: DataSource) => void;
+  /** Set the player */
+  setPlayer: (player: Player) => void;
+
+  /** Any currently selected data source */
+  currentDataSource?: DataSource;
+
+  /** available data sources */
+  availableDataSources: DataSource[];
 }
 
 const PlayerSelectionContext = createContext<PlayerSelection>({
-  selectSource: () => {},
-  availableSources: [],
+  setDataSource: () => {},
+  setPlayer: () => {},
+  availableDataSources: [],
 });
 
 export function usePlayerSelection(): PlayerSelection {

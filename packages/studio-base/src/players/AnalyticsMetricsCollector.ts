@@ -4,7 +4,7 @@
 
 import Log from "@foxglove/log";
 import { Time } from "@foxglove/rostime";
-import { PlayerSourceDefinition } from "@foxglove/studio-base/context/PlayerSelectionContext";
+import { DataSource } from "@foxglove/studio-base/context/PlayerSelectionContext";
 import {
   PlayerMetricsCollectorInterface,
   SubscribePayload,
@@ -17,7 +17,7 @@ type EventData = { [key: string]: string | number | boolean };
 
 export default class AnalyticsMetricsCollector implements PlayerMetricsCollectorInterface {
   metadata: EventData = {};
-  playerType?: PlayerSourceDefinition;
+  playerType?: DataSource;
   private _analytics: IAnalytics;
 
   constructor(analytics: IAnalytics) {
