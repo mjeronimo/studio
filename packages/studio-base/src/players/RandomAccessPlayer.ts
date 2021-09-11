@@ -17,12 +17,12 @@ import { filterMap } from "@foxglove/den/collection";
 import {
   Time,
   add,
-  areEqual,
   compare,
   clampTime,
   fromMillis,
   percentOf,
   subtract as subtractTimes,
+  areEqual,
 } from "@foxglove/rostime";
 import NoopMetricsCollector from "@foxglove/studio-base/players/NoopMetricsCollector";
 import {
@@ -146,6 +146,7 @@ export default class RandomAccessPlayer implements Player {
   _problems = new Map<string, PlayerProblem>();
 
   private _readingMutex = new Mutex();
+  private _backfillMutex = new Mutex();
 
   constructor(
     providerDescriptor: RandomAccessDataProviderDescriptor,
@@ -230,6 +231,7 @@ export default class RandomAccessPlayer implements Player {
           return;
         }
 
+        // possibly pick an initial time some time into the bag to load some messages to start
         const initialTime = getSeekTimeFromSpec(this._seekToTime, start, end);
 
         this._start = start;
@@ -241,19 +243,11 @@ export default class RandomAccessPlayer implements Player {
         this._parsedMessageDefinitionsByTopic =
           parsedMessageDefinitions.parsedMessageDefinitionsByTopic;
         this._initializing = false;
+        this._currentTime = initialTime;
         this._reportInitialized();
 
-        // Wait a bit until panels have had the chance to subscribe to topics before we start
-        // playback.
-        setTimeout(() => {
-          if (this._closed) {
-            return;
-          }
-          // Only do the initial seek if we haven't started playing already.
-          if (!this._isPlaying && areEqual(this._nextReadStartTime, initialTime)) {
-            this.seekPlayback(initialTime);
-          }
-        }, SEEK_START_DELAY_MS);
+        // seek forward a little bit to prepare some messages
+        this.seekPlayback(initialTime);
       })
       .catch((error: Error) => {
         this._setError("Error initializing player", error);
@@ -499,6 +493,7 @@ export default class RandomAccessPlayer implements Player {
   }
 
   startPlayback(): void {
+    console.log("start playback");
     if (this._isPlaying) {
       return;
     }
@@ -539,61 +534,83 @@ export default class RandomAccessPlayer implements Player {
     this._nextReadStartTime = clampTime(time, this._start, this._end);
   }
 
-  private _seekPlaybackInternal = debouncePromise(async (backfillDuration?: Time) => {
-    const seekTime = Date.now();
-    this._lastSeekStartTime = seekTime;
-    this._cancelSeekBackfill = false;
-    // cancel any queued _emitState that might later emit messages from before we seeked
-    this._messages = [];
+  // backfill SEEK_BACK_NANOSECONDS from the next read start time
+  private async _seekPlaybackInternal(backfillDuration?: Time) {
+    if (this._backfillMutex.isLocked()) {
+      return;
+    }
 
-    // backfill includes the current time we've seek'd to
-    // playback after backfill will load messages after the seek time
-    const backfillEnd = clampTime(this._nextReadStartTime, this._start, this._end);
+    let readStartTime = this._nextReadStartTime;
+    do {
+      console.log(this._isPlaying);
+      // if we are playing then we don't backfill and instead read forward with _read
+      if (this._isPlaying) {
+        // If we are playing, set this emit time so that consumers will know that we seeked.
+        this._lastSeekEmitTime = Date.now();
+        return;
+      }
 
-    // Backfill a few hundred milliseconds of data if we're paused so panels have something to show.
-    // If we're playing, we'll give the panels some data soon anyway.
-    const internalBackfillDuration = { sec: 0, nsec: this._isPlaying ? 0 : SEEK_BACK_NANOSECONDS };
-    // Add on any extra time needed by the OrderedStampPlayer.
-    const totalBackfillDuration = add(
-      internalBackfillDuration,
-      backfillDuration ?? { sec: 0, nsec: 0 },
-    );
-    const backfillStart = clampTime(
-      subtractTimes(this._nextReadStartTime, totalBackfillDuration),
-      this._start,
-      this._end,
-    );
+      readStartTime = this._nextReadStartTime;
 
-    // Only getMessages if we have some messages to get.
-    if (backfillDuration || !this._isPlaying) {
-      const messages = await this._getMessages(backfillStart, backfillEnd);
+      this._cancelSeekBackfill = false;
+      // cancel any queued _emitState that might later emit messages from before we seeked
+      this._messages = [];
+
+      // backfill includes the current time we've seek'd to
+      // playback after backfill will load messages after the seek time
+      const backfillEnd = clampTime(readStartTime, this._start, this._end);
+
+      // Backfill a few hundred milliseconds of data if we're paused so panels have something to show.
+      // If we're playing, we'll give the panels some data soon anyway.
+      const internalBackfillDuration = {
+        sec: 0,
+        nsec: this._isPlaying ? 0 : SEEK_BACK_NANOSECONDS,
+      };
+      // Add on any extra time needed by the OrderedStampPlayer.
+      const totalBackfillDuration = add(
+        internalBackfillDuration,
+        backfillDuration ?? { sec: 0, nsec: 0 },
+      );
+
+      const backfillStart = clampTime(
+        subtractTimes(readStartTime, totalBackfillDuration),
+        this._start,
+        this._end,
+      );
+
+      console.log("get backfill messages", readStartTime, this._nextReadStartTime);
+
+      const messages = await this._backfillMutex.runExclusive(async () => {
+        return await this._getMessages(backfillStart, backfillEnd);
+      });
+
+      console.log("after get messages", readStartTime, this._nextReadStartTime);
       // Only emit the messages if we haven't seeked again / emitted messages since we
       // started loading them. Note that for the latter part just checking for `isPlaying`
       // is not enough because the user might have started playback and then paused again!
       // Therefore we really need something like `this._cancelSeekBackfill`.
-      if (this._lastSeekStartTime === seekTime && !this._cancelSeekBackfill) {
+      if (areEqual(this._nextReadStartTime, readStartTime) && !this._cancelSeekBackfill) {
         // similar to _tick(), we set the next start time past where we have read
         // this happens after reading and confirming that playback or other seeking hasn't happened
         this._nextReadStartTime = add(backfillEnd, { sec: 0, nsec: 1 });
 
         this._messages = messages;
-        this._lastSeekEmitTime = seekTime;
+        this._lastSeekEmitTime = Date.now();
         this._emitState();
+        break;
       }
-    } else {
-      // If we are playing, make sure we set this emit time so that consumers will know that we seeked.
-      this._lastSeekEmitTime = seekTime;
-    }
-  });
+    } while (readStartTime !== this._nextReadStartTime);
+  }
 
   seekPlayback(time: Time, backfillDuration?: Time): void {
+    console.log("seek", time);
     // Only seek when the provider initialization is done.
     if (!this._initialized) {
       return;
     }
     this._metricsCollector.seek(time);
     this._setNextReadStartTime(time);
-    this._seekPlaybackInternal(backfillDuration);
+    void this._seekPlaybackInternal(backfillDuration);
   }
 
   setSubscriptions(newSubscriptions: SubscribePayload[]): void {

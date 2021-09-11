@@ -30,7 +30,7 @@ import {
   InitializationResult,
 } from "@foxglove/studio-base/randomAccessDataProviders/types";
 import delay from "@foxglove/studio-base/util/delay";
-import signal from "@foxglove/studio-base/util/signal";
+import signal, { Signal } from "@foxglove/studio-base/util/signal";
 import { getSeekToTime, SEEK_ON_START_NS } from "@foxglove/studio-base/util/time";
 
 import RandomAccessPlayer, {
@@ -333,7 +333,6 @@ describe("RandomAccessPlayer", () => {
     expect(messagePayloads).toEqual([
       { messages: [] },
       { messages: [] },
-      { messages: [] },
       {
         messages: [
           {
@@ -343,6 +342,7 @@ describe("RandomAccessPlayer", () => {
           },
         ],
       },
+      { messages: [] },
       { messages: [] },
     ]);
   });
@@ -379,7 +379,7 @@ describe("RandomAccessPlayer", () => {
     ]);
   });
 
-  it("still moves forward time if there are no messages", async () => {
+  it.only("still moves forward time if there are no messages", async () => {
     const provider = new TestProvider();
     const source = new RandomAccessPlayer(
       { name: "TestProvider", args: { provider }, children: [] },
@@ -393,15 +393,15 @@ describe("RandomAccessPlayer", () => {
       topics: GetMessagesTopics,
     ): Promise<GetMessagesResult> => {
       callCount++;
+      console.log(callCount);
       switch (callCount) {
-        case 1:
-          // initial getMessages from player initialization
+        case 1: // initialization
           expect(start).toEqual({ sec: 10, nsec: 0 });
           expect(end).toEqual({ sec: 10, nsec: 0 });
           expect(topics).toEqual({ parsedMessages: ["/foo/bar"] });
           return getMessagesResult;
 
-        case 2:
+        case 2: // request backfill
           expect(start).toEqual({ sec: 10, nsec: 0 });
           expect(end).toEqual({ sec: 10, nsec: 4000000 });
           expect(topics).toEqual({ parsedMessages: ["/foo/bar"] });
@@ -418,6 +418,9 @@ describe("RandomAccessPlayer", () => {
     await Promise.resolve();
     source.setSubscriptions([{ topic: "/foo/bar" }]);
     source.requestBackfill(); // We always get a `requestBackfill` after each `setSubscriptions`.
+
+    // this fires immediately ...
+    // and the get messages for the backfill request hasn't gone through
     source.startPlayback();
     const messages = await store.done;
     // close the player to stop more reads
@@ -957,59 +960,91 @@ describe("RandomAccessPlayer", () => {
     source.setSubscriptions([{ topic: "/foo/bar" }]);
     source.requestBackfill(); // We always get a `requestBackfill` after each `setSubscriptions`.
 
-    let lastGetMessagesCall:
-      | {
-          start: Time;
-          end: Time;
-          topics: GetMessagesTopics;
-          resolve: (_: GetMessagesResult) => void;
-        }
-      | undefined;
+    type LastGetMessagesCall = {
+      start: Time;
+      end: Time;
+      topics: GetMessagesTopics;
+    };
+
+    const lastMessagesSignals: Signal<LastGetMessagesCall>[] = [];
+
     const getMessages = async (
       start: Time,
       end: Time,
       topics: GetMessagesTopics,
     ): Promise<GetMessagesResult> => {
-      return await new Promise((resolve) => {
-        lastGetMessagesCall = { start, end, topics, resolve };
-      });
+      const getMessagesSignal = lastMessagesSignals.shift();
+      if (!getMessagesSignal) {
+        throw new Error("unexpected get messages call");
+      }
+      getMessagesSignal.resolve({ start, end, topics });
+      return getMessagesResult;
     };
     provider.getMessages = getMessages;
 
     source.setListener(async () => {});
     await Promise.resolve();
     source.setSubscriptions([{ topic: "/foo/bar" }]);
-    source.requestBackfill(); // We always get a `requestBackfill` after each `setSubscriptions`.
 
-    // Resolve original seek.
-    if (!lastGetMessagesCall) {
-      throw new Error("lastGetMessagesCall not set");
+    {
+      const sig = signal<LastGetMessagesCall>();
+      lastMessagesSignals.push(sig);
+      source.requestBackfill(); // We always get a `requestBackfill` after each `setSubscriptions`.
+
+      const lastGetMessagesCall = await sig;
+      expect(lastGetMessagesCall).toEqual({
+        start: { sec: 10, nsec: 0 },
+        end: { sec: 10, nsec: 0 },
+        topics: { parsedMessages: ["/foo/bar"] },
+      });
     }
-    lastGetMessagesCall.resolve(getMessagesResult);
 
-    // Try to seek to a time before the start time
-    source.seekPlayback({ sec: 0, nsec: 250 });
+    {
+      const sig = signal<LastGetMessagesCall>();
+      lastMessagesSignals.push(sig);
 
-    await delay(1);
-    lastGetMessagesCall.resolve(getMessagesResult);
-    expect(lastGetMessagesCall).toEqual({
-      start: { sec: 10, nsec: 0 }, // Clamped to start
-      end: { sec: 10, nsec: 1 }, // Clamped to start
-      topics: { parsedMessages: ["/foo/bar"] },
-      resolve: expect.any(Function),
-    });
+      // Try to seek to a time before the start time
+      source.seekPlayback({ sec: 0, nsec: 250 });
 
-    // Test clamping to end time.
-    lastGetMessagesCall.resolve(getMessagesResult);
-    source.seekPlayback(add({ sec: 100, nsec: 0 }, { sec: 0, nsec: -100 }));
-    lastGetMessagesCall.resolve(getMessagesResult);
-    source.startPlayback();
-    expect(lastGetMessagesCall).toEqual({
-      start: { nsec: 999999900, sec: 99 },
-      end: { nsec: 0, sec: 100 },
-      topics: { parsedMessages: ["/foo/bar"] },
-      resolve: expect.any(Function),
-    });
+      // internal backfill
+      const lastGetMessagesCall = await sig;
+      expect(lastGetMessagesCall).toEqual({
+        start: { sec: 10, nsec: 0 },
+        end: { sec: 10, nsec: 0 },
+        topics: { parsedMessages: ["/foo/bar"] },
+      });
+    }
+
+    // clamp to end time
+    {
+      {
+        const sig = signal<LastGetMessagesCall>();
+        lastMessagesSignals.push(sig);
+        source.seekPlayback(add({ sec: 100, nsec: 0 }, { sec: 0, nsec: -100 }));
+
+        // internal backfill
+        const lastGetMessagesCall = await sig;
+        expect(lastGetMessagesCall).toEqual({
+          start: { sec: 99, nsec: 700999900 },
+          end: { sec: 99, nsec: 999999900 },
+          topics: { parsedMessages: ["/foo/bar"] },
+        });
+
+        // wait for backfill to finish
+        await delay(1);
+      }
+
+      const sig = signal<LastGetMessagesCall>();
+      lastMessagesSignals.push(sig);
+      source.startPlayback();
+
+      const lastGetMessagesCall = await sig;
+      expect(lastGetMessagesCall).toEqual({
+        start: { nsec: 999999901, sec: 99 },
+        end: { nsec: 0, sec: 100 },
+        topics: { parsedMessages: ["/foo/bar"] },
+      });
+    }
 
     source.close();
   });
