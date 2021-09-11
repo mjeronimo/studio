@@ -259,7 +259,7 @@ export default class RandomAccessPlayer implements Player {
 
   // Potentially performance-sensitive; await can be expensive
   // eslint-disable-next-line @typescript-eslint/promise-function-async
-  _emitState = debouncePromise(() => {
+  private _emitState = debouncePromise(() => {
     if (!this._listener) {
       return Promise.resolve();
     }
@@ -346,7 +346,7 @@ export default class RandomAccessPlayer implements Player {
     return this._listener(data);
   });
 
-  async _tick(): Promise<void> {
+  private async _tick(): Promise<void> {
     if (this._initializing || !this._isPlaying || this._hasError) {
       return;
     }
@@ -382,7 +382,7 @@ export default class RandomAccessPlayer implements Player {
       this._end,
     );
 
-    const { parsedMessages: messages } = await this._getMessages(start, end);
+    const messages = await this._getMessages(start, end);
     await this._emitState.currentPromise;
 
     // if we seeked while reading then do not emit messages
@@ -405,7 +405,7 @@ export default class RandomAccessPlayer implements Player {
     this._emitState();
   }
 
-  _read = debouncePromise(async () => {
+  private _read = debouncePromise(async () => {
     try {
       while (this._isPlaying && !this._hasError) {
         const start = Date.now();
@@ -422,10 +422,10 @@ export default class RandomAccessPlayer implements Player {
     }
   });
 
-  async _getMessages(start: Time, end: Time): Promise<{ parsedMessages: MessageEvent<unknown>[] }> {
+  private async _getMessages(start: Time, end: Time): Promise<MessageEvent<unknown>[]> {
     const parsedTopics = getSanitizedTopics(this._parsedSubscribedTopics, this._providerTopics);
     if (parsedTopics.length === 0) {
-      return { parsedMessages: [] };
+      return [];
     }
     if (!this.hasCachedRange(start, end)) {
       this._metricsCollector.recordUncachedRangeRequest();
@@ -440,7 +440,7 @@ export default class RandomAccessPlayer implements Player {
         message: `Bad set of messages`,
         tip: `Restart the app or contact support if the issue persists.`,
       });
-      return { parsedMessages: [] };
+      return [];
     }
     this._problems.delete("bad-messages");
 
@@ -485,9 +485,7 @@ export default class RandomAccessPlayer implements Player {
           message: message.message,
         };
       });
-    return {
-      parsedMessages: filterMessages(parsedMessages, parsedTopics),
-    };
+    return filterMessages(parsedMessages, parsedTopics);
   }
 
   startPlayback(): void {
@@ -518,7 +516,7 @@ export default class RandomAccessPlayer implements Player {
     this._emitState();
   }
 
-  _reportInitialized(): void {
+  private _reportInitialized(): void {
     if (this._initializing || this._initialized) {
       return;
     }
@@ -526,12 +524,12 @@ export default class RandomAccessPlayer implements Player {
     this._initialized = true;
   }
 
-  _setNextReadStartTime(time: Time): void {
+  private _setNextReadStartTime(time: Time): void {
     this._metricsCollector.recordPlaybackTime(time, !this.hasCachedRange(this._start, this._end));
     this._nextReadStartTime = clampTime(time, this._start, this._end);
   }
 
-  _seekPlaybackInternal = debouncePromise(async (backfillDuration?: Time) => {
+  private _seekPlaybackInternal = debouncePromise(async (backfillDuration?: Time) => {
     const seekTime = Date.now();
     this._lastSeekStartTime = seekTime;
     this._cancelSeekBackfill = false;
@@ -558,7 +556,7 @@ export default class RandomAccessPlayer implements Player {
 
     // Only getMessages if we have some messages to get.
     if (backfillDuration || !this._isPlaying) {
-      const { parsedMessages: messages } = await this._getMessages(backfillStart, backfillEnd);
+      const messages = await this._getMessages(backfillStart, backfillEnd);
       // Only emit the messages if we haven't seeked again / emitted messages since we
       // started loading them. Note that for the latter part just checking for `isPlaying`
       // is not enough because the user might have started playback and then paused again!
