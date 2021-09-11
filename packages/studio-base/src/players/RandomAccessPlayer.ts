@@ -10,6 +10,7 @@
 //   This source code is licensed under the Apache License, Version 2.0,
 //   found at http://www.apache.org/licenses/LICENSE-2.0
 //   You may not use this file except in compliance with the License.
+import { Mutex } from "async-mutex";
 import { v4 as uuidv4 } from "uuid";
 
 import { filterMap } from "@foxglove/den/collection";
@@ -143,6 +144,8 @@ export default class RandomAccessPlayer implements Player {
   // The overall player may be healthy, but individual topics may have warnings or errors.
   // These are set/cleared in the store to track the current set of problems
   _problems = new Map<string, PlayerProblem>();
+
+  private _readingMutex = new Mutex();
 
   constructor(
     providerDescriptor: RandomAccessDataProviderDescriptor,
@@ -405,22 +408,29 @@ export default class RandomAccessPlayer implements Player {
     this._emitState();
   }
 
-  private _read = debouncePromise(async () => {
-    try {
-      while (this._isPlaying && !this._hasError) {
-        const start = Date.now();
-        await this._tick();
-        const time = Date.now() - start;
-        // make sure we've slept at least 16 millis or so (aprox 1 frame)
-        // to give the UI some time to breathe and not burn in a tight loop
-        if (time < 16) {
-          await delay(16 - time);
-        }
-      }
-    } catch (err) {
-      this._setError(err.message, err);
+  private async _read() {
+    // if we are already reading we don't need to start reading again
+    if (this._readingMutex.isLocked()) {
+      return;
     }
-  });
+
+    await this._readingMutex.runExclusive(async () => {
+      try {
+        while (this._isPlaying && !this._hasError) {
+          const start = Date.now();
+          await this._tick();
+          const time = Date.now() - start;
+          // make sure we've slept at least 16 millis or so (aprox 1 frame)
+          // to give the UI some time to breathe and not burn in a tight loop
+          if (time < 16) {
+            await delay(16 - time);
+          }
+        }
+      } catch (err) {
+        this._setError(err.message, err);
+      }
+    });
+  }
 
   private async _getMessages(start: Time, end: Time): Promise<MessageEvent<unknown>[]> {
     const parsedTopics = getSanitizedTopics(this._parsedSubscribedTopics, this._providerTopics);
@@ -495,7 +505,7 @@ export default class RandomAccessPlayer implements Player {
     this._metricsCollector.play(this._speed);
     this._isPlaying = true;
     this._emitState();
-    this._read();
+    void this._read();
   }
 
   pausePlayback(): void {
