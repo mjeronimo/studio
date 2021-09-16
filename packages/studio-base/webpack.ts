@@ -3,7 +3,6 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/
 
 import CircularDependencyPlugin from "circular-dependency-plugin";
-import { ESBuildMinifyPlugin } from "esbuild-loader";
 import ForkTsCheckerWebpackPlugin from "fork-ts-checker-webpack-plugin";
 import MonacoWebpackPlugin from "monaco-editor-webpack-plugin";
 import path from "path";
@@ -199,7 +198,7 @@ export function makeConfig(
     },
     optimization: {
       removeAvailableModules: true,
-      minimizer: [new ESBuildMinifyPlugin({ target: "es2020" })],
+      minimize: false, // full error stack traces are helpful for debugging
     },
     plugins: [
       new CircularDependencyPlugin({
