@@ -121,7 +121,16 @@ export default function ThemeProvider({
     return ReactNull;
   }
 
-  const muiTheme = createMuiTheme({ palette: { type: "dark", primary: { main: "#A197EA" } } });
+  const muiTheme = createMuiTheme({
+    palette: {
+      type: "dark",
+      primary: { main: "#A197EA" },
+      background: {
+        paper: "#121217",
+        default: "#000000",
+      },
+    },
+  });
 
   return (
     <MuiThemeProvider theme={muiTheme}>

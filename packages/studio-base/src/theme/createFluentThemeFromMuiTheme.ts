@@ -3,12 +3,10 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/
 
 import {
-  BaseSlots,
   ITheme,
   ThemeGenerator,
   createTheme,
   getColorFromString,
-  isDark,
   themeRulesStandardCreator,
 } from "@fluentui/react";
 import { Theme as MuiTheme } from "@material-ui/core";
@@ -20,20 +18,16 @@ export function createFluentThemeFromMuiTheme(theme: MuiTheme): ITheme {
   const themeRules = themeRulesStandardCreator();
   const colorPalette = {
     primaryColor: getColorFromString(theme.palette.primary.main)!,
-    textColor: getColorFromString(theme.palette.text.primary)!,
-    backgroundColor: getColorFromString(theme.palette.background.default)!,
+    foregroundColor: getColorFromString(theme.palette.text.primary)!,
+    backgroundColor: getColorFromString(theme.palette.background.paper)!,
   };
-  ThemeGenerator.insureSlots(
-    themeRules,
-    isDark(themeRules[BaseSlots[BaseSlots.backgroundColor]].color!),
-  );
-  ThemeGenerator.setSlot(themeRules[BaseSlots[BaseSlots.primaryColor]], colorPalette.primaryColor);
-  ThemeGenerator.setSlot(themeRules[BaseSlots[BaseSlots.foregroundColor]], colorPalette.textColor);
-  ThemeGenerator.setSlot(
-    themeRules[BaseSlots[BaseSlots.backgroundColor]],
-    colorPalette.backgroundColor,
-  );
-  const themeAsJson: {
+
+  ThemeGenerator.insureSlots(themeRules, theme.palette.type === "dark");
+  ThemeGenerator.setSlot(themeRules.primaryColor!, colorPalette.primaryColor);
+  ThemeGenerator.setSlot(themeRules.foregroundColor!, colorPalette.foregroundColor);
+  ThemeGenerator.setSlot(themeRules.backgroundColor!, colorPalette.backgroundColor);
+
+  const palette: {
     [key: string]: string;
   } = ThemeGenerator.getThemeAsJson(themeRules);
 
@@ -44,11 +38,11 @@ export function createFluentThemeFromMuiTheme(theme: MuiTheme): ITheme {
     semanticColors: {
       menuBackground: "#242429",
       menuItemBackgroundHovered: "#2e2e39",
-      errorBackground: colors.RED1,
+      errorBackground: theme.palette.error.main,
       warningBackground: colors.YELLOW1,
     },
     components,
-    palette: themeAsJson,
-    isInverted: isDark(themeRules[BaseSlots[BaseSlots.backgroundColor]].color!),
+    palette,
+    isInverted: theme.palette.type === "dark",
   });
 }
