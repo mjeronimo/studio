@@ -44,6 +44,7 @@
     "@foxglove/rostime": "1.1.1",
     "@foxglove/studio": "workspace:*",
     "@foxglove/velodyne-cloud": "1.0.0",
+    "@material-ui/core": "4.12.3",
     "@mdi/svg": "6.1.95",
     "@sentry/core": "6.12.0",
     "@sentry/types": "6.12.0",

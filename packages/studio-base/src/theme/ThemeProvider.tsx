@@ -16,6 +16,10 @@ import {
 } from "@fluentui/react-icons";
 import * as Icons from "@fluentui/react-icons-mdl2";
 import { registerIcons, unregisterIcons } from "@fluentui/style-utilities";
+import {
+  createTheme as createMuiTheme,
+  ThemeProvider as MuiThemeProvider,
+} from "@material-ui/core";
 import { useLayoutEffect, useState } from "react";
 import { ThemeProvider as StyledThemeProvider } from "styled-components";
 
@@ -24,6 +28,7 @@ import BlockheadIcon from "@foxglove/studio-base/components/BlockheadIcon";
 import LoopIcon from "@foxglove/studio-base/components/LoopIcon";
 import RosIcon from "@foxglove/studio-base/components/RosIcon";
 import theme from "@foxglove/studio-base/theme";
+import { createFluentThemeFromMuiTheme } from "@foxglove/studio-base/theme/createFluentThemeFromMuiTheme";
 
 const icons: {
   // This makes it a type error to forget to add an icon here once it has been added to RegisteredIconNames.
@@ -116,18 +121,22 @@ export default function ThemeProvider({
     return ReactNull;
   }
 
+  const muiTheme = createMuiTheme({ palette: { type: "dark", primary: { main: "#A197EA" } } });
+
   return (
-    <FluentThemeProvider
-      as={ThemeContainer}
-      applyTo="none" // skip default global styles for now
-      theme={theme}
-    >
-      <StyledThemeProvider
-        // Expose the same theme to styled-components - see types/styled-components.d.ts for type definitions
-        theme={theme}
+    <MuiThemeProvider theme={muiTheme}>
+      <FluentThemeProvider
+        as={ThemeContainer}
+        applyTo="none" // skip default global styles for now
+        theme={createFluentThemeFromMuiTheme(muiTheme)}
       >
-        {children}
-      </StyledThemeProvider>
-    </FluentThemeProvider>
+        <StyledThemeProvider
+          // Expose the same theme to styled-components - see types/styled-components.d.ts for type definitions
+          theme={theme}
+        >
+          {children}
+        </StyledThemeProvider>
+      </FluentThemeProvider>
+    </MuiThemeProvider>
   );
 }
