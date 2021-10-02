@@ -12,7 +12,7 @@ import {
 import { Theme as MuiTheme } from "@material-ui/core";
 
 import components from "@foxglove/studio-base/theme/components";
-import { colors, fonts } from "@foxglove/studio-base/util/sharedStyleConstants";
+import { fonts } from "@foxglove/studio-base/util/sharedStyleConstants";
 
 export function createFluentThemeFromMuiTheme(theme: MuiTheme): ITheme {
   const themeRules = themeRulesStandardCreator();
@@ -36,10 +36,10 @@ export function createFluentThemeFromMuiTheme(theme: MuiTheme): ITheme {
       fontFamily: fonts.SANS_SERIF,
     },
     semanticColors: {
-      menuBackground: "#242429",
-      menuItemBackgroundHovered: "#2e2e39",
+      menuBackground: theme.palette.background.paper,
+      menuItemBackgroundHovered: theme.palette.action.hover,
       errorBackground: theme.palette.error.main,
-      warningBackground: colors.YELLOW1,
+      warningBackground: theme.palette.warning.main,
     },
     components,
     palette,

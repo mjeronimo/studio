@@ -29,6 +29,7 @@ import LoopIcon from "@foxglove/studio-base/components/LoopIcon";
 import RosIcon from "@foxglove/studio-base/components/RosIcon";
 import theme from "@foxglove/studio-base/theme";
 import { createFluentThemeFromMuiTheme } from "@foxglove/studio-base/theme/createFluentThemeFromMuiTheme";
+import { fonts } from "@foxglove/studio-base/util/sharedStyleConstants";
 
 const icons: {
   // This makes it a type error to forget to add an icon here once it has been added to RegisteredIconNames.
@@ -125,10 +126,14 @@ export default function ThemeProvider({
     palette: {
       type: "dark",
       primary: { main: "#A197EA" },
+      secondary: { main: "#f7f7f7" },
       background: {
         paper: "#121217",
         default: "#000000",
       },
+    },
+    typography: {
+      fontFamily: fonts.SANS_SERIF,
     },
   });
 
