@@ -29,6 +29,7 @@ const builtin: PanelInfo[] = [
     type: "StateTransitions",
     module: async () => await import("./StateTransitions"),
   },
+  { title: "SystemView", type: "SystemView", module: async () => await import("./SystemView") },
   { title: "Table", type: "Table", module: async () => await import("./Table") },
   { title: "URDF Viewer", type: "URDFViewer", module: async () => await import("./URDFViewer") },
   { title: "Topic Graph", type: "TopicGraph", module: async () => await import("./TopicGraph") },
