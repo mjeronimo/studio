@@ -148,9 +148,8 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
           onNodeDragStop={onNodeDragStop}
           onlyRenderVisibleElements={false}
         >
-          <MiniMap />
           <Controls />
-          <Background variant={BackgroundVariant.Lines} />
+          <Background variant={BackgroundVariant.Dots} />
 
           <button type="button" onClick={addRandomNode} style={buttonStyle}>
             Add Node
