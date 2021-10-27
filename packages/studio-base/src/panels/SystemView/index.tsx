@@ -23,6 +23,8 @@ import TopicToRenderMenu from "@foxglove/studio-base/components/TopicToRenderMen
 import { MessageEvent } from "@foxglove/studio-base/players/types";
 
 import FilterBar, { FilterBarProps } from "./FilterBar";
+import RosNode from "./RosNode";
+import RosTopic from "./RosTopic";
 import LogList from "./LogList";
 import LogMessage from "./LogMessage";
 import filterMessages from "./filterMessages";
@@ -34,7 +36,7 @@ import styles from "@foxglove/studio-base/panels/ThreeDimensionalViz/sharedStyle
 import FitToPageIcon from "@mdi/svg/svg/fit-to-page-outline.svg";
 
 import { Icon as FluentIcon } from "@fluentui/react";
-import { Dismiss12Regular, Info24Regular, Settings24Regular } from "@fluentui/react-icons";
+import { Dismiss12Regular, Info24Regular, Settings24Filled } from "@fluentui/react-icons";
 
 import PiIcon from './Raspberry_Pi-Logo.wine.svg';
 import InfoIcon from './info.svg';
@@ -62,23 +64,31 @@ import ReactFlow, {
   ArrowHeadType
 } from 'react-flow-renderer';
 
+const nodeTypes = {
+  rosNode: RosNode,
+  rosTopic: RosTopic,
+};
+
 const hrStyles: CSSProperties = { height: '1px', background: '#aaa', border: 'none' };
 
 const infoStyles: CSSProperties = { color: 'white', border: '0px solid #000', float: 'left', marginLeft: '0.5rem' };
-const settingsStyles: CSSProperties = { color: 'white', border: '0px solid #000', float: 'right', marginRight: '0.5rem' };
+
+//const settingsStyles: CSSProperties = { color: 'white', border: '0px solid #000', float: 'right', marginRight: '0.5rem', background: '#0078d7' };
+const settingsStyles: CSSProperties =   { background: '#0078d7', border: 'none', position: 'absolute', right: '0px' };
+
 const magnifyStyles: CSSProperties = { border: '0px solid #000', float: 'right', marginRight: '0.5rem' };
 
-const nodeTitleStyle: CSSProperties = { color: 'white', background: '#0063ba', textAlign: 'left', padding: '10px', paddingLeft: '5px', border: '0px solid #000' };
+const nodeTitleStyle: CSSProperties = { color: 'white', background: '#6263a4', textAlign: 'left', padding: '5px', paddingLeft: '5px', border: '0px solid #000' };
 
 const dismissStyle: CSSProperties = {
   color: 'white',
   position: 'absolute',
-  top: '-8px',
-  right: '-23px',
+  top: '-13px',
+  right: '-12px',
   border: '0px solid #000'
 };
 const noBorderStyle: CSSProperties = { border: '0px solid #000' };
-const nodeBodyStyle: CSSProperties = { background: '#0078d7', border: '0px solid #000' };
+const nodeBodyStyle: CSSProperties = { background: '#565899', height: '40px', border: 'none' };
 
 const buttonWrapperStyles: CSSProperties = { background: '#cecece', border: '0px solid #000' };
 const onLoad = (reactFlowInstance: OnLoadParams) => console.log('flow loaded:', reactFlowInstance);
@@ -141,6 +151,7 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
 
   const onElementsRemove = (elementsToRemove: Elements) => setElements((els) => removeElements(elementsToRemove, els));
   const onConnect = (params: Connection | Edge) => setElements((els) => addEdge(params, els));
+
   const addRandomNode = () => {
     const nodeId: ElementId = (elements.length + 1).toString();
     const newNode: Node = {
@@ -150,6 +161,8 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
     };
     setElements((els) => els.concat(newNode));
   };
+
+const onChange = () => {}
 
 const initialElements: Elements = [
   {
@@ -167,11 +180,8 @@ const initialElements: Elements = [
             </Button>
           </div>
           <div style={nodeBodyStyle}>
-            <Button className={styles.iconButton} tooltip="Display node information" onClick={addRandomNode}>
-              <Info24Regular style={infoStyles} />
-            </Button>
-            <Button className={styles.iconButton} tooltip="Display node parameters" onClick={addRandomNode}>
-              <Settings24Regular style={settingsStyles} />
+            <Button className={styles.iconButton} tooltip="Display node parameters" onClick={addRandomNode} style={settingsStyles} >
+              <Settings24Filled />
             </Button>
           </div>
         </>
@@ -182,54 +192,25 @@ const initialElements: Elements = [
   },
   {
     id: '2',
+    type: 'rosTopic',
+    data: { title: 'left/image_raw', onChange: onChange },
+    style: { background: 'red', color: '#333', border: '0px solid #AAA', width: 100 },
     position: { x: 100, y: 200 },
-    data: {
-      label: (
-        <>
-          <strong>left/image_raw</strong>
-          <hr style={hrStyles} />
-          <div style={buttonWrapperStyles}>
-            <img src="./info.svg" style={infoStyles} width="7" height="20" />
-            <img src="./magnify.svg" style={magnifyStyles} width="20" height="20" />
-          </div>
-        </>
-      ),
-    },
-    style: { background: '#FFFFFF', color: '#333', border: '1px solid #AAA', width: 100 },
   },
   {
     id: '4',
+    type: 'rosTopic',
+    data: { title: 'right/image_raw', onChange: onChange },
+    style: { background: 'red', color: '#333', border: '0px solid #AAA', width: 100 },
     position: { x: 410, y: 200 },
-    data: {
-      label: (
-        <>
-          <strong>right/image_raw</strong>
-          <hr style={hrStyles} />
-          <div style={buttonWrapperStyles}>
-            <img src="./info.svg" style={infoStyles} width="7" height="20" />
-            <img src="./magnify" style={magnifyStyles} width="20" height="20" />
-          </div>
-        </>
-      ),
-    },
-    style: { background: '#FFFFFF', color: '#333', border: '1px solid #AAA', width: 100 },
   },
   {
     id: '5',
-    data: {
-      label: (
-        <>
-          <strong>image_adjuster_left_stereo</strong>
-          <hr style={hrStyles}/>
-          <div style={buttonWrapperStyles}>
-            <img src="./info.svg" style={infoStyles} width="7" height="20" />
-            <img src="./settings.svg" style={settingsStyles} width="20" height="20" />
-          </div>
-        </>
-      ),
-    },
+    type: 'rosNode',
+    data: { title: 'image_adjuster_left_stereo', onChange: onChange },
+    //style: { background: 'blue', color: '#333', border: '0px solid #ffc', width: 180 },
+    style: { border: '0px', width: 180 },
     position: { x: 65, y: 350 },
-    style: { background: '#FAEDCD', color: '#333', border: '1px solid #ffc', width: 180, borderRadius: "50px" },
   },
   {
     id: '7',
@@ -400,6 +381,7 @@ const initialElements: Elements = [
           onConnect={(p) => onConnect(p)}
           onNodeDragStop={onNodeDragStop}
           onlyRenderVisibleElements={false}
+          nodeTypes={nodeTypes}
         >
           <Controls />
           <Background variant={BackgroundVariant.Dots} />
