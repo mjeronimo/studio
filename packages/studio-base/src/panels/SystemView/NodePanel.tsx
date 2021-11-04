@@ -15,14 +15,13 @@ const NodePanel: React.FunctionComponent = () => {
       <br />
       <DefaultButton text="Open panel" onClick={openPanel} />
       <Panel
-        headerText="ROS 2 Nodes"
+        headerText="Nodes"
         // this prop makes the panel non-modal
         isBlocking={false}
         isOpen={isOpen}
         onDismiss={dismissPanel}
         closeButtonAriaLabel="Close"
       >
-        <p>GroupedList example with custom checkbox</p>
         <NodeList/>
       </Panel>
     </div>

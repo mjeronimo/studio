@@ -1,16 +1,8 @@
 
 import React, { memo } from 'react';
-
 import { GroupHeader, GroupedList, IGroupHeaderCheckboxProps, IGroupHeaderProps, IGroupRenderProps, IGroup, IColumn, IObjectWithKey, DetailsRow, FocusZone, Selection, SelectionMode, SelectionZone, Toggle, ThemeProvider } from "@fluentui/react";
-
 import { useConst } from "@fluentui/react-hooks";
-
-import { createListItems, createGroups, IExampleItem } from "./listitems";
-
-// import { initializeIcons } from "office-ui-fabric-react/lib/Icons";
-// import { initializeIcons } from "@uifabric/icons";
-// initializeIcons();
-
+import { getRosNodes, createGroups, IRosNode } from "./listitems";
 import { ws_connect, ws_disconnect, ws_send } from "./wsclient"
 
 const groupProps: IGroupRenderProps = {
@@ -23,28 +15,36 @@ const onRenderGroupHeaderCheckbox = (props?: IGroupHeaderCheckboxProps) => (
   <Toggle checked={props ? props.checked : undefined} />
 );
 
-const groupCount = 2;
-const groupDepth = 2;
-
 const NodeList: React.FunctionComponent = () => {
-  const items: IObjectWithKey[] = useConst(() => createListItems(Math.pow(groupCount, groupDepth + 1)));
+  const items: IObjectWithKey[] = useConst(() => getRosNodes());
+
+  const groupCount = 2;
+  const groupDepth = 2;
   const groups = useConst(() => createGroups(groupCount, groupDepth, 0, groupCount));
+
+  console.log("GROUPS:");
+  console.log(groups);
+
+  //const columns = useConst(() =>
+    //Object.keys(items[0]!)
+      //.slice(0, 1)
+      //.map(
+        //(key: string): IColumn => ({
+          //key: key,
+          //name: key,
+          //fieldName: key,
+          //minWidth: 300,
+        //}),
+      //),
+  //);
+
   const columns = useConst(() =>
-    Object.keys(items[0]!)
-      .slice(0, 3)
-      .map(
-        (key: string): IColumn => ({
-          key: key,
-          name: key,
-          fieldName: key,
-          minWidth: 300,
-        }),
-      ),
+    [{fieldName: "node_with_namespace", key: "node_with_namespace", minWidth: 300, name: "node_with_namespace"} ]
   );
   const selection = useConst(() => new Selection({ items }));
 
   const onRenderCell = React.useCallback(
-    (nestingDepth?: number, item?: IExampleItem, itemIndex?: number, group?: IGroup): React.ReactNode => (
+    (nestingDepth?: number, item?: IRosNode, itemIndex?: number, group?: IGroup): React.ReactNode => (
       <DetailsRow
         columns={columns}
         groupNestingDepth={nestingDepth}
@@ -53,6 +53,7 @@ const NodeList: React.FunctionComponent = () => {
         selection={selection}
         selectionMode={SelectionMode.multiple}
         group={group}
+        indentWidth={0}
       />
     ),
     [columns, selection],
