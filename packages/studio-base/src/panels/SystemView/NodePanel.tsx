@@ -9,6 +9,17 @@ import NodeList from './NodeList';
 
 import { PanelType } from "@fluentui/react";
 
+import { ILabelStyles, IStyleSet, Label } from '@fluentui/react';
+import { Pivot, PivotItem } from '@fluentui/react-tabs';
+
+import { Separator } from '@fluentui/react/lib/Separator';
+
+const labelStyles: Partial<IStyleSet<ILabelStyles>> = {
+  root: { marginTop: 10 },
+};
+
+// <Label styles={labelStyles}>Pivot #1</Label>
+
 const NodePanel: React.FunctionComponent = () => {
   const [isOpen, { setTrue: openPanel, setFalse: dismissPanel }] = useBoolean(false);
 
@@ -17,7 +28,7 @@ const NodePanel: React.FunctionComponent = () => {
       <br />
       <DefaultButton text="Open panel" onClick={openPanel} />
       <Panel
-        headerText="Nodes"
+        headerText="ROS 2 Node List"
         // this prop makes the panel non-modal
         isBlocking={false}
         isOpen={isOpen}
@@ -26,7 +37,24 @@ const NodePanel: React.FunctionComponent = () => {
         customWidth="425px"
         type={PanelType.custom}
       >
-        <NodeList/>
+          <Separator />
+          <Pivot aria-label="Basic Pivot Example">
+            <PivotItem
+              headerText="Logical"
+              headerButtonProps={{
+                'data-order': 1,
+                'data-title': 'My Files Title',
+              }}
+            >
+                <NodeList/>
+            </PivotItem>
+            <PivotItem headerText="Physical">
+              <Label styles={labelStyles}>Physical View</Label>
+            </PivotItem>
+            <PivotItem headerText="Alphabetized">
+              <Label styles={labelStyles}>Alphabetized List</Label>
+            </PivotItem>
+          </Pivot>
       </Panel>
     </div>
   );

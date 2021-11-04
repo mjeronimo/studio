@@ -6,6 +6,7 @@ export interface IRosNode {
   hostname: string;
   process_id: string;
   key: string;
+  visible?: boolean;
 }
 
 export interface INodeGroup {
@@ -37,15 +38,15 @@ export function getRosNodes(): IRosNode[] {
 
 export function createGroups(): INodeGroup[] {
   let subgroup1: INodeGroup[] = [];
-  subgroup1.push({ count: 2, key: "Host0-0", name: "pid: 12345", startIndex: 0, level: 1, isCollapsed: false, children: [] });
-  subgroup1.push({ count: 2, key: "Host0-1", name: "pid: 12346", startIndex: 2, level: 1, isCollapsed: false, children: [] });
+  subgroup1.push({ count: 2, key: "Host0-0", name: "/viper", startIndex: 0, level: 1, isCollapsed: false, children: [] });
+  subgroup1.push({ count: 2, key: "Host0-1", name: "/viper", startIndex: 2, level: 1, isCollapsed: false, children: [] });
 
   let subgroup2: INodeGroup[] = [];
-  subgroup2.push({ count: 2, key: "Host1-0", name: "pid: 12347", startIndex: 4, level: 1, isCollapsed: false, children: [] });
-  subgroup2.push({ count: 2, key: "Host1-1", name: "pid: 12348", startIndex: 6, level: 1, isCollapsed: false, children: [] });
+  subgroup2.push({ count: 2, key: "Host1-0", name: "/viper", startIndex: 4, level: 1, isCollapsed: false, children: [] });
+  subgroup2.push({ count: 2, key: "Host1-1", name: "/viper", startIndex: 6, level: 1, isCollapsed: false, children: [] });
 
   let groups: INodeGroup[] = [];
-  groups.push({ count: 4, key: "Domain0", name: "host: bluenote", startIndex: 0, level: 0, isCollapsed: false, children: subgroup1 });
-  groups.push({ count: 4, key: "Domain1", name: "host: coltrane", startIndex: 4, level: 0, isCollapsed: false, children: subgroup2 });
+  groups.push({ count: 4, key: "Domain0", name: "Domain 0", startIndex: 0, level: 0, isCollapsed: false, children: subgroup1 });
+  groups.push({ count: 4, key: "Domain1", name: "Domain 1", startIndex: 4, level: 0, isCollapsed: false, children: subgroup2 });
   return groups;
 }

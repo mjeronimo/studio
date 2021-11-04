@@ -126,6 +126,7 @@
   },
   "dependencies": {
     "@fluentui/example-data": "^8.2.7",
+    "@fluentui/react-tabs": "0.6.21",
     "esbuild-loader": "^2.16.0",
     "fork-ts-checker-webpack-plugin": "^6.4.0",
     "office-ui-fabric-react": "7.178.1"

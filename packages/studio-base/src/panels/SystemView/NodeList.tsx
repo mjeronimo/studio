@@ -17,18 +17,15 @@ const onRenderGroupHeaderCheckbox = (props?: IGroupHeaderCheckboxProps) => (
 );
 
 const NodeList: React.FunctionComponent = () => {
+
+  /////
   const items: IObjectWithKey[] = useConst(() => getRosNodes());
-
-  const groupCount = 2;
-  const groupDepth = 2;
   const groups = useConst(() => createGroups());
-
-  console.log("GROUPS:");
-  console.log(groups);
-
   const columns = useConst(() =>
     [{fieldName: "node_with_namespace", key: "node_with_namespace", minWidth: 300, name: "node_with_namespace"} ]
   );
+  /////
+
   const selection = useConst(() => new Selection({ items }));
 
   const onRenderCell = React.useCallback(
