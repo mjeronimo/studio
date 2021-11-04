@@ -2,8 +2,9 @@
 import React, { memo } from 'react';
 import { GroupHeader, GroupedList, IGroupHeaderCheckboxProps, IGroupHeaderProps, IGroupRenderProps, IGroup, IColumn, IObjectWithKey, DetailsRow, FocusZone, Selection, SelectionMode, SelectionZone, Toggle, ThemeProvider } from "@fluentui/react";
 import { useConst } from "@fluentui/react-hooks";
-import { getRosNodes, createGroups, IRosNode } from "./listitems";
 import { ws_connect, ws_disconnect, ws_send } from "./wsclient"
+
+import { getRosNodes, createGroups, IRosNode } from "./listitems";
 
 const groupProps: IGroupRenderProps = {
   onRenderHeader: (props?: IGroupHeaderProps): JSX.Element => (
@@ -20,23 +21,10 @@ const NodeList: React.FunctionComponent = () => {
 
   const groupCount = 2;
   const groupDepth = 2;
-  const groups = useConst(() => createGroups(groupCount, groupDepth, 0, groupCount));
+  const groups = useConst(() => createGroups());
 
   console.log("GROUPS:");
   console.log(groups);
-
-  //const columns = useConst(() =>
-    //Object.keys(items[0]!)
-      //.slice(0, 1)
-      //.map(
-        //(key: string): IColumn => ({
-          //key: key,
-          //name: key,
-          //fieldName: key,
-          //minWidth: 300,
-        //}),
-      //),
-  //);
 
   const columns = useConst(() =>
     [{fieldName: "node_with_namespace", key: "node_with_namespace", minWidth: 300, name: "node_with_namespace"} ]
@@ -53,7 +41,7 @@ const NodeList: React.FunctionComponent = () => {
         selection={selection}
         selectionMode={SelectionMode.multiple}
         group={group}
-        indentWidth={0}
+        indentWidth={50}
       />
     ),
     [columns, selection],
@@ -70,6 +58,7 @@ const NodeList: React.FunctionComponent = () => {
             selectionMode={SelectionMode.multiple}
             groups={groups}
             groupProps={groupProps}
+            compact={true}
           />
         </SelectionZone>
       </FocusZone>

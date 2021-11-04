@@ -35,38 +35,17 @@ export function getRosNodes(): IRosNode[] {
   return nodes;
 }
 
-//export function createGroups2(): INodeGroup[] {
-//  let groups: INodeGroup[] = [];
-//  groups.push({ count: 2, key: "/viper", name: "/viper/stereo_camera_controller", startIndex: 0, level: 0, isCollapsed: false, children: [] });
-//  return groups;
-//}
+export function createGroups(): INodeGroup[] {
+  let subgroup1: INodeGroup[] = [];
+  subgroup1.push({ count: 2, key: "Host0-0", name: "pid: 12345", startIndex: 0, level: 1, isCollapsed: false, children: [] });
+  subgroup1.push({ count: 2, key: "Host0-1", name: "pid: 12346", startIndex: 2, level: 1, isCollapsed: false, children: [] });
 
-export function createGroups(
-  groupCount: number,
-  groupDepth: number,
-  startIndex: number,
-  itemsPerGroup: number,
-  level: number = 0,
-  key: string = '',
-  isCollapsed?: boolean,
-): INodeGroup[] {
-  if (key !== '') {
-    key = key + '-';
-  }
-  const count = Math.pow(itemsPerGroup, groupDepth);
-  console.log("createGroups: count: " + count)
-  return [...Array(groupCount)].map((value: number, index: number) => {
-    return {
-      count: count,
-      key: 'Host' + key + index,
-      name: 'Host ' + key + index,
-      startIndex: index * count + startIndex,
-      level: level,
-      isCollapsed: isCollapsed,
-      children:
-        groupDepth > 1
-          ? createGroups(groupCount, groupDepth - 1, index * count + startIndex, itemsPerGroup, level + 1, key + index)
-          : [],
-    };
-  });
+  let subgroup2: INodeGroup[] = [];
+  subgroup2.push({ count: 2, key: "Host1-0", name: "pid: 12347", startIndex: 4, level: 1, isCollapsed: false, children: [] });
+  subgroup2.push({ count: 2, key: "Host1-1", name: "pid: 12348", startIndex: 6, level: 1, isCollapsed: false, children: [] });
+
+  let groups: INodeGroup[] = [];
+  groups.push({ count: 4, key: "Domain0", name: "host: bluenote", startIndex: 0, level: 0, isCollapsed: false, children: subgroup1 });
+  groups.push({ count: 4, key: "Domain1", name: "host: coltrane", startIndex: 4, level: 0, isCollapsed: false, children: subgroup2 });
+  return groups;
 }

@@ -7,6 +7,8 @@ import { useBoolean } from '@fluentui/react-hooks';
 
 import NodeList from './NodeList';
 
+import { PanelType } from "@fluentui/react";
+
 const NodePanel: React.FunctionComponent = () => {
   const [isOpen, { setTrue: openPanel, setFalse: dismissPanel }] = useBoolean(false);
 
@@ -21,6 +23,8 @@ const NodePanel: React.FunctionComponent = () => {
         isOpen={isOpen}
         onDismiss={dismissPanel}
         closeButtonAriaLabel="Close"
+        customWidth="425px"
+        type={PanelType.custom}
       >
         <NodeList/>
       </Panel>
