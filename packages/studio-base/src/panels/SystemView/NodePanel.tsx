@@ -14,6 +14,8 @@ import { Pivot, PivotItem } from '@fluentui/react-tabs';
 
 import { Separator } from '@fluentui/react/lib/Separator';
 
+const openStyle: CSSProperties = { position: 'absolute', left: 5, top: 5, zIndex: 4 };
+
 const labelStyles: Partial<IStyleSet<ILabelStyles>> = {
   root: { marginTop: 10 },
 };
@@ -26,18 +28,18 @@ const NodePanel: React.FunctionComponent = () => {
   return (
     <div>
       <br />
-      <DefaultButton text="Open panel" onClick={openPanel} />
+      <DefaultButton text="Open panel" onClick={openPanel} style={openStyle} />
       <Panel
         headerText="ROS 2 Node List"
         // this prop makes the panel non-modal
         isBlocking={false}
+        // isLightDismiss
         isOpen={isOpen}
         onDismiss={dismissPanel}
         closeButtonAriaLabel="Close"
         customWidth="425px"
         type={PanelType.custom}
       >
-          <Separator />
           <Pivot aria-label="Basic Pivot Example">
             <PivotItem
               headerText="Logical"

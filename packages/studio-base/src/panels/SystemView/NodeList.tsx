@@ -22,7 +22,7 @@ const NodeList: React.FunctionComponent = () => {
   const items: IObjectWithKey[] = useConst(() => getRosNodes());
   const groups = useConst(() => createGroups());
   const columns = useConst(() =>
-    [{fieldName: "node_with_namespace", key: "node_with_namespace", minWidth: 300, name: "node_with_namespace"} ]
+    [{fieldName: "name", key: "name", minWidth: 300, name: "name"} ]
   );
   /////
 

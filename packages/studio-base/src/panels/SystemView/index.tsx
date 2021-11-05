@@ -20,13 +20,11 @@ import TopicToRenderMenu from "@foxglove/studio-base/components/TopicToRenderMen
 import { MessageEvent } from "@foxglove/studio-base/players/types";
 import styles from "@foxglove/studio-base/panels/ThreeDimensionalViz/sharedStyles";
 
-import filterMessages from "./filterMessages";
 import helpContent from "./index.help.md";
 import { RosgraphMsgs$Log } from "./types";
-import FilterBar, { FilterBarProps } from "./FilterBar";
+
 import RosNode from "./RosNode";
 import RosTopic from "./RosTopic";
-import LogList from "./LogList";
 import LogMessage from "./LogMessage";
 import NodePanel from "./NodePanel";
 
@@ -54,17 +52,6 @@ const nodeTypes = {
   rosTopic: RosTopic,
 };
 
-const hrStyles: CSSProperties = { height: '1px', background: '#aaa', border: 'none' };
-const infoStyles: CSSProperties = { color: 'white', border: '0px solid #000', float: 'left', marginLeft: '0.5rem' };
-const settingsStyles: CSSProperties = { background: '#0078d7', border: 'none', position: 'absolute', right: '0px' };
-const magnifyStyles: CSSProperties = { border: '0px solid #000', float: 'right', marginRight: '0.5rem' };
-const nodeTitleStyle: CSSProperties = { color: 'white', background: '#6263a4', textAlign: 'left', padding: '5px', paddingLeft: '5px', border: '0px solid #000' };
-const noBorderStyle: CSSProperties = { border: '0px solid #000' };
-const nodeBodyStyle: CSSProperties = { background: '#565899', height: '40px', border: 'none' };
-const buttonWrapperStyles: CSSProperties = { background: '#cecece', border: '0px solid #000' };
-const buttonStyle: CSSProperties = { position: 'absolute', left: 0, top: 35, zIndex: 4 };
-const dismissStyle: CSSProperties = { color: 'white', position: 'absolute', top: '-13px', right: '-12px', border: '0px solid #000' };
-
 const onLoad = (reactFlowInstance: OnLoadParams) => {
   ws_connect();
   console.log('flow loaded:', reactFlowInstance);
@@ -89,13 +76,6 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
   const { topics } = PanelAPI.useDataSourceInfo();
   const { minLogLevel, searchTerms } = config;
 
-  const onFilterChange = useCallback<FilterBarProps["onFilterChange"]>(
-    (filter) => {
-      saveConfig({ ...config, minLogLevel: filter.minLogLevel, searchTerms: filter.searchTerms });
-    },
-    [config, saveConfig],
-  );
-
   const { [config.topicToRender]: messages = [] } = PanelAPI.useMessagesByTopic({
     topics: [config.topicToRender],
     historySize: 100000,
@@ -107,21 +87,6 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
   messages.forEach((msg) => seenNodeNames.current.add(msg.message.name));
 
   const searchTermsSet = useMemo(() => new Set(searchTerms), [searchTerms]);
-
-  const filteredMessages = useMemo(
-    () => filterMessages(messages, { minLogLevel, searchTerms }),
-    [messages, minLogLevel, searchTerms],
-  );
-
-  const topicToRenderMenu = (
-    <TopicToRenderMenu
-      topicToRender={config.topicToRender}
-      onChange={(topicToRender) => saveConfig({ ...config, topicToRender })}
-      topics={topics}
-      allowedDatatypes={["rosgraph_msgs/Log", "rcl_interfaces/msg/Log"]}
-      defaultTopicToRender={"/rosout"}
-    />
-  );
 
   const onElementsRemove = (elementsToRemove: Elements) => setElements((els) => removeElements(elementsToRemove, els));
   const onConnect = (params: Connection | Edge) => setElements((els) => addEdge(params, els));
@@ -189,6 +154,7 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
       data: { title: 'point_cloud_node' },
       style: { border: '0px', width: 215 },
       position: { x: 100, y: 925 },
+      isHidden: false
     },
     {
       id: '10',
@@ -238,24 +204,8 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
 
   return (
     <Stack verticalFill>
-      <PanelToolbar floating helpContent={helpContent} additionalIcons={topicToRenderMenu}>
-        <FilterBar
-          searchTerms={searchTermsSet}
-          minLogLevel={minLogLevel}
-          nodeNames={seenNodeNames.current}
-          messages={filteredMessages}
-          onFilterChange={onFilterChange}
-        />
-      </PanelToolbar>
+      <PanelToolbar helpContent={helpContent} floating />
       <Stack grow>
-        <LogList
-          items={filteredMessages}
-          renderRow={({ item, style, key, index, ref }) => (
-            <div ref={ref} key={key} style={index === 0 ? { ...style, paddingTop: 36 } : style}>
-              <LogMessage msg={item.message} />
-            </div>
-          )}
-        />
         <ReactFlow
           elements={elements}
           onLoad={onLoad}
@@ -268,11 +218,6 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
         >
           <Controls />
           <Background variant={BackgroundVariant.Dots} />
-          <Button className={styles.iconButton} tooltip="Zoom fit" onClick={addRandomNode} style={buttonStyle}>
-            <Icon style={{ color: "white" }} size="small" >
-              <FitToPageIcon />
-            </Icon>
-          </Button>
         </ReactFlow>
         <NodePanel />
       </Stack>
@@ -285,6 +230,6 @@ SystemViewPanel.displayName = "SystemView";
 export default Panel(
   Object.assign(SystemViewPanel, {
     defaultConfig: { searchTerms: [], minLogLevel: 1, topicToRender: "/rosout" } as Config,
-    panelType: "RosOut",
+    panelType: "SystemView",
   }),
 );
