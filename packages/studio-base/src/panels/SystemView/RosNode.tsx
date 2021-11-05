@@ -10,8 +10,8 @@ import Button from "@foxglove/studio-base/components/Button";
 import styles from "@foxglove/studio-base/panels/ThreeDimensionalViz/sharedStyles";
 
 const targetHandleStyle: CSSProperties = { background: '#555' };
-//const sourceHandleStyleA: CSSProperties = { ...targetHandleStyle, top: 10 };
-//const sourceHandleStyleB: CSSProperties = { ...targetHandleStyle, bottom: 10, top: 'auto' };
+// const sourceHandleStyleA: CSSProperties = { ...targetHandleStyle, top: 10 };
+// const sourceHandleStyleB: CSSProperties = { ...targetHandleStyle, bottom: 10, top: 'auto' };
 
 const onConnect = (params: Connection | Edge) => console.log('handle onConnect', params);
 const settingsStyles: CSSProperties = { background: '#0078d7', border: 'none', position: 'absolute', right: '0px' };
@@ -37,7 +37,7 @@ const RosNode: FC<NodeProps> = ({ data }) => {
         </Icon>
         <strong>{data.title}</strong>
         <Button className={styles.iconButton} tooltip="Remove node from graph" style={dismissStyle}>
-          <Dismiss12Regular/>
+          <Dismiss12Regular />
         </Button>
       </div>
       <div style={nodeBodyStyle}>

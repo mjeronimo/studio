@@ -47,7 +47,7 @@ export function getRosNodes(): IRosNode[] {
 export function createGroups(nodes: IObjectWithKey[]): INodeGroup[] {
   var domains = new Array();
 
-  nodes.forEach(node => { 
+  nodes.forEach(node => {
     let n = node as IRosNode;
     if (domains[n.domain] == undefined) {
       domains[n.domain] = new Array();

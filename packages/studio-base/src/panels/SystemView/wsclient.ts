@@ -4,7 +4,7 @@ var webSocket: WebSocket;
 export function ws_connect() {
   var protocol = 'ws';
   var hostname = 'localhost';
-  var port   = '9002';
+  var port = '9002';
   var endpoint = '/Browser';
 
   var webSocketURL = null;
@@ -14,7 +14,7 @@ export function ws_connect() {
   try {
     webSocket = new WebSocket(webSocketURL);
 
-    webSocket.onopen = function(openEvent) {
+    webSocket.onopen = function (openEvent) {
       console.log("WebSocket OPEN: " + JSON.stringify(openEvent, null, 4));
     };
 
