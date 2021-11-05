@@ -7,7 +7,7 @@ import { useBoolean } from '@fluentui/react-hooks';
 
 import NodeList from './NodeList';
 
-import { PanelType } from "@fluentui/react";
+import { Checkbox, PanelType, Text, useTheme } from "@fluentui/react";
 
 import { ILabelStyles, IStyleSet, Label } from '@fluentui/react';
 import { Pivot, PivotItem } from '@fluentui/react-tabs';
@@ -22,6 +22,23 @@ const labelStyles: Partial<IStyleSet<ILabelStyles>> = {
 
 // <Label styles={labelStyles}>Pivot #1</Label>
 
+function SectionHeader({ children }: React.PropsWithChildren<unknown>) {
+  const theme = useTheme();
+  return (
+    <Text
+      block
+      as="h2"
+      variant="large"
+      style={{
+        marginBottom: theme.spacing.s1,
+        color: theme.palette.themeSecondary,
+      }}
+    >
+      {children}
+    </Text>
+  );
+}
+
 const NodePanel: React.FunctionComponent = () => {
   const [isOpen, { setTrue: openPanel, setFalse: dismissPanel }] = useBoolean(false);
 
@@ -30,7 +47,7 @@ const NodePanel: React.FunctionComponent = () => {
       <br />
       <DefaultButton text="Open panel" onClick={openPanel} style={openStyle} />
       <Panel
-        headerText="ROS 2 Node List"
+        headerText="Node List"
         // this prop makes the panel non-modal
         isBlocking={false}
         // isLightDismiss
@@ -40,6 +57,11 @@ const NodePanel: React.FunctionComponent = () => {
         customWidth="425px"
         type={PanelType.custom}
       >
+          <SectionHeader>Some Heading</SectionHeader>
+             <Checkbox
+              label={`Send usage data`}
+            />
+
           <Pivot aria-label="Basic Pivot Example">
             <PivotItem
               headerText="Logical"

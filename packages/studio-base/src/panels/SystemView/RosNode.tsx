@@ -1,8 +1,11 @@
 import React, { memo, FC, CSSProperties } from 'react';
 import { Dismiss12Regular, Info24Regular, Settings24Filled } from "@fluentui/react-icons";
 import { Handle, Position, NodeProps, Connection, Edge } from 'react-flow-renderer';
-import PiIcon from './Raspberry_Pi-Logo.wine.svg';
+
+import FitToPageIcon from "@mdi/svg/svg/fit-to-page-outline.svg";
+import { Wrench24Regular } from "@fluentui/react-icons";
 import Icon from "@foxglove/studio-base/components/Icon";
+
 import Button from "@foxglove/studio-base/components/Button";
 import styles from "@foxglove/studio-base/panels/ThreeDimensionalViz/sharedStyles";
 
@@ -29,8 +32,8 @@ const RosNode: FC<NodeProps> = ({ data }) => {
   return (
     <div style={nodeStyle} >
       <div style={nodeTitleStyle} >
-        <Icon style={{ color: "white" }} size="medium" >
-          <PiIcon />
+        <Icon style={{ color: "white", marginRight: "10px" }} size="small">
+          <Wrench24Regular />
         </Icon>
         <strong>{data.title}</strong>
         <Button className={styles.iconButton} tooltip="Remove node from graph" style={dismissStyle}>

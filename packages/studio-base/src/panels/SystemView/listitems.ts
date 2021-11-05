@@ -1,3 +1,4 @@
+import { IObjectWithKey } from "@fluentui/react";
 
 export interface IRosNode {
   domain: number;
@@ -26,13 +27,13 @@ export function getRosNodes(): IRosNode[] {
   nodes.push({ domain: 0, namespace: "/viper", name: "image_adjuster_right_stereo", hostname: "bluenote", process_id: "1547", key: "item-3" });
   nodes.push({ domain: 0, namespace: "/viper", name: "disparity_node", hostname: "bluenote", process_id: "1548", key: "item-4" });
   nodes.push({ domain: 0, namespace: "/viper", name: "point_cloud_node", hostname: "bluenote", process_id: "1549", key: "item-5" });
-  nodes.push({ domain: 0, namespace: "/viper", name: "node6", hostname: "bluenote", process_id: "1550", key: "item-6" });
-  nodes.push({ domain: 0, namespace: "/viper", name: "node7", hostname: "bluenote", process_id: "1551", key: "item-7" });
-  nodes.push({ domain: 0, namespace: "/viper", name: "node8", hostname: "bluenote", process_id: "1552", key: "item-8" });
-  nodes.push({ domain: 0, namespace: "/viper", name: "node9", hostname: "bluenote", process_id: "1553", key: "item-9" });
-  nodes.push({ domain: 0, namespace: "/viper", name: "node10", hostname: "bluenote", process_id: "1554", key: "item-10" });
-  nodes.push({ domain: 0, namespace: "/viper", name: "node11", hostname: "bluenote", process_id: "1555", key: "item-11" });
-  nodes.push({ domain: 0, namespace: "/viper", name: "node12", hostname: "bluenote", process_id: "1556", key: "item-12" });
+  nodes.push({ domain: 0, namespace: "/other", name: "node6", hostname: "bluenote", process_id: "1550", key: "item-6" });
+  nodes.push({ domain: 0, namespace: "/other", name: "node7", hostname: "bluenote", process_id: "1551", key: "item-7" });
+  nodes.push({ domain: 0, namespace: "/other", name: "node8", hostname: "bluenote", process_id: "1552", key: "item-8" });
+  nodes.push({ domain: 0, namespace: "/other", name: "node9", hostname: "bluenote", process_id: "1553", key: "item-9" });
+  nodes.push({ domain: 0, namespace: "/other", name: "node10", hostname: "bluenote", process_id: "1554", key: "item-10" });
+  nodes.push({ domain: 0, namespace: "/other", name: "node11", hostname: "bluenote", process_id: "1555", key: "item-11" });
+  nodes.push({ domain: 0, namespace: "/other", name: "node12", hostname: "bluenote", process_id: "1556", key: "item-12" });
   nodes.push({ domain: 1, namespace: "/viper", name: "node13", hostname: "bluenote", process_id: "1557", key: "item-13" });
   nodes.push({ domain: 1, namespace: "/viper", name: "node14", hostname: "bluenote", process_id: "1558", key: "item-14" });
   nodes.push({ domain: 1, namespace: "/viper", name: "node15", hostname: "bluenote", process_id: "1559", key: "item-15" });
@@ -43,7 +44,23 @@ export function getRosNodes(): IRosNode[] {
   return nodes;
 }
 
-export function createGroups(): INodeGroup[] {
+export function createGroups(nodes: IObjectWithKey[]): INodeGroup[] {
+  var domains = new Array();
+
+  nodes.forEach(node => { 
+    let n = node as IRosNode;
+    if (domains[n.domain] == undefined) {
+      domains[n.domain] = new Array();
+    }
+
+    if (domains[n.domain][n.namespace] == undefined) {
+      domains[n.domain][n.namespace] = new Array();
+    }
+
+    domains[n.domain][n.namespace].push(n);
+  });
+
+  console.log(domains);
 
   // TODO: automatically generate the groups from the node list
 

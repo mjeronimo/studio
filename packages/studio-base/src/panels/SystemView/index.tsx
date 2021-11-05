@@ -9,8 +9,6 @@ import {
 
 import { Stack } from "@fluentui/react";
 
-import FitToPageIcon from "@mdi/svg/svg/fit-to-page-outline.svg";
-
 import * as PanelAPI from "@foxglove/studio-base/PanelAPI";
 import Panel from "@foxglove/studio-base/components/Panel";
 import Button from "@foxglove/studio-base/components/Button";
@@ -25,7 +23,6 @@ import { RosgraphMsgs$Log } from "./types";
 
 import RosNode from "./RosNode";
 import RosTopic from "./RosTopic";
-import LogMessage from "./LogMessage";
 import NodePanel from "./NodePanel";
 
 import ReactFlow, {

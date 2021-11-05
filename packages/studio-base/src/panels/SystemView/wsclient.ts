@@ -42,7 +42,6 @@ export function ws_disconnect() {
   webSocket.close();
 }
 
-
 export function ws_send(msg: string) {
   if (webSocket.readyState != WebSocket.OPEN) {
     console.error("webSocket is not open: " + webSocket.readyState);
