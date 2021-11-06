@@ -3,25 +3,22 @@ import React, { memo } from 'react';
 
 import {
   GroupHeader,
-  GroupedList, 
-  IGroupHeaderCheckboxProps, 
-  IGroupHeaderProps, 
-  IGroupRenderProps, 
-  IGroup, 
-  IColumn, 
-  IObjectWithKey, 
-  DetailsRow, 
-  FocusZone, 
-  Selection, 
-  SelectionMode, 
-  SelectionZone, 
-  Toggle, 
-  ThemeProvider,
+  GroupedList,
+  IGroupHeaderCheckboxProps,
+  IGroupHeaderProps,
+  IGroupRenderProps,
+  IGroup,
+  IObjectWithKey,
+  DetailsRow,
+  FocusZone,
+  Selection,
+  SelectionMode,
+  SelectionZone,
+  Toggle,
   useTheme
 } from "@fluentui/react";
 
 import { useConst } from "@fluentui/react-hooks";
-import { ws_connect, ws_disconnect, ws_send } from "./wsclient"
 import { getRosNodes, createGroups, IRosNode } from "./listitems";
 
 const groupProps: IGroupRenderProps = {
@@ -38,8 +35,7 @@ const NodeList: React.FunctionComponent = () => {
 
   const items: IObjectWithKey[] = useConst(() => getRosNodes());
   const groups = useConst(() => createGroups(items));
-
-  const columns = useConst(() => [{fieldName: "name", key: "name", minWidth: 300, name: "name"} ]);
+  const columns = useConst(() => [{ fieldName: "name", key: "name", minWidth: 300, name: "name" }]);
   const selection = useConst(() => new Selection({ items }));
 
   const onRenderCell = React.useCallback(

@@ -1,30 +1,17 @@
-import {
-  CSSProperties,
-  MouseEvent,
-  useCallback,
-  useMemo,
-  useRef,
-  useState
-} from "react";
+// React 
+import { CSSProperties, MouseEvent, useCallback, useMemo, useRef, useState } from "react";
 
+// FluentUI
 import { Stack } from "@fluentui/react";
 
+// Foxglove
 import * as PanelAPI from "@foxglove/studio-base/PanelAPI";
 import Panel from "@foxglove/studio-base/components/Panel";
 import Button from "@foxglove/studio-base/components/Button";
 import Icon from "@foxglove/studio-base/components/Icon";
 import PanelToolbar from "@foxglove/studio-base/components/PanelToolbar";
-import TopicToRenderMenu from "@foxglove/studio-base/components/TopicToRenderMenu";
-import { MessageEvent } from "@foxglove/studio-base/players/types";
-import styles from "@foxglove/studio-base/panels/ThreeDimensionalViz/sharedStyles";
 
-import helpContent from "./index.help.md";
-import { RosgraphMsgs$Log } from "./types";
-
-import RosNode from "./RosNode";
-import RosTopic from "./RosTopic";
-import NodePanel from "./NodePanel";
-
+// ReactFlow
 import ReactFlow, {
   addEdge,
   ArrowHeadType,
@@ -41,8 +28,12 @@ import ReactFlow, {
   removeElements,
 } from 'react-flow-renderer';
 
-
-import { ws_connect, ws_disconnect } from "./wsclient"
+// Local
+import helpContent from "./index.help.md";
+import RosNode from "./RosNode";
+import RosTopic from "./RosTopic";
+import NodePanel from "./NodePanel";
+import { ws_connect, ws_disconnect } from "./WebSocketClient"
 
 const nodeTypes = {
   rosNode: RosNode,
@@ -56,8 +47,7 @@ const onLoad = (reactFlowInstance: OnLoadParams) => {
 const onElementClick = (_: MouseEvent, element: FlowElement) => console.log('click', element);
 const onNodeDragStop = (_: MouseEvent, node: Node) => console.log('drag stop', node);
 
-//////////////////////////
-
+// TODO: Define the default configuration for this panel
 type Config = {
   searchTerms: string[];
   minLogLevel: number;
@@ -71,19 +61,9 @@ type Props = {
 
 const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
   const { topics } = PanelAPI.useDataSourceInfo();
+
+  // TODO: configuration
   const { minLogLevel, searchTerms } = config;
-
-  const { [config.topicToRender]: messages = [] } = PanelAPI.useMessagesByTopic({
-    topics: [config.topicToRender],
-    historySize: 100000,
-  }) as { [key: string]: MessageEvent<RosgraphMsgs$Log>[] };
-
-  // avoid making new sets for node names
-  // the filter bar uess the node names during on-demand filtering
-  const seenNodeNames = useRef(new Set<string>());
-  messages.forEach((msg) => seenNodeNames.current.add(msg.message.name));
-
-  const searchTermsSet = useMemo(() => new Set(searchTerms), [searchTerms]);
 
   const onElementsRemove = (elementsToRemove: Elements) => setElements((els) => removeElements(elementsToRemove, els));
   const onConnect = (params: Connection | Edge) => setElements((els) => addEdge(params, els));
@@ -226,6 +206,8 @@ SystemViewPanel.displayName = "SystemView";
 
 export default Panel(
   Object.assign(SystemViewPanel, {
+
+    // TODO: configuration
     defaultConfig: { searchTerms: [], minLogLevel: 1, topicToRender: "/rosout" } as Config,
     panelType: "SystemView",
   }),

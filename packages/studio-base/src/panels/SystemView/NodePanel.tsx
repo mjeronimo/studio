@@ -38,7 +38,6 @@ const NodePanel: React.FunctionComponent = () => {
       <DefaultButton text="Open panel" onClick={openPanel} style={openStyle} />
       <Panel
         headerText="Node List"
-        // this prop makes the panel non-modal
         isBlocking={false}
         // isLightDismiss
         isOpen={isOpen}
@@ -48,10 +47,7 @@ const NodePanel: React.FunctionComponent = () => {
         type={PanelType.custom}
       >
         <SectionHeader>Some Heading</SectionHeader>
-        <Checkbox
-          label={`Send usage data`}
-        />
-
+        <Checkbox label={`Send usage data`} />
         <Pivot aria-label="Basic Pivot Example">
           <PivotItem
             headerText="Logical"
