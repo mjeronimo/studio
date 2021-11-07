@@ -9,29 +9,8 @@ import Panel from "@foxglove/studio-base/components/Panel";
 import PanelToolbar from "@foxglove/studio-base/components/PanelToolbar";
 import Button from "@foxglove/studio-base/components/Button";
 
-import dagre from 'dagre';
-
-// ReactFlow
-import ReactFlow, {
-  addEdge,
-  ArrowHeadType,
-  Background,
-  BackgroundVariant,
-  Connection,
-  Controls,
-  Edge,
-  ElementId,
-  Elements,
-  FlowElement,
-  isNode,
-  Node,
-  OnLoadParams,
-  Position,
-  ReactFlowProvider,
-  removeElements,
-} from 'react-flow-renderer';
-
-import './layouting.css';
+// Reaflow
+import { Canvas, CanvasRef, Node, Edge, MarkerArrow, Port, Icon, Arrow, Label, Remove, Add, NodeProps, EdgeProps } from 'reaflow';
 
 // Local
 import helpContent from "./index.help.md";
@@ -40,60 +19,10 @@ import RosTopic from "./RosTopic";
 import NodePanel from "./NodePanel";
 import { ws_connect, ws_disconnect } from "./WebSocketClient"
 
-const dagreGraph = new dagre.graphlib.Graph();
-dagreGraph.setDefaultEdgeLabel(() => ({}));
-
-const nodeWidth = 250;
-const nodeHeight = 100;
-
-const getLayoutedElements = (elements: Elements, direction = 'TB') => {
-  const isHorizontal = direction === 'LR';
-
-  dagreGraph.setGraph({ rankdir: direction });
-
-  elements.forEach((el) => {
-    if (isNode(el)) {
-      dagreGraph.setNode(el.id, { width: nodeWidth, height: nodeHeight });
-    } else {
-      dagreGraph.setEdge(el.source, el.target);
-    }
-  });
-
-  dagre.layout(dagreGraph);
-
-  return elements.map((el) => {
-    if (isNode(el)) {
-      const nodeWithPosition = dagreGraph.node(el.id);
-      console.log("isHorizontal")
-      console.log(isHorizontal)
-
-      el.targetPosition = isHorizontal ? Position.Left : Position.Top;
-      el.sourcePosition = isHorizontal ? Position.Right : Position.Bottom;
-
-      // unfortunately we need this little hack to pass a slightly different position
-      // to notify react flow about the change. Moreover we are shifting the dagre node position
-      // (anchor=center center) to the top left so it matches the react flow node anchor point (top left).
-      el.position = {
-        x: nodeWithPosition.x - nodeWidth / 2 + Math.random() / 1000,
-        y: nodeWithPosition.y - nodeHeight / 2,
-      };
-    }
-
-    return el;
-  });
-};
-
-const nodeTypes = {
-  rosNode: RosNode,
-  rosTopic: RosTopic,
-};
-
-const onLoad = (reactFlowInstance: OnLoadParams) => {
-  ws_connect();
-  console.log('flow loaded:', reactFlowInstance);
-}
-const onElementClick = (_: MouseEvent, element: FlowElement) => console.log('click', element);
-const onNodeDragStop = (_: MouseEvent, node: Node) => console.log('drag stop', node);
+//const onLoad = (reactFlowInstance: OnLoadParams) => {
+//  ws_connect();
+//  console.log('flow loaded:', reactFlowInstance);
+//}
 
 // TODO: Define the default configuration for this panel
 type Config = {
@@ -112,157 +41,134 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
   // TODO: configuration
   const { minLogLevel, searchTerms } = config;
 
-  const onElementsRemove = (elementsToRemove: Elements) => setElements((els) => removeElements(elementsToRemove, els));
-  const onConnect = (params: Connection | Edge) => setElements((els) => addEdge(params, els));
-
-  const addRandomNode = () => {
-    const nodeId: ElementId = (elements.length + 1).toString();
-    const newNode: Node = {
-      id: nodeId,
-      type: 'rosNode',
-      data: { title: `Node: ${nodeId}` },
-      style: { border: '0px', width: 180 },
-      position: { x: Math.random() * window.innerWidth, y: Math.random() * window.innerHeight },
-    };
-    setElements((els) => els.concat(newNode));
-  };
-
-  const onChange = () => { }
-  const edgeType = 'smoothstep';
-
-  const initialElements: Elements = [
-    {
-      id: '3',
-      type: 'rosNode',
-      data: { title: 'stereo_camera_controller' },
-      style: { border: '0px', width: 250 },
-      position: { x: 220, y: 50 },
-    },
-    {
-      id: '2',
-      type: 'rosTopic',
-      data: { title: 'left/image_raw' },
-      style: { textAlign: 'center', color: '#FFF', border: '0px solid #AAA', width: 250 },
-      position: { x: 100, y: 200 },
-    },
-    {
-      id: '4',
-      type: 'rosTopic',
-      data: { title: 'right/image_raw' },
-      style: { textAlign: 'center', color: '#FFF', border: '0px solid #AAA', width: 250 },
-      position: { x: 410, y: 200 },
-    },
-    {
-      id: '5',
-      type: 'rosNode',
-      data: { title: 'image_adjuster_left_stereo' },
-      style: { border: '0px', width: 250 },
-      position: { x: 65, y: 350 },
-    },
-    {
-      id: '7',
-      type: 'rosNode',
-      data: { title: 'image_adjuster_right_stereo' },
-      style: { border: '0px', width: 250 },
-      position: { x: 375, y: 350 },
-    },
-    {
-      id: '8',
-      type: 'rosNode',
-      data: { title: 'disparity_node' },
-      style: { border: '0px', width: 250 },
-      position: { x: 225, y: 650 },
-    },
-    {
-      id: '9',
-      type: 'rosNode',
-      data: { title: 'point_cloud_node' },
-      style: { border: '0px', width: 250 },
-      position: { x: 100, y: 925 },
-      isHidden: false
-    },
-    {
-      id: '10',
-      type: 'rosTopic',
-      data: { title: 'left/image_raw/adjusted_stereo' },
-      style: { textAlign: 'center', color: '#FFF', border: '0px solid #AAA', width: 250 },
-      position: { x: 50, y: 500 },
-    },
-    {
-      id: '11',
-      type: 'rosTopic',
-      data: { title: 'right/image_raw/adjusted_stereo' },
-      style: { textAlign: 'center', color: '#FFF', border: '0px solid #AAA', width: 250 },
-      position: { x: 360, y: 500 },
-    },
-    {
-      id: '12',
-      type: 'rosTopic',
-      data: { title: 'disparity' },
-      style: { textAlign: 'center', color: '#FFF', border: '0px solid #AAA', width: 250 },
-      position: { x: 250, y: 780 },
-    },
-    {
-      id: '13',
-      type: 'rosTopic',
-      data: { title: 'points2' },
-      style: { textAlign: 'center', color: '#FFF', border: '0px solid #AAA', width: 250 },
-      position: { x: 110, y: 1080 },
-    },
-
-
-    { id: 'e3-2', type: edgeType, source: '3', target: '2', arrowHeadType: ArrowHeadType.Arrow, animated: true, label: '1Hz', style: { stroke: 'white' } },
-    { id: 'e3-4', type: edgeType, source: '3', target: '4', arrowHeadType: ArrowHeadType.Arrow, animated: true, label: '', style: { stroke: 'white' } },
-    { id: 'e2-5', type: edgeType, source: '2', target: '5', arrowHeadType: ArrowHeadType.Arrow, animated: true, label: '10 Hz', style: { stroke: 'white' }, labelBgStyle: { fill: '#FFCC00', color: '#fff', fillOpacity: 0.0 } },
-    { id: 'e4-7', type: edgeType, source: '4', target: '7', arrowHeadType: ArrowHeadType.Arrow, animated: true, label: '10 Hz', style: { stroke: 'white' }, labelBgStyle: { fill: '#FFCC00', color: '#fff', fillOpacity: 0.0 } },
-    { id: 'e7-11', type: edgeType, source: '7', target: '11', arrowHeadType: ArrowHeadType.Arrow, animated: true, label: '', style: { stroke: 'white' } },
-    { id: 'e10-8', type: edgeType, source: '10', target: '8', arrowHeadType: ArrowHeadType.Arrow, animated: true, label: '', style: { stroke: 'white' } },
-    { id: 'e5-10', type: edgeType, source: '5', target: '10', arrowHeadType: ArrowHeadType.Arrow, animated: true, label: '', style: { stroke: 'white' } },
-    { id: 'e11-8', type: edgeType, source: '11', target: '8', arrowHeadType: ArrowHeadType.Arrow, animated: true, label: '', style: { stroke: 'white' } },
-    { id: 'e12-9', type: edgeType, source: '12', target: '9', animated: false, label: '', style: { stroke: 'red', strokeWidth: 3 } },
-    { id: 'e10-9', type: edgeType, source: '10', target: '9', arrowHeadType: ArrowHeadType.Arrow, animated: true, label: '', style: { stroke: 'white' } },
-    { id: 'e8-12', type: edgeType, source: '8', target: '12', animated: false, label: '', style: { stroke: 'red', strokeWidth: 3 } },
-    { id: 'e9-13', type: edgeType, source: '9', target: '13', animated: false, label: '', style: { stroke: 'red', strokeWidth: 3 } },
-  ];
-
-  //const [elements, setElements] = useState<Elements>([]);
-  const [elements, setElements] = useState(getLayoutedElements(initialElements));
-
-  const onLayout = useCallback(
-    (direction: string) => {
-      const layoutedElements = getLayoutedElements(elements, direction);
-      setElements(layoutedElements);
-    },
-    [elements]
-  );
-
   return (
     <Stack verticalFill>
       <PanelToolbar helpContent={helpContent} floating />
       <Stack grow>
-        <div className="layoutflow">
-        <ReactFlowProvider>
+      <div 
+      style={{ 
+          position: 'absolute', 
+          top: 0, 
+          bottom: 0, 
+          left: 0, 
+          right: 0,
+          // backgroundColor: 'blue',
+          // backgroundImage: 'repeating-radial-gradient(top center,rgba(1.0,0,0,.2),rgba(1.0,0,0,.2) 10px, transparent 0, transparent 100%)',
+          // background: 'repeating-radial-gradient(red, yellow 10%, green 15%)'
 
-        <ReactFlow
-          elements={elements}
-          onLoad={onLoad}
-          onElementClick={onElementClick}
-          onElementsRemove={onElementsRemove}
-          onConnect={(p) => onConnect(p)}
-          onNodeDragStop={onNodeDragStop}
-          onlyRenderVisibleElements={false}
-          nodeTypes={nodeTypes}
-        >
-          <Controls>
-            <Button onClick={() => onLayout('TB')}>vertical layout</Button>
-            <Button onClick={() => onLayout('LR')}>horizontal layout</Button>
-          </Controls>
-          <Background variant={BackgroundVariant.Dots} />
-        </ReactFlow>
+          // background: '666',
+          // backgroundImage: 'linear-gradient(45deg, #bbb 25%, transparent 0), linear-gradient(45deg, transparent 75%, #bbb 0)',
+          // backgroundPosition: '0 0, 25px 25px',
+          // backgroundSize: '30px 30px',
+          }} >
+    <Canvas
+      // required to enable edges from/to nested nodes
+      pannable={true}
+      fit={true}
+      center={true}
+      nodes={[
+          { id: '3', text: 'stereo_camera_controller',
+            icon: {
+                url: 'https://s3.amazonaws.com/img.crft.app/package-slack-logo-bw.svg',
+                height: 25,
+                width: 25
+                },
+          },
+          { id: '2', text: '/left/image_raw',
+            icon: {
+                url: 'https://s3.amazonaws.com/img.crft.app/package-flashpoint-logo-bw.svg',
+                height: 25,
+                width: 25
+                },
+          },
+          { id: '4', text: '/right/image_raw',
+            icon: {
+                url: 'https://s3.amazonaws.com/img.crft.app/package-flashpoint-logo-bw.svg',
+                height: 25,
+                width: 25
+                },
+          },
+          { id: '5', text: 'image_adjuster_left_stereo',
+            icon: {
+                url: 'https://s3.amazonaws.com/img.crft.app/package-slack-logo-bw.svg',
+                height: 25,
+                width: 25
+                }
+          },
+          { id: '7', text: 'image_adjuster_right_stereo',
+            icon: {
+                url: 'https://s3.amazonaws.com/img.crft.app/package-slack-logo-bw.svg',
+                height: 25,
+                width: 25
+                }
+          },
+          { id: '8', text: 'disparity_node',
+            icon: {
+                url: 'https://s3.amazonaws.com/img.crft.app/package-slack-logo-bw.svg',
+                height: 25,
+                width: 25
+                }
+          },
+          { id: '9', text: 'point_cloud_node',
+            icon: {
+                url: 'https://s3.amazonaws.com/img.crft.app/package-slack-logo-bw.svg',
+                height: 25,
+                width: 25
+                }
+          },
+          { id: '10', text: '/left/image_raw/adjusted_stereo',
+            icon: {
+                url: 'https://s3.amazonaws.com/img.crft.app/package-flashpoint-logo-bw.svg',
+                height: 25,
+                width: 25
+                }
+          },
+          { id: '11', text: '/right/image_raw/adjusted_stereo',
+            icon: {
+                url: 'https://s3.amazonaws.com/img.crft.app/package-flashpoint-logo-bw.svg',
+                height: 25,
+                width: 25
+                }
+          },
+          { id: '12', text: '/disparity',
+            icon: {
+                url: 'https://s3.amazonaws.com/img.crft.app/package-slack-logo-bw.svg',
+                height: 25,
+                width: 25
+                }
+          },
+          { id: '13', text: '/points2',
+            icon: {
+                url: 'https://s3.amazonaws.com/img.crft.app/package-slack-logo-bw.svg',
+                height: 25,
+                width: 25
+                }
+          },
 
-        </ReactFlowProvider>
-        </div>
+      ]}
+      edges={[
+          { id: 'e3-4', from: '3', to: '4', text: '10 Hz' },
+          { id: 'e3-2', from: '3', to: '2', text: '11 Hz' },
+          { id: 'e4-7', from: '4', to: '7', text: '12 Hz' },
+          { id: 'e2-5', from: '2', to: '5', text: '13 Hz' },
+          { id: 'e7-11', from: '7', to: '11', text: '14 Hz' },
+          { id: 'e10-8', from: '10', to: '8', text: '15 Hz' },
+          { id: 'e10-9', from: '10', to: '9', text: '16 Hz' },
+          { id: 'e5-10', from: '5', to: '10', text: '17 Hz' },
+          { id: 'e11-8', from: '11', to: '8', text: '18 Hz' },
+          { id: 'e12-9', from: '12', to: '9', text: '19 Hz' },
+          { id: 'e8-12', from: '8', to: '12', text: '20 Hz' },
+          { id: 'e9-13', from: '9', to: '13', text: '21 Hz' },
+      ]}
+      node={
+        <Node
+          icon={<Icon />}
+        />
+      }
 
+      // direction="RIGHT"
+      onLayoutChange={layout => console.log('Layout', layout)} />
+      </div>
         <NodePanel />
       </Stack>
     </Stack>

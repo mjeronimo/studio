@@ -131,6 +131,7 @@
     "dagre": "0.8.5",
     "esbuild-loader": "^2.16.0",
     "fork-ts-checker-webpack-plugin": "^6.4.0",
-    "office-ui-fabric-react": "7.178.1"
+    "office-ui-fabric-react": "7.178.1",
+    "reaflow": "4.2.11"
   }
 }
