@@ -5,7 +5,6 @@ import { MouseEvent, useState, useCallback } from "react";
 import { Stack } from "@fluentui/react";
 
 // Foxglove
-import * as PanelAPI from "@foxglove/studio-base/PanelAPI";
 import Panel from "@foxglove/studio-base/components/Panel";
 import PanelToolbar from "@foxglove/studio-base/components/PanelToolbar";
 import Button from "@foxglove/studio-base/components/Button";
@@ -24,12 +23,15 @@ import ReactFlow, {
   ElementId,
   Elements,
   FlowElement,
+  isNode,
   Node,
   OnLoadParams,
   Position,
-  isNode,
+  ReactFlowProvider,
   removeElements,
 } from 'react-flow-renderer';
+
+import './layouting.css';
 
 // Local
 import helpContent from "./index.help.md";
@@ -46,6 +48,7 @@ const nodeHeight = 100;
 
 const getLayoutedElements = (elements: Elements, direction = 'TB') => {
   const isHorizontal = direction === 'LR';
+
   dagreGraph.setGraph({ rankdir: direction });
 
   elements.forEach((el) => {
@@ -61,8 +64,9 @@ const getLayoutedElements = (elements: Elements, direction = 'TB') => {
   return elements.map((el) => {
     if (isNode(el)) {
       const nodeWithPosition = dagreGraph.node(el.id);
-      // el.targetPosition = isHorizontal ? 'left' : 'top';
-      // el.sourcePosition = isHorizontal ? 'right' : 'bottom';
+      console.log("isHorizontal")
+      console.log(isHorizontal)
+
       el.targetPosition = isHorizontal ? Position.Left : Position.Top;
       el.sourcePosition = isHorizontal ? Position.Right : Position.Bottom;
 
@@ -104,7 +108,6 @@ type Props = {
 };
 
 const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
-  const { topics } = PanelAPI.useDataSourceInfo();
 
   // TODO: configuration
   const { minLogLevel, searchTerms } = config;
@@ -237,6 +240,9 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
     <Stack verticalFill>
       <PanelToolbar helpContent={helpContent} floating />
       <Stack grow>
+        <div className="layoutflow">
+        <ReactFlowProvider>
+
         <ReactFlow
           elements={elements}
           onLoad={onLoad}
@@ -253,6 +259,10 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
           </Controls>
           <Background variant={BackgroundVariant.Dots} />
         </ReactFlow>
+
+        </ReactFlowProvider>
+        </div>
+
         <NodePanel />
       </Stack>
     </Stack>

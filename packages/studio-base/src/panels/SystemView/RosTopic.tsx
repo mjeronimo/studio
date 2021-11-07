@@ -7,14 +7,19 @@ const targetHandleStyle: CSSProperties = { background: '#555' };
 
 const onConnect = (params: Connection | Edge) => console.log('handle onConnect', params);
 
-const RosTopic: FC<NodeProps> = ({ data }) => {
+const RosTopic: FC<NodeProps> = ({ 
+  data,
+  targetPosition = Position.Top,
+  sourcePosition = Position.Bottom,
+
+}) => {
   return (
     <>
       <div>
         <strong>{data.title}</strong>
       </div>
-      <Handle type="target" position={Position.Top} />
-      <Handle type="source" position={Position.Bottom} />
+      <Handle type="target" position={targetPosition} />
+      <Handle type="source" position={sourcePosition} />
     </>
   );
 };

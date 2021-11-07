@@ -28,7 +28,12 @@ const dismissStyle: CSSProperties = {
   border: '1px solid #000',
 };
 
-const RosNode: FC<NodeProps> = ({ data }) => {
+const RosNode: FC<NodeProps> = ({ 
+  data,
+  targetPosition = Position.Top,
+  sourcePosition = Position.Bottom,
+
+}) => {
   return (
     <div style={nodeStyle} >
       <div style={nodeTitleStyle} >
@@ -45,8 +50,8 @@ const RosNode: FC<NodeProps> = ({ data }) => {
           <Settings24Filled />
         </Button>
       </div>
-      <Handle type="target" position={Position.Top} style={targetHandleStyle} />
-      <Handle type="source" position={Position.Bottom} />
+      <Handle type="target" position={targetPosition} style={targetHandleStyle} />
+      <Handle type="source" position={sourcePosition} />
     </div>
   );
 };
