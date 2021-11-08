@@ -191,7 +191,7 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) =>
         />
       }
 
-      direction={"RIGHT"}
+      direction={"DOWN"}
       onLayoutChange={layout => console.log('Layout', layout)} />
       </div>
         <NodePanel />
