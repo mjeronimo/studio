@@ -10,10 +10,6 @@ import { Pivot, PivotItem } from '@fluentui/react-tabs';
 import NodeList from './NodeList';
 
 const openStyle: CSSProperties = { position: 'absolute', left: 5, top: 5, zIndex: 4 };
-const horizontalStyle: CSSProperties = { position: 'absolute', left: 5, top: 45, zIndex: 4 };
-const verticalStyle: CSSProperties = { position: 'absolute', left: 5, top: 85, zIndex: 4 };
-const fitStyle: CSSProperties = { position: 'absolute', left: 5, top: 125, zIndex: 4 };
-const centerStyle: CSSProperties = { position: 'absolute', left: 5, top: 165, zIndex: 4 };
 
 const labelStyles: Partial<IStyleSet<ILabelStyles>> = { root: { marginTop: 10 }, };
 
@@ -41,10 +37,6 @@ const NodePanel: React.FunctionComponent = () => {
     <div>
       <br />
       <DefaultButton text="Open panel" onClick={openPanel} style={openStyle} />
-      <DefaultButton text="Horizontal" style={horizontalStyle} />
-      <DefaultButton text="Vertical" style={verticalStyle} />
-      <DefaultButton text="Fit" style={fitStyle} />
-      <DefaultButton text="Center" style={centerStyle} />
       <Panel
         headerText="Node List"
         isBlocking={false}

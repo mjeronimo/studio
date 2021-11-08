@@ -1,8 +1,10 @@
-// React 
-import { MouseEvent, useState, useCallback } from "react";
+// React
+import { MouseEvent, useState, useCallback, CSSProperties, useRef } from "react";
 
 // FluentUI
 import { Stack } from "@fluentui/react";
+import { DefaultButton } from '@fluentui/react/lib/Button';
+import { useBoolean } from '@fluentui/react-hooks';
 
 // Foxglove
 import Panel from "@foxglove/studio-base/components/Panel";
@@ -10,9 +12,9 @@ import PanelToolbar from "@foxglove/studio-base/components/PanelToolbar";
 import Button from "@foxglove/studio-base/components/Button";
 
 // Reaflow
-import { Canvas, CanvasRef, Node, Edge, MarkerArrow, Port, Icon, Arrow, Label, Remove, Add, NodeProps, EdgeProps } from 'reaflow';
+import { Canvas, CanvasDirection, CanvasRef, Node, Edge, MarkerArrow, Port, Icon, Arrow, Label, Remove, Add, NodeProps, EdgeProps } from 'reaflow';
 
-// Local
+// SystemView
 import helpContent from "./index.help.md";
 import RosNode from "./RosNode";
 import RosTopic from "./RosTopic";
@@ -24,6 +26,19 @@ import { ws_connect, ws_disconnect } from "./WebSocketClient"
 //  console.log('flow loaded:', reactFlowInstance);
 //}
 
+
+const canvasRef = React.createRef<CanvasRef>();
+const onLayout = (direction: CanvasDirection) => {
+  const canvas = canvasRef.current!;
+  console.log(canvas);
+
+  if (canvas.fitCanvas) {
+    canvas.fitCanvas();
+  }
+
+  console.log(canvas.layout);
+}
+
 // TODO: Define the default configuration for this panel
 type Config = {
   searchTerms: string[];
@@ -31,26 +46,35 @@ type Config = {
   topicToRender: string;
 };
 
+const horizontalStyle: CSSProperties = { position: 'absolute', left: 5, top: 45, zIndex: 4 };
+const verticalStyle: CSSProperties = { position: 'absolute', left: 5, top: 85, zIndex: 4 };
+const fitStyle: CSSProperties = { position: 'absolute', left: 5, top: 125, zIndex: 4 };
+const centerStyle: CSSProperties = { position: 'absolute', left: 5, top: 165, zIndex: 4 };
+
 type Props = {
   config: Config;
   saveConfig: (arg0: Config) => void;
 };
 
-const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
-
+const SystemViewPanel = React.memo(({ config, saveConfig }: Props) =>
+{
   // TODO: configuration
   const { minLogLevel, searchTerms } = config;
 
   return (
     <Stack verticalFill>
       <PanelToolbar helpContent={helpContent} floating />
+      <DefaultButton text="Horizontal" onClick={() => onLayout("RIGHT")} style={horizontalStyle} />
+      <DefaultButton text="Vertical" style={verticalStyle} />
+      <DefaultButton text="Fit" style={fitStyle} />
+      <DefaultButton text="Center" style={centerStyle} />
       <Stack grow>
-      <div 
-      style={{ 
-          position: 'absolute', 
-          top: 0, 
-          bottom: 0, 
-          left: 0, 
+      <div
+      style={{
+          position: 'absolute',
+          top: 0,
+          bottom: 0,
+          left: 0,
           right: 0,
           // backgroundColor: 'blue',
           // backgroundImage: 'repeating-radial-gradient(top center,rgba(1.0,0,0,.2),rgba(1.0,0,0,.2) 10px, transparent 0, transparent 100%)',
@@ -63,6 +87,7 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
           }} >
     <Canvas
       // required to enable edges from/to nested nodes
+      ref={canvasRef}
       pannable={true}
       fit={true}
       center={true}
@@ -166,7 +191,7 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
         />
       }
 
-      // direction="RIGHT"
+      direction={"RIGHT"}
       onLayoutChange={layout => console.log('Layout', layout)} />
       </div>
         <NodePanel />
