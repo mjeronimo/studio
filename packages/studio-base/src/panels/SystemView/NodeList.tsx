@@ -1,3 +1,16 @@
+// Copyright 2021 Open Source Robotics Foundation, Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 
 import React, { memo } from 'react';
 
@@ -21,22 +34,24 @@ import {
 import { useConst } from "@fluentui/react-hooks";
 import { getRosNodes, createGroups, IRosNode } from "./listitems";
 
-const groupProps: IGroupRenderProps = {
-  onRenderHeader: (props?: IGroupHeaderProps): JSX.Element => (
-    <GroupHeader onRenderGroupHeaderCheckbox={onRenderGroupHeaderCheckbox} {...props} />
-  ),
-};
-
-const onRenderGroupHeaderCheckbox = (props?: IGroupHeaderCheckboxProps) => (
-  <Toggle checked={props ? props.checked : undefined} />
-);
-
 const NodeList: React.FunctionComponent = () => {
+
+  const theme = useTheme();
 
   const items: IObjectWithKey[] = useConst(() => getRosNodes());
   const groups = useConst(() => createGroups(items));
   const columns = useConst(() => [{ fieldName: "name", key: "name", minWidth: 300, name: "name" }]);
   const selection = useConst(() => new Selection({ items }));
+
+  const groupProps: IGroupRenderProps = {
+    onRenderHeader: (props?: IGroupHeaderProps): JSX.Element => (
+      <GroupHeader onRenderGroupHeaderCheckbox={onRenderGroupHeaderCheckbox} {...props} />
+    ),
+  };
+
+  const onRenderGroupHeaderCheckbox = (props?: IGroupHeaderCheckboxProps) => (
+    <Toggle checked={props ? props.checked : undefined} />
+  );
 
   const onRenderCell = React.useCallback(
     (nestingDepth?: number, item?: IRosNode, itemIndex?: number, group?: IGroup): React.ReactNode => (
@@ -53,8 +68,6 @@ const NodeList: React.FunctionComponent = () => {
     ),
     [columns, selection],
   );
-
-  const theme = useTheme();
 
   return (
     <div>
