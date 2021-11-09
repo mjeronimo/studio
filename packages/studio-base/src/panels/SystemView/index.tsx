@@ -170,7 +170,7 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
               {
                 id: '12', text: '/disparity',
                 icon: {
-                  url: 'https://s3.amazonaws.com/img.crft.app/package-slack-logo-bw.svg',
+                  url: 'https://s3.amazonaws.com/img.crft.app/package-flashpoint-logo-bw.svg',
                   height: 25,
                   width: 25
                 }
@@ -178,7 +178,7 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
               {
                 id: '13', text: '/points2',
                 icon: {
-                  url: 'https://s3.amazonaws.com/img.crft.app/package-slack-logo-bw.svg',
+                  url: 'https://s3.amazonaws.com/img.crft.app/package-flashpoint-logo-bw.svg',
                   height: 25,
                   width: 25
                 }
@@ -202,6 +202,7 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
             node={
               <Node
                 icon={<Icon />}
+                linkable={false}
               />
             }
 
