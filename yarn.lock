@@ -13278,6 +13278,7 @@ __metadata:
     react-flow-renderer: 9.6.8
     react-refresh: 0.10.0
     react-refresh-typescript: 2.0.2
+    react-zoom-pan-pinch: 2.1.3
     reaflow: 4.2.11
     rimraf: 3.0.2
     semver: 7.3.5
@@ -21371,6 +21372,16 @@ react-use@17.3.1:
     react: ^15.3.0 || ^16.0.0-alpha
     react-dom: ^15.3.0 || ^16.0.0-alpha
   checksum: 5e3b566592293bc0057bc6be4f6ee29c58c8931421d2882a3ef45ca9b24c6f3ea78bbc5a182c2916af6520845e5a90f569b3a63c9b5e89428720913e6d6239cc
+  languageName: node
+  linkType: hard
+
+"react-zoom-pan-pinch@npm:2.1.3":
+  version: 2.1.3
+  resolution: "react-zoom-pan-pinch@npm:2.1.3"
+  peerDependencies:
+    react: ^17.0.2
+    react-dom: ^17.0.2
+  checksum: 4694c63f32b7b9fbd71860b98e6ad5502617c66520bec747d88ef4c1db33cc2810b52ebb799f07128f128a0902d821ea1039b291fffb20f71530113ecd2f7c02
   languageName: node
   linkType: hard
 

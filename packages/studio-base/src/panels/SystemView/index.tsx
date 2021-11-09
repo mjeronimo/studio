@@ -13,6 +13,9 @@ import Button from "@foxglove/studio-base/components/Button";
 // Reaflow
 import { Canvas, CanvasDirection, CanvasRef, Node, Edge, MarkerArrow, Port, Icon, Arrow, Label, Remove, Add, NodeProps, EdgeProps, } from 'reaflow';
 
+// react-zoom-pan-pinch
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+
 // SystemView
 import helpContent from "./index.help.md";
 import NodePanel from "./NodePanel";
@@ -31,6 +34,13 @@ const horizontalStyle: CSSProperties = { position: 'absolute', left: 5, top: 45,
 const verticalStyle: CSSProperties = { position: 'absolute', left: 5, top: 85, zIndex: 4 };
 const fitStyle: CSSProperties = { position: 'absolute', left: 5, top: 125, zIndex: 4 };
 const centerStyle: CSSProperties = { position: 'absolute', left: 5, top: 165, zIndex: 4 };
+
+const controlsStyle: CSSProperties = { position: 'absolute', left: 5, top: 205, zIndex: 4 };
+
+const canvasStyle: CSSProperties = {
+  backgroundColor: 'white',
+  backgroundImage: '-webkit-repeating-radial-gradient(top center,rgba(0,0,0,.2),rgba(0,0,0,.2) 1px,transparent 0,transparent 100%)',
+};
 
 type Props = {
   config: Config;
@@ -58,18 +68,30 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
       <DefaultButton text="Fit" style={fitStyle} />
       <DefaultButton text="Center" style={centerStyle} />
       <Stack grow>
-        <div
-          style={{
-            position: 'absolute',
-            top: 0,
-            bottom: 0,
-            left: 0,
-            right: 0,
-          }} >
+          <TransformWrapper
+              wheel={{ step: 0.1 }}
+              pinch={{ step: 5 }}
+              doubleClick={{ step: 0.5 }}
+              minScale={0.2}
+              centerOnInit={true}
+              centerZoomedOut={false}
+              panning={{ velocityDisabled: true }}
+              limitToBounds={false}
+          >
+
+          {({ zoomIn, zoomOut, resetTransform, centerView, ...rest }) => (
+          <React.Fragment>
+            <div className="tools" style={controlsStyle} >
+              <button onClick={() => zoomIn()}>+</button>
+              <button onClick={() => zoomOut()}>-</button>
+              <button onClick={() => resetTransform()}>100%</button>
+            </div>
+
+  <TransformComponent>
           <Canvas
             // required to enable edges from/to nested nodes
             ref={canvasRef}
-            pannable={true}
+            zoomable={false}
             fit={true}
             center={true}
             nodes={[
@@ -185,7 +207,10 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
 
             direction={"DOWN"}
             onLayoutChange={layout => console.log('Layout', layout)} />
-        </div>
+              </TransformComponent>
+    </React.Fragment>
+    )}
+</TransformWrapper>
         <NodePanel />
       </Stack>
     </Stack>
