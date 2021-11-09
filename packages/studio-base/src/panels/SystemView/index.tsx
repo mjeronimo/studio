@@ -11,7 +11,7 @@ import PanelToolbar from "@foxglove/studio-base/components/PanelToolbar";
 import Button from "@foxglove/studio-base/components/Button";
 
 // Reaflow
-import { Canvas, CanvasDirection, CanvasRef, Node, Edge, MarkerArrow, Port, Icon, Arrow, Label, Remove, Add, NodeProps, EdgeProps } from 'reaflow';
+import { Canvas, CanvasDirection, CanvasRef, Node, Edge, MarkerArrow, Port, Icon, Arrow, Label, Remove, Add, NodeProps, EdgeProps, } from 'reaflow';
 
 // SystemView
 import helpContent from "./index.help.md";
@@ -19,14 +19,6 @@ import NodePanel from "./NodePanel";
 import { ws_connect, ws_disconnect } from "./WebSocketClient"
 
 const canvasRef = React.createRef<CanvasRef>();
-const onLayout = (direction: CanvasDirection) => {
-  const canvas = canvasRef.current!;
-  console.log(canvas);
-  if (canvas.fitCanvas) {
-    canvas.fitCanvas();
-  }
-  console.log(canvas.layout);
-}
 
 // TODO: Define the default configuration for this panel
 type Config = {
@@ -49,10 +41,19 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
   // TODO: configuration
   const { minLogLevel, searchTerms } = config;
 
+  const getDirection = () => {
+    const canvas = canvasRef.current!;
+    console.log(canvas);
+    if (canvas.fitCanvas) {
+      canvas.fitCanvas();
+    }
+    console.log(canvas);
+  }
+
   return (
     <Stack verticalFill>
       <PanelToolbar helpContent={helpContent} floating />
-      <DefaultButton text="Horizontal" onClick={() => onLayout("RIGHT")} style={horizontalStyle} />
+      <DefaultButton text="Horizontal" onClick={() => getDirection()} style={horizontalStyle} />
       <DefaultButton text="Vertical" style={verticalStyle} />
       <DefaultButton text="Fit" style={fitStyle} />
       <DefaultButton text="Center" style={centerStyle} />
@@ -164,16 +165,16 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
             ]}
             edges={[
               { id: 'e3-4', from: '3', to: '4', text: '10 Hz' },
-              { id: 'e3-2', from: '4', to: '2', text: '11 Hz' },
+              { id: 'e3-2', from: '3', to: '2', text: '11 Hz' },
               { id: 'e4-7', from: '4', to: '7', text: '12 Hz' },
               { id: 'e2-5', from: '2', to: '5', text: '13 Hz' },
               { id: 'e7-11', from: '7', to: '11', text: '14 Hz' },
-              { id: 'e10-8', from: '10', to: '8', text: '15 Hz' },
-              { id: 'e10-9', from: '10', to: '9', text: '16 Hz' },
-              { id: 'e5-10', from: '5', to: '10', text: '17 Hz' },
-              { id: 'e11-8', from: '11', to: '8', text: '18 Hz' },
-              { id: 'e12-9', from: '12', to: '9', text: '19 Hz' },
-              { id: 'e8-12', from: '8', to: '12', text: '20 Hz' },
+              { id: 'e10-8', from: '10', to: '8', text: '17 Hz' },
+              { id: 'e10-9', from: '10', to: '9', text: '18 Hz' },
+              { id: 'e5-10', from: '5', to: '10', text: '15 Hz' },
+              { id: 'e11-8', from: '11', to: '8', text: '16 Hz' },
+              { id: 'e12-9', from: '12', to: '9', text: '20 Hz' },
+              { id: 'e8-12', from: '8', to: '12', text: '19 Hz' },
               { id: 'e9-13', from: '9', to: '13', text: '21 Hz' },
             ]}
             node={
