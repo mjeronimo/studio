@@ -71,15 +71,15 @@ const NodePanel: React.FunctionComponent<NodePanelProps> = (props) => {
         customWidth="425px"
         type={PanelType.custom}
       >
-        <br/>
+        <br />
         <SectionHeader>Selection Method</SectionHeader>
         <ChoiceGroup defaultSelectedKey="A" options={options} label="" required={true} />
 
-        <br/>
+        <br />
         <SectionHeader>Visibility</SectionHeader>
         <Checkbox label={`Include hidden nodes`} />
 
-        <br/>
+        <br />
         <SectionHeader>Nodes</SectionHeader>
         <Pivot aria-label="Basic Pivot Example">
           <PivotItem

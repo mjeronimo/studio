@@ -113,20 +113,16 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
 
   const [lrOrientation, setLROrientation] = useState<boolean>(false);
   const [showServices, setShowServices] = useState<boolean>(true);
+  const [direction, setDirection] = useState<CanvasDirection>('RIGHT');
 
   const onZoomFit = useCallback(() => {
     //graph.current?.fit();
   }, []);
 
   const toggleOrientation = useCallback(() => {
-    // graph.current?.resetUserPanZoom();
     setLROrientation(!lrOrientation);
+    setDirection(lrOrientation ? 'RIGHT' : 'DOWN');
   }, [lrOrientation]);
-
-              //<div className="tools" style={controlsStyle} >
-                //<button onClick={() => zoomIn()}>+</button>
-                //<button onClick={() => zoomOut()}>-</button>
-              //</div>
 
   const toggleShowServices = useCallback(() => {
     // graph.current?.resetUserPanZoom();
@@ -157,12 +153,12 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
 
               <Toolbar>
                 <div className={styles.buttons}>
-                  <Button className={styles.iconButton} tooltip="Zoom fit" onClick={openPanel}>
+                  <Button className={styles.iconButton} tooltip="Open node panel" onClick={openPanel}>
                     <FoxgloveIcon style={{ color: "white" }} size="small">
                       <PaneOpen24Regular />
                     </FoxgloveIcon>
                   </Button>
-                  <Button className={styles.iconButton} tooltip="Zoom fit" onClick={() => resetTransform()}>
+                  <Button className={styles.iconButton} tooltip="Fit graph to window" onClick={() => resetTransform()}>
                     <FoxgloveIcon style={{ color: "white" }} size="small">
                       <FitToPageIcon />
                     </FoxgloveIcon>
@@ -172,12 +168,12 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
                       <Plus />
                     </FoxgloveIcon>
                   </Button>
-                  <Button className={styles.iconButton} tooltip="Zoom in" onClick={() => zoomOut()}>
+                  <Button className={styles.iconButton} tooltip="Zoom out" onClick={() => zoomOut()}>
                     <FoxgloveIcon style={{ color: "white" }} size="small">
                       <Minus />
                     </FoxgloveIcon>
                   </Button>
-                  <Button className={styles.iconButton} tooltip="Orientation" onClick={toggleOrientation}>
+                  <Button className={styles.iconButton} tooltip="Change graph orientation" onClick={toggleOrientation}>
                     <FoxgloveIcon style={{ color: "white" }} size="small">
                       {lrOrientation ? <ArrowLeftRightIcon /> : <ArrowUpDownIcon />}
                     </FoxgloveIcon>
@@ -198,7 +194,7 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
                       icon: {
                         url: rosLogoURL,
                         height: 25,
-                        width: 25
+                        width: 25,
                       },
                     },
                     {
@@ -304,7 +300,7 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
                     />
                   }
 
-                  direction={"DOWN"}
+                  direction={direction}
                   onLayoutChange={layout => console.log('Layout', layout)} />
               </TransformComponent>
             </React.Fragment>
