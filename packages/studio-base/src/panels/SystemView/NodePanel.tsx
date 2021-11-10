@@ -49,19 +49,24 @@ function SectionHeader({ children }: React.PropsWithChildren<unknown>) {
   );
 }
 
-const NodePanel: React.FunctionComponent = () => {
-  const [isOpen, { setTrue: openPanel, setFalse: dismissPanel }] = useBoolean(false);
+interface NodePanelProps {
+  isOpen: boolean | undefined
+  openPanel: () => void
+  dismissPanel: () => void
+}
+
+const NodePanel: React.FunctionComponent<NodePanelProps> = (props) => {
+  //const [isOpen, { setTrue: openPanel, setFalse: dismissPanel }] = useBoolean(false);
 
   return (
     <div>
       <br />
-      <DefaultButton text="Open panel" onClick={openPanel} style={openStyle} />
       <Panel
         headerText="Node List"
         isBlocking={false}
         // isLightDismiss
-        isOpen={isOpen}
-        onDismiss={dismissPanel}
+        isOpen={props.isOpen}
+        onDismiss={props.dismissPanel}
         closeButtonAriaLabel="Close"
         customWidth="425px"
         type={PanelType.custom}

@@ -14,16 +14,21 @@
 
 // React
 import { MouseEvent, useState, useCallback, CSSProperties, useRef } from "react";
+import { useBoolean } from '@fluentui/react-hooks';
 
 // FluentUI
 import { Stack } from "@fluentui/react";
 import { DefaultButton } from '@fluentui/react/lib/Button';
 import { mergeStyleSets } from "@fluentui/react";
+import { PaneOpen24Regular } from "@fluentui/react-icons";
 
 import ServiceIcon from "@mdi/svg/svg/rectangle-outline.svg";
 import FitToPageIcon from "@mdi/svg/svg/fit-to-page-outline.svg";
 import ArrowLeftRightIcon from "@mdi/svg/svg/arrow-left-right.svg";
 import ArrowUpDownIcon from "@mdi/svg/svg/arrow-up-down.svg";
+import PlusIcon from "@mdi/svg/svg/shape-square-plus.svg";
+import Plus from "@mdi/svg/svg/plus.svg";
+import Minus from "@mdi/svg/svg/minus.svg";
 
 // Foxglove
 import Panel from "@foxglove/studio-base/components/Panel";
@@ -118,11 +123,17 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
     setLROrientation(!lrOrientation);
   }, [lrOrientation]);
 
+              //<div className="tools" style={controlsStyle} >
+                //<button onClick={() => zoomIn()}>+</button>
+                //<button onClick={() => zoomOut()}>-</button>
+              //</div>
 
   const toggleShowServices = useCallback(() => {
     // graph.current?.resetUserPanZoom();
     setShowServices(!showServices);
   }, [showServices]);
+
+  const [isOpen, { setTrue: openPanel, setFalse: dismissPanel }] = useBoolean(false);
 
   return (
     <Stack verticalFill>
@@ -140,15 +151,27 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
         >
           {({ zoomIn, zoomOut, resetTransform, centerView, ...rest }) => (
             <React.Fragment>
-              <div className="tools" style={controlsStyle} >
-                <button onClick={() => zoomIn()}>+</button>
-                <button onClick={() => zoomOut()}>-</button>
-              </div>
+
               <Toolbar>
                 <div className={styles.buttons}>
+                  <Button className={styles.iconButton} tooltip="Zoom fit" onClick={openPanel}>
+                    <FoxgloveIcon style={{ color: "white" }} size="small">
+                      <PaneOpen24Regular />
+                    </FoxgloveIcon>
+                  </Button>
                   <Button className={styles.iconButton} tooltip="Zoom fit" onClick={() => resetTransform()}>
                     <FoxgloveIcon style={{ color: "white" }} size="small">
                       <FitToPageIcon />
+                    </FoxgloveIcon>
+                  </Button>
+                  <Button className={styles.iconButton} tooltip="Zoom in" onClick={() => zoomIn()}>
+                    <FoxgloveIcon style={{ color: "white" }} size="small">
+                      <Plus />
+                    </FoxgloveIcon>
+                  </Button>
+                  <Button className={styles.iconButton} tooltip="Zoom in" onClick={() => zoomOut()}>
+                    <FoxgloveIcon style={{ color: "white" }} size="small">
+                      <Minus />
                     </FoxgloveIcon>
                   </Button>
                   <Button className={styles.iconButton} tooltip="Orientation" onClick={toggleOrientation}>
@@ -156,17 +179,9 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
                       {lrOrientation ? <ArrowLeftRightIcon /> : <ArrowUpDownIcon />}
                     </FoxgloveIcon>
                   </Button>
-                  <Button
-                    className={styles.iconButton}
-                    tooltip={showServices ? "Showing services" : "Hiding services"}
-                    onClick={toggleShowServices}
-                  >
-                    <FoxgloveIcon style={{ color: showServices ? colors.RED2 : "white" }} size="small">
-                      <ServiceIcon />
-                    </FoxgloveIcon>
-                  </Button>
                 </div>
               </Toolbar>
+
               <TransformComponent>
                 <Canvas
                   // required to enable edges from/to nested nodes
@@ -292,7 +307,7 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
             </React.Fragment>
           )}
         </TransformWrapper>
-        <NodePanel />
+        <NodePanel isOpen={isOpen} openPanel={openPanel} dismissPanel={dismissPanel} />
       </Stack>
     </Stack>
   );
