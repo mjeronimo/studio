@@ -135,6 +135,9 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
 
   const [isOpen, { setTrue: openPanel, setFalse: dismissPanel }] = useBoolean(false);
 
+  let rosLogoURL = 'https://raw.githubusercontent.com/mjeronimo/studio/a802e32713b70509f49247c7dae817231ab9ec57/packages/studio-base/src/panels/SystemView/assets/ros_logo.svg';
+  let wirelessURL = 'https://raw.githubusercontent.com/mjeronimo/studio/a802e32713b70509f49247c7dae817231ab9ec57/packages/studio-base/src/panels/SystemView/assets/wireless.svg';
+
   return (
     <Stack verticalFill>
       <PanelToolbar helpContent={helpContent} floating />
@@ -193,7 +196,7 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
                     {
                       id: '3', text: 'stereo_camera_controller',
                       icon: {
-                        url: 'https://s3.amazonaws.com/img.crft.app/package-slack-logo-bw.svg',
+                        url: rosLogoURL,
                         height: 25,
                         width: 25
                       },
@@ -201,7 +204,7 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
                     {
                       id: '2', text: '/left/image_raw',
                       icon: {
-                        url: 'https://s3.amazonaws.com/img.crft.app/package-flashpoint-logo-bw.svg',
+                        url: wirelessURL,
                         height: 25,
                         width: 25
                       },
@@ -209,7 +212,7 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
                     {
                       id: '4', text: '/right/image_raw',
                       icon: {
-                        url: 'https://s3.amazonaws.com/img.crft.app/package-flashpoint-logo-bw.svg',
+                        url: wirelessURL,
                         height: 25,
                         width: 25
                       },
@@ -217,7 +220,7 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
                     {
                       id: '5', text: 'image_adjuster_left_stereo',
                       icon: {
-                        url: 'https://s3.amazonaws.com/img.crft.app/package-slack-logo-bw.svg',
+                        url: rosLogoURL,
                         height: 25,
                         width: 25
                       }
@@ -225,7 +228,7 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
                     {
                       id: '7', text: 'image_adjuster_right_stereo',
                       icon: {
-                        url: 'https://s3.amazonaws.com/img.crft.app/package-slack-logo-bw.svg',
+                        url: rosLogoURL,
                         height: 25,
                         width: 25
                       }
@@ -233,7 +236,7 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
                     {
                       id: '8', text: 'disparity_node',
                       icon: {
-                        url: 'https://s3.amazonaws.com/img.crft.app/package-slack-logo-bw.svg',
+                        url: rosLogoURL,
                         height: 25,
                         width: 25
                       }
@@ -241,7 +244,7 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
                     {
                       id: '9', text: 'point_cloud_node',
                       icon: {
-                        url: 'https://s3.amazonaws.com/img.crft.app/package-slack-logo-bw.svg',
+                        url: rosLogoURL,
                         height: 25,
                         width: 25
                       }
@@ -249,7 +252,7 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
                     {
                       id: '10', text: '/left/image_raw/adjusted_stereo',
                       icon: {
-                        url: 'https://s3.amazonaws.com/img.crft.app/package-flashpoint-logo-bw.svg',
+                        url: wirelessURL,
                         height: 25,
                         width: 25
                       }
@@ -257,7 +260,7 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
                     {
                       id: '11', text: '/right/image_raw/adjusted_stereo',
                       icon: {
-                        url: 'https://s3.amazonaws.com/img.crft.app/package-flashpoint-logo-bw.svg',
+                        url: wirelessURL,
                         height: 25,
                         width: 25
                       }
@@ -265,7 +268,7 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
                     {
                       id: '12', text: '/disparity',
                       icon: {
-                        url: 'https://s3.amazonaws.com/img.crft.app/package-flashpoint-logo-bw.svg',
+                        url: wirelessURL,
                         height: 25,
                         width: 25
                       }
@@ -273,7 +276,7 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
                     {
                       id: '13', text: '/points2',
                       icon: {
-                        url: 'https://s3.amazonaws.com/img.crft.app/package-flashpoint-logo-bw.svg',
+                        url: wirelessURL,
                         height: 25,
                         width: 25
                       }
