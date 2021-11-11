@@ -22,6 +22,8 @@ import { Checkbox, PanelType, Text, useTheme } from "@fluentui/react";
 import { ILabelStyles, IStyleSet, Label } from '@fluentui/react';
 import { Pivot, PivotItem } from '@fluentui/react-tabs';
 
+import styled from "styled-components";
+
 import NodeList from './NodeList';
 
 const options: IChoiceGroupOption[] = [
@@ -55,8 +57,51 @@ interface NodePanelProps {
   dismissPanel: () => void
 }
 
+const STableContainer = styled.div`
+  overflow-y: auto;
+  overflow-x: hidden;
+`;
+
+const STable = styled.div`
+  max-width: 100%;
+  min-width: 400px;
+  overflow: auto;
+`;
+
+const SRow = styled.div`
+  &:nth-child(even) {
+    background: #333;
+  }
+`;
+
+const SCell = styled.div`
+  border: 0;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  font-size: 14px;
+  line-height: 1.6;
+  width: 100%;
+  display: inline-block;
+  padding: 2px 8px;
+  white-space: nowrap;
+`;
+
+const SHeader = styled.div`
+  font-size: 14px;
+  border-bottom: #333 solid 2px;
+`;
+
+const STitle = styled.div`
+  padding: 2px 8px;
+`;
+
+const SHeaderItem = styled.div`
+  overflow: hidden;
+  white-space: nowrap;
+`;
+
+
 const NodePanel: React.FunctionComponent<NodePanelProps> = (props) => {
-  //const [isOpen, { setTrue: openPanel, setFalse: dismissPanel }] = useBoolean(false);
 
   return (
     <div>
@@ -64,7 +109,6 @@ const NodePanel: React.FunctionComponent<NodePanelProps> = (props) => {
       <Panel
         headerText="Node List"
         isBlocking={false}
-        // isLightDismiss
         isOpen={props.isOpen}
         onDismiss={props.dismissPanel}
         closeButtonAriaLabel="Close"
@@ -72,32 +116,46 @@ const NodePanel: React.FunctionComponent<NodePanelProps> = (props) => {
         type={PanelType.custom}
       >
         <br />
-        <SectionHeader>Selection Method</SectionHeader>
-        <ChoiceGroup defaultSelectedKey="A" options={options} label="" required={true} />
-
-        <br />
         <SectionHeader>Visibility</SectionHeader>
         <Checkbox label={`Include hidden nodes`} />
 
         <br />
+        <SectionHeader>Selection Method</SectionHeader>
+        <ChoiceGroup defaultSelectedKey="A" options={options} label="" required={true} />
+
+        <br />
         <SectionHeader>Nodes</SectionHeader>
-        <Pivot aria-label="Basic Pivot Example">
-          <PivotItem
-            headerText="Logical"
-            headerButtonProps={{
-              'data-order': 1,
-              'data-title': 'My Files Title',
-            }}
-          >
-            <NodeList />
-          </PivotItem>
-          <PivotItem headerText="Physical">
-            <Label styles={labelStyle}>Physical View</Label>
-          </PivotItem>
-          <PivotItem headerText="Alphabetized">
-            <Label styles={labelStyle}>Alphabetized List</Label>
-          </PivotItem>
-        </Pivot>
+
+      <STableContainer>
+        <STable>
+            <SRow key={"topic.name"}>
+              <SCell title={`Click to copy topic name to clipboard.`} >
+                /viper/stereo_camera_controller
+              </SCell>
+            </SRow>
+            <SRow key={"topic.name"}>
+              <SCell title={`Click to copy topic type to clipboard.`} >
+                /viper/image_adjuster_left_stereo
+              </SCell>
+            </SRow>
+            <SRow key={"topic.name"}>
+              <SCell title={`Click to copy topic name to clipboard.`} >
+                /viper/image_adjuster_right_stereo
+              </SCell>
+            </SRow>
+            <SRow key={"topic.name"}>
+              <SCell title={`Click to copy topic type to clipboard.`} >
+                /viper/disparity_node
+              </SCell>
+            </SRow>
+            <SRow key={"topic.name"}>
+              <SCell title={`Click to copy topic name to clipboard.`} >
+                /viper/point_cloud_node
+              </SCell>
+            </SRow>
+        </STable>
+      </STableContainer>
+
       </Panel>
     </div>
   );

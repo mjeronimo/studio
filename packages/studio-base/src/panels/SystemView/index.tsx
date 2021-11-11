@@ -13,20 +13,17 @@
 // limitations under the License.
 
 // React
-import { MouseEvent, useState, useCallback, CSSProperties, useRef } from "react";
-import { useBoolean } from '@fluentui/react-hooks';
+import { useState, useCallback } from "react";
 
 // FluentUI
-import { Stack } from "@fluentui/react";
-import { DefaultButton } from '@fluentui/react/lib/Button';
-import { mergeStyleSets } from "@fluentui/react";
+import { Stack, mergeStyleSets } from "@fluentui/react";
 import { PaneOpen24Regular } from "@fluentui/react-icons";
+import { useBoolean } from '@fluentui/react-hooks';
 
-import ServiceIcon from "@mdi/svg/svg/rectangle-outline.svg";
+// MDI icons
 import FitToPageIcon from "@mdi/svg/svg/fit-to-page-outline.svg";
 import ArrowLeftRightIcon from "@mdi/svg/svg/arrow-left-right.svg";
 import ArrowUpDownIcon from "@mdi/svg/svg/arrow-up-down.svg";
-import PlusIcon from "@mdi/svg/svg/shape-square-plus.svg";
 import Plus from "@mdi/svg/svg/plus.svg";
 import Minus from "@mdi/svg/svg/minus.svg";
 
@@ -38,7 +35,7 @@ import { colors } from "@foxglove/studio-base/util/sharedStyleConstants";
 import FoxgloveIcon from "@foxglove/studio-base/components/Icon";
 
 // Reaflow
-import { Canvas, CanvasDirection, CanvasRef, Node, Edge, MarkerArrow, Port, Icon, Arrow, Label, Remove, Add, NodeProps, EdgeProps, } from 'reaflow';
+import { Canvas, CanvasDirection, CanvasRef, Node, NodeData, Edge, EdgeData, Icon } from 'reaflow';
 
 // react-zoom-pan-pinch
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
@@ -58,13 +55,10 @@ type Config = {
   topicToRender: string;
 };
 
-const controlsStyle: CSSProperties = { position: 'absolute', left: 5, top: 205, zIndex: 4 };
-
 type Props = {
   config: Config;
   saveConfig: (arg0: Config) => void;
 };
-
 
 const styles = mergeStyleSets({
   iconButton: {
@@ -97,46 +91,154 @@ const styles = mergeStyleSets({
   },
 });
 
+const on_message = function (messageEvent: any) {
+  var wsMsg = messageEvent.data;
+  console.log("WebSocket MESSAGE: " + wsMsg);
+  if (wsMsg.indexOf("error") > 0) {
+    console.log("error: " + wsMsg.error)
+  }
+}
+
+// TODO: move this to a page load event
+ws_connect(on_message);
 
 const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
   // TODO: configuration
   const { minLogLevel, searchTerms } = config;
 
-  const getDirection = () => {
-    const canvas = canvasRef.current!;
-    console.log(canvas);
-    if (canvas.fitCanvas) {
-      canvas.fitCanvas();
-    }
-    console.log(canvas);
-  }
-
-  const [lrOrientation, setLROrientation] = useState<boolean>(false);
-  const [showServices, setShowServices] = useState<boolean>(true);
-  const [direction, setDirection] = useState<CanvasDirection>('RIGHT');
-
-  const onZoomFit = useCallback(() => {
-    //graph.current?.fit();
-  }, []);
+  const [lrOrientation, setLROrientation] = useState<boolean>(true);
+  const [direction, setDirection] = useState<CanvasDirection>('DOWN');
 
   const toggleOrientation = useCallback(() => {
+    const canvas = canvasRef.current!;
+    console.log(canvas);
     setLROrientation(!lrOrientation);
     setDirection(lrOrientation ? 'RIGHT' : 'DOWN');
+    console.log(direction);
   }, [lrOrientation]);
-
-  const toggleShowServices = useCallback(() => {
-    // graph.current?.resetUserPanZoom();
-    setShowServices(!showServices);
-  }, [showServices]);
 
   const [isOpen, { setTrue: openPanel, setFalse: dismissPanel }] = useBoolean(false);
 
-  let rosLogoURL = 'https://raw.githubusercontent.com/mjeronimo/studio/a802e32713b70509f49247c7dae817231ab9ec57/packages/studio-base/src/panels/SystemView/assets/ros_logo.svg';
-  let wirelessURL = 'https://raw.githubusercontent.com/mjeronimo/studio/develop/packages/studio-base/src/panels/SystemView/assets/wireless.svg';
+  const rosLogoURL = 'https://raw.githubusercontent.com/mjeronimo/studio/a802e32713b70509f49247c7dae817231ab9ec57/packages/studio-base/src/panels/SystemView/assets/ros_logo.svg';
+  const wirelessURL = 'https://raw.githubusercontent.com/mjeronimo/studio/develop/packages/studio-base/src/panels/SystemView/assets/wireless.svg';
+
+  const initialNodes: NodeData<any>[] = [
+    {
+      id: '3', text: 'stereo_camera_controller',
+      icon: {
+        url: rosLogoURL,
+        height: 25,
+        width: 25,
+      },
+    },
+    {
+      id: '2', text: '/left/image_raw',
+      icon: {
+        url: wirelessURL,
+        height: 25,
+        width: 25
+      },
+    },
+    {
+      id: '4', text: '/right/image_raw',
+      icon: {
+        url: wirelessURL,
+        height: 25,
+        width: 25
+      },
+    },
+    {
+      id: '5', text: 'image_adjuster_left_stereo',
+      icon: {
+        url: rosLogoURL,
+        height: 25,
+        width: 25
+      }
+    },
+    {
+      id: '7', text: 'image_adjuster_right_stereo',
+      icon: {
+        url: rosLogoURL,
+        height: 25,
+        width: 25
+      }
+    },
+    {
+      id: '8', text: 'disparity_node',
+      icon: {
+        url: rosLogoURL,
+        height: 25,
+        width: 25
+      }
+    },
+    {
+      id: '9', text: 'point_cloud_node',
+      icon: {
+        url: rosLogoURL,
+        height: 25,
+        width: 25
+      }
+    },
+    {
+      id: '10', text: '/left/image_raw/adjusted_stereo',
+      icon: {
+        url: wirelessURL,
+        height: 25,
+        width: 25
+      }
+    },
+    {
+      id: '11', text: '/right/image_raw/adjusted_stereo',
+      icon: {
+        url: wirelessURL,
+        height: 25,
+        width: 25
+      }
+    },
+    {
+      id: '12', text: '/disparity',
+      icon: {
+        url: wirelessURL,
+        height: 25,
+        width: 25
+      }
+    },
+    {
+      id: '13', text: '/points2',
+      icon: {
+        url: wirelessURL,
+        height: 25,
+        width: 25
+      }
+    },
+  ]
+
+  const [nodes, setNodes] = useState<NodeData[]>(initialNodes);
+
+  const edges: EdgeData<any>[] = [
+    { id: 'e3-4', from: '3', to: '4', text: '10 Hz' },
+    { id: 'e3-2', from: '3', to: '2', text: '11 Hz' },
+    { id: 'e4-7', from: '4', to: '7', text: '12 Hz' },
+    { id: 'e2-5', from: '2', to: '5', text: '13 Hz' },
+    { id: 'e7-11', from: '7', to: '11', text: '14 Hz' },
+    { id: 'e10-8', from: '10', to: '8', text: '17 Hz' },
+    { id: 'e10-9', from: '10', to: '9', text: '18 Hz' },
+    { id: 'e5-10', from: '5', to: '10', text: '15 Hz' },
+    { id: 'e11-8', from: '11', to: '8', text: '16 Hz' },
+    { id: 'e12-9', from: '12', to: '9', text: '20 Hz' },
+    { id: 'e8-12', from: '8', to: '12', text: '19 Hz' },
+    { id: 'e9-13', from: '9', to: '13', text: '21 Hz' },
+  ]
 
   return (
     <Stack verticalFill>
       <PanelToolbar helpContent={helpContent} floating />
+      <button
+        style={{ position: 'absolute', top: 10, left: 10, zIndex: 999 }}
+        onClick={() => setNodes([...nodes, { id: `a${Math.random()}`, text: `Node ${Math.random()}` }])}
+      >
+        Add Node
+      </button>
       <Stack grow>
         <TransformWrapper
           wheel={{ step: 0.1 }}
@@ -163,12 +265,24 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
                       <FitToPageIcon />
                     </FoxgloveIcon>
                   </Button>
-                  <Button className={styles.iconButton} tooltip="Zoom in" onClick={() => zoomIn()}>
+                  <Button className={styles.iconButton} tooltip="Zoom in" onClick={() => {
+                    const canvas = canvasRef.current!;
+                    if (canvas.zoomIn) {
+                      canvas.zoomIn();
+                    }
+                  }
+                  }>
                     <FoxgloveIcon style={{ color: "white" }} size="small">
                       <Plus />
                     </FoxgloveIcon>
                   </Button>
-                  <Button className={styles.iconButton} tooltip="Zoom out" onClick={() => zoomOut()}>
+                  <Button className={styles.iconButton} tooltip="Zoom out" onClick={() => {
+                    const canvas = canvasRef.current!;
+                    if (canvas.zoomOut) {
+                      canvas.zoomOut();
+                    }
+                  }
+                  }>
                     <FoxgloveIcon style={{ color: "white" }} size="small">
                       <Minus />
                     </FoxgloveIcon>
@@ -183,124 +297,21 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
 
               <TransformComponent>
                 <Canvas
-                  // required to enable edges from/to nested nodes
                   ref={canvasRef}
                   zoomable={false}
-                  fit={true}
-                  center={true}
-                  nodes={[
-                    {
-                      id: '3', text: 'stereo_camera_controller',
-                      icon: {
-                        url: rosLogoURL,
-                        height: 25,
-                        width: 25,
-                      },
-                    },
-                    {
-                      id: '2', text: '/left/image_raw',
-                      icon: {
-                        url: wirelessURL,
-                        height: 25,
-                        width: 25
-                      },
-                    },
-                    {
-                      id: '4', text: '/right/image_raw',
-                      icon: {
-                        url: wirelessURL,
-                        height: 25,
-                        width: 25
-                      },
-                    },
-                    {
-                      id: '5', text: 'image_adjuster_left_stereo',
-                      icon: {
-                        url: rosLogoURL,
-                        height: 25,
-                        width: 25
-                      }
-                    },
-                    {
-                      id: '7', text: 'image_adjuster_right_stereo',
-                      icon: {
-                        url: rosLogoURL,
-                        height: 25,
-                        width: 25
-                      }
-                    },
-                    {
-                      id: '8', text: 'disparity_node',
-                      icon: {
-                        url: rosLogoURL,
-                        height: 25,
-                        width: 25
-                      }
-                    },
-                    {
-                      id: '9', text: 'point_cloud_node',
-                      icon: {
-                        url: rosLogoURL,
-                        height: 25,
-                        width: 25
-                      }
-                    },
-                    {
-                      id: '10', text: '/left/image_raw/adjusted_stereo',
-                      icon: {
-                        url: wirelessURL,
-                        height: 25,
-                        width: 25
-                      }
-                    },
-                    {
-                      id: '11', text: '/right/image_raw/adjusted_stereo',
-                      icon: {
-                        url: wirelessURL,
-                        height: 25,
-                        width: 25
-                      }
-                    },
-                    {
-                      id: '12', text: '/disparity',
-                      icon: {
-                        url: wirelessURL,
-                        height: 25,
-                        width: 25
-                      }
-                    },
-                    {
-                      id: '13', text: '/points2',
-                      icon: {
-                        url: wirelessURL,
-                        height: 25,
-                        width: 25
-                      }
-                    },
-
-                  ]}
-                  edges={[
-                    { id: 'e3-4', from: '3', to: '4', text: '10 Hz' },
-                    { id: 'e3-2', from: '3', to: '2', text: '11 Hz' },
-                    { id: 'e4-7', from: '4', to: '7', text: '12 Hz' },
-                    { id: 'e2-5', from: '2', to: '5', text: '13 Hz' },
-                    { id: 'e7-11', from: '7', to: '11', text: '14 Hz' },
-                    { id: 'e10-8', from: '10', to: '8', text: '17 Hz' },
-                    { id: 'e10-9', from: '10', to: '9', text: '18 Hz' },
-                    { id: 'e5-10', from: '5', to: '10', text: '15 Hz' },
-                    { id: 'e11-8', from: '11', to: '8', text: '16 Hz' },
-                    { id: 'e12-9', from: '12', to: '9', text: '20 Hz' },
-                    { id: 'e8-12', from: '8', to: '12', text: '19 Hz' },
-                    { id: 'e9-13', from: '9', to: '13', text: '21 Hz' },
-                  ]}
+                  fit={false}
+                  direction={direction}
+                  center={false}
+                  maxWidth={5000}
+                  maxHeight={5000}
+                  nodes={nodes}
+                  edges={edges}
                   node={
                     <Node
                       icon={<Icon />}
                       linkable={false}
                     />
                   }
-
-                  direction={direction}
                   onLayoutChange={layout => console.log('Layout', layout)} />
               </TransformComponent>
             </React.Fragment>

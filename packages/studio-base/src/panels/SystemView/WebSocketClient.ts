@@ -14,7 +14,7 @@
 
 var webSocket: WebSocket;
 
-export function ws_connect() {
+export function ws_connect(on_message: (mesageEvent: any) => void) {
   var protocol = 'ws';
   var hostname = 'localhost';
   var port = '9002';
@@ -39,13 +39,7 @@ export function ws_connect() {
       console.log("WebSocket ERROR: " + JSON.stringify(errorEvent, null, 4));
     };
 
-    webSocket.onmessage = function (messageEvent) {
-      var wsMsg = messageEvent.data;
-      console.log("WebSocket MESSAGE: " + wsMsg);
-      if (wsMsg.indexOf("error") > 0) {
-        console.log("error: " + wsMsg.error)
-      }
-    }
+    webSocket.onmessage = on_message;
   } catch (exception) {
     console.error(exception);
   }
