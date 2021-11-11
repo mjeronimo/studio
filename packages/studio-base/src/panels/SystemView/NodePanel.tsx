@@ -15,24 +15,15 @@
 import React, { memo, CSSProperties } from 'react';
 
 import { ChoiceGroup, IChoiceGroupOption } from '@fluentui/react/lib/ChoiceGroup';
-import { DefaultButton } from '@fluentui/react/lib/Button';
 import { Panel } from '@fluentui/react/lib/Panel';
-import { useBoolean } from '@fluentui/react-hooks';
 import { Checkbox, PanelType, Text, useTheme } from "@fluentui/react";
-import { ILabelStyles, IStyleSet, Label } from '@fluentui/react';
-import { Pivot, PivotItem } from '@fluentui/react-tabs';
 
 import styled from "styled-components";
-
-import NodeList from './NodeList';
 
 const options: IChoiceGroupOption[] = [
   { key: 'A', text: 'Automatically include all nodes' },
   { key: 'M', text: 'Manually select nodes' },
 ];
-
-const openStyle: CSSProperties = { position: 'absolute', left: 5, top: 5, zIndex: 4 };
-const labelStyle: Partial<IStyleSet<ILabelStyles>> = { root: { marginTop: 10 }, };
 
 function SectionHeader({ children }: React.PropsWithChildren<unknown>) {
   const theme = useTheme();
@@ -99,7 +90,6 @@ const SHeaderItem = styled.div`
   overflow: hidden;
   white-space: nowrap;
 `;
-
 
 const NodePanel: React.FunctionComponent<NodePanelProps> = (props) => {
 
