@@ -12,17 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { useState } from "react";
 import React, { memo, CSSProperties } from 'react';
 
 import { ChoiceGroup, IChoiceGroupOption } from '@fluentui/react/lib/ChoiceGroup';
 import { Panel } from '@fluentui/react/lib/Panel';
 import { Checkbox, PanelType, Text, useTheme } from "@fluentui/react";
 
+import { DetailsListCompactExample } from "./NodeList";
+
 import styled from "styled-components";
 
-const options: IChoiceGroupOption[] = [
-  { key: 'A', text: 'Automatically include all nodes' },
-  { key: 'M', text: 'Manually select nodes' },
+//const options: IChoiceGroupOption[] = [
+//  { key: 'A', text: 'Automatically include all nodes' },
+//  { key: 'M', text: 'Manually select nodes' },
+//];
+
+const displayOptions: IChoiceGroupOption[] = [
+  { key: 'L', text: 'Logical' },
+  { key: 'P', text: 'Physical' },
 ];
 
 function SectionHeader({ children }: React.PropsWithChildren<unknown>) {
@@ -48,56 +56,22 @@ interface NodePanelProps {
   dismissPanel: () => void
 }
 
-const STableContainer = styled.div`
-  overflow-y: auto;
-  overflow-x: hidden;
-`;
-
-const STable = styled.div`
-  max-width: 100%;
-  min-width: 400px;
-  overflow: auto;
-`;
-
-const SRow = styled.div`
-  &:nth-child(even) {
-    background: #333;
-  }
-`;
-
-const SCell = styled.div`
-  border: 0;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  font-size: 14px;
-  line-height: 1.6;
-  width: 100%;
-  display: inline-block;
-  padding: 2px 8px;
-  white-space: nowrap;
-`;
-
-const SHeader = styled.div`
-  font-size: 14px;
-  border-bottom: #333 solid 2px;
-`;
-
-const STitle = styled.div`
-  padding: 2px 8px;
-`;
-
-const SHeaderItem = styled.div`
-  overflow: hidden;
-  white-space: nowrap;
-`;
-
 const NodePanel: React.FunctionComponent<NodePanelProps> = (props) => {
+
+    const [selectedList, setSelectedList] = useState([]);
+
+    const handleChange = (e: any) => {
+      let { options } = e.target;
+      options = Array.apply(null, options)
+      const selectedValues = options.filter((x: any) => x.selected).map((x: any) => x.value);
+      setSelectedList(selectedValues);
+    }
 
   return (
     <div>
       <br />
       <Panel
-        headerText="Node List"
+        headerText="Node Selection"
         isBlocking={false}
         isOpen={props.isOpen}
         onDismiss={props.dismissPanel}
@@ -106,46 +80,15 @@ const NodePanel: React.FunctionComponent<NodePanelProps> = (props) => {
         type={PanelType.custom}
       >
         <br />
-        <SectionHeader>Visibility</SectionHeader>
+        <SectionHeader>Options</SectionHeader>
         <Checkbox label={`Include hidden nodes`} />
-
         <br />
-        <SectionHeader>Selection Method</SectionHeader>
-        <ChoiceGroup defaultSelectedKey="A" options={options} label="" required={true} />
-
+        <Checkbox label={`Automatically display new nodes`} />
+        <br />
+        <ChoiceGroup defaultSelectedKey="L" options={displayOptions} label="Node Layout" required={false} />
         <br />
         <SectionHeader>Nodes</SectionHeader>
-
-      <STableContainer>
-        <STable>
-            <SRow key={"topic.name"}>
-              <SCell title={`Click to copy topic name to clipboard.`} >
-                /viper/stereo_camera_controller
-              </SCell>
-            </SRow>
-            <SRow key={"topic.name"}>
-              <SCell title={`Click to copy topic type to clipboard.`} >
-                /viper/image_adjuster_left_stereo
-              </SCell>
-            </SRow>
-            <SRow key={"topic.name"}>
-              <SCell title={`Click to copy topic name to clipboard.`} >
-                /viper/image_adjuster_right_stereo
-              </SCell>
-            </SRow>
-            <SRow key={"topic.name"}>
-              <SCell title={`Click to copy topic type to clipboard.`} >
-                /viper/disparity_node
-              </SCell>
-            </SRow>
-            <SRow key={"topic.name"}>
-              <SCell title={`Click to copy topic name to clipboard.`} >
-                /viper/point_cloud_node
-              </SCell>
-            </SRow>
-        </STable>
-      </STableContainer>
-
+        <DetailsListCompactExample />
       </Panel>
     </div>
   );
