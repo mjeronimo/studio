@@ -1,11 +1,12 @@
 import * as React from 'react';
+import { Link, useTheme } from "@fluentui/react";
 import { Announced } from '@fluentui/react/lib/Announced';
 import { TextField, ITextFieldStyles } from '@fluentui/react/lib/TextField';
-import { DetailsList, DetailsListLayoutMode, Selection, IColumn } from '@fluentui/react/lib/DetailsList';
+import { IRenderFunction } from '@fluentui/utilities';
+import { DetailsList, DetailsListLayoutMode, IDetailsHeaderProps, Selection, IColumn } from '@fluentui/react/lib/DetailsList';
 import { MarqueeSelection } from '@fluentui/react/lib/MarqueeSelection';
 import { mergeStyles } from '@fluentui/react/lib/Styling';
-
-import { useTheme } from "@fluentui/react";
+import { CSSProperties } from 'react';
 
 const exampleChildClass = mergeStyles({
   display: 'block',
@@ -14,19 +15,25 @@ const exampleChildClass = mergeStyles({
 
 const textFieldStyles: Partial<ITextFieldStyles> = { root: { maxWidth: '300px' } };
 
-export interface IDetailsListCompactExampleItem {
+const selectNoneStyle: CSSProperties = { paddingLeft: '25px' };
+
+export interface INodeListItem {
   key: number;
   name: string;
 }
 
-export interface IDetailsListCompactExampleState {
-  items: IDetailsListCompactExampleItem[];
+export interface INodeListState {
+  items: INodeListItem[];
   selectionDetails: string;
 }
 
-export class DetailsListCompactExample extends React.Component<{}, IDetailsListCompactExampleState> {
+function handleClickOnLink(ev: React.MouseEvent<unknown>) {
+  window.alert('clicked on Link component which is rendered as html button');
+}
+
+export class NodeList extends React.Component<{}, INodeListState> {
   private _selection: Selection;
-  private _allItems: IDetailsListCompactExampleItem[];
+  private _allItems: INodeListItem[];
   private _columns: IColumn[];
 
   constructor(props: {}) {
@@ -54,17 +61,30 @@ export class DetailsListCompactExample extends React.Component<{}, IDetailsListC
     };
   }
 
-  public override render(): JSX.Element {
-    const { items, selectionDetails } = this.state;
+  private onRenderDetailsHeader: IRenderFunction<IDetailsHeaderProps> = (props, defaultRender) => {
+    if (!props) {
+      return null;
+    }
 
-    return (
-      <div>
+    return ( 
+        <div>
+        <Link onClick={handleClickOnLink} underline>Select all</Link>
+        <Link onClick={handleClickOnLink} underline style={selectNoneStyle}>Select none</Link>
         <TextField
           className={exampleChildClass}
           label="Filter by name:"
           onChange={this._onFilter}
           styles={textFieldStyles}
         />
+        </div>
+    );
+  }
+
+  public override render(): JSX.Element {
+    const { items, selectionDetails } = this.state;
+
+    return (
+      <div>
         <MarqueeSelection selection={this._selection}>
           <DetailsList
             compact={true}
@@ -75,6 +95,7 @@ export class DetailsListCompactExample extends React.Component<{}, IDetailsListC
             selection={this._selection}
             selectionPreservedOnEmptyClick={true}
             onItemInvoked={this._onItemInvoked}
+            onRenderDetailsHeader={this.onRenderDetailsHeader}
             ariaLabelForSelectionColumn="Toggle selection"
             ariaLabelForSelectAllCheckbox="Toggle selection for all items"
             checkButtonAriaLabel="select row"
@@ -83,7 +104,6 @@ export class DetailsListCompactExample extends React.Component<{}, IDetailsListC
       </div>
     );
   }
-            // onRenderDetailsHeader={renderFixedDetailsHeader}
 
   private _getSelectionDetails(): string {
     const selectionCount = this._selection.getSelectedCount();
@@ -92,7 +112,7 @@ export class DetailsListCompactExample extends React.Component<{}, IDetailsListC
       case 0:
         return 'No items selected';
       case 1:
-        return '1 item selected: ' + (this._selection.getSelection()[0] as IDetailsListCompactExampleItem).name;
+        return '1 item selected: ' + (this._selection.getSelection()[0] as INodeListItem).name;
       default:
         return `${selectionCount} items selected`;
     }
@@ -104,7 +124,7 @@ export class DetailsListCompactExample extends React.Component<{}, IDetailsListC
     });
   };
 
-  private _onItemInvoked(item: IDetailsListCompactExampleItem): void {
+  private _onItemInvoked(item: INodeListItem): void {
     alert(`Item invoked: ${item.name}`);
   }
 }

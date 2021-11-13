@@ -19,14 +19,9 @@ import { ChoiceGroup, IChoiceGroupOption } from '@fluentui/react/lib/ChoiceGroup
 import { Panel } from '@fluentui/react/lib/Panel';
 import { Checkbox, PanelType, Text, useTheme } from "@fluentui/react";
 
-import { DetailsListCompactExample } from "./NodeList";
+import { NodeList } from "./NodeList";
 
 import styled from "styled-components";
-
-//const options: IChoiceGroupOption[] = [
-//  { key: 'A', text: 'Automatically include all nodes' },
-//  { key: 'M', text: 'Manually select nodes' },
-//];
 
 const displayOptions: IChoiceGroupOption[] = [
   { key: 'L', text: 'Logical' },
@@ -88,7 +83,7 @@ const NodePanel: React.FunctionComponent<NodePanelProps> = (props) => {
         <ChoiceGroup defaultSelectedKey="L" options={displayOptions} label="Node Layout" required={false} />
         <br />
         <SectionHeader>Nodes</SectionHeader>
-        <DetailsListCompactExample />
+        <NodeList />
       </Panel>
     </div>
   );
