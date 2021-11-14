@@ -13,8 +13,7 @@
 // limitations under the License.
 
 // React
-import { useState } from "react";
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 
 // Fluent UI
 import { ChoiceGroup, IChoiceGroupOption } from '@fluentui/react/lib/ChoiceGroup';
@@ -73,7 +72,7 @@ const NodePanel: React.FunctionComponent<NodePanelProps> = (props) => {
     <div>
       <br />
       <Panel
-        headerText="Node Selection"
+        headerText="Node Display"
         isBlocking={false}
         isOpen={props.isOpen}
         onDismiss={props.dismissPanel}
@@ -89,7 +88,7 @@ const NodePanel: React.FunctionComponent<NodePanelProps> = (props) => {
         <br />
         <ChoiceGroup defaultSelectedKey="L" options={displayOptions} label="Node Grouping" required={false} />
         <br />
-        <SectionHeader>Nodes</SectionHeader>
+        <SectionHeader>Node Selection</SectionHeader>
         <NodeList nodes={props.nodes} edges={props.edges} />
       </Panel>
     </div>
