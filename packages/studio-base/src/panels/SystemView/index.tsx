@@ -43,7 +43,7 @@ import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 // SystemView
 import helpContent from "./index.help.md";
 import NodePanel from "./NodePanel";
-import { ws_connect, ws_disconnect } from "./WebSocketClient"
+import { ws_connect, ws_disconnect } from "./WebSocketClient";
 import Toolbar from "./Toolbar";
 
 const canvasRef = React.createRef<CanvasRef>();
@@ -213,9 +213,7 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
     },
   ]
 
-  const [nodes, setNodes] = useState<NodeData[]>(initialNodes);
-
-  const edges: EdgeData<any>[] = [
+const edges: EdgeData<any>[] = [
     { id: 'e3-4', from: '3', to: '4', text: '10 Hz' },
     { id: 'e3-2', from: '3', to: '2', text: '11 Hz' },
     { id: 'e4-7', from: '4', to: '7', text: '12 Hz' },
@@ -229,6 +227,8 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
     { id: 'e8-12', from: '8', to: '12', text: '19 Hz' },
     { id: 'e9-13', from: '9', to: '13', text: '21 Hz' },
   ]
+
+  const [nodes, setNodes] = useState<NodeData[]>(initialNodes);
 
   return (
     <Stack verticalFill>

@@ -21,8 +21,6 @@ import { Checkbox, PanelType, Text, useTheme } from "@fluentui/react";
 
 import { NodeList } from "./NodeList";
 
-import styled from "styled-components";
-
 const displayOptions: IChoiceGroupOption[] = [
   { key: 'L', text: 'Logical' },
   { key: 'P', text: 'Physical' },

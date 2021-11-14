@@ -1,25 +1,37 @@
+// React
 import * as React from 'react';
-import { Link, useTheme } from "@fluentui/react";
-import { Announced } from '@fluentui/react/lib/Announced';
+import { CSSProperties, useEffect, useState } from 'react';
+
+// Fluent UI
+import { DefaultButton } from "@fluentui/react";
 import { TextField, ITextFieldStyles } from '@fluentui/react/lib/TextField';
 import { IRenderFunction } from '@fluentui/utilities';
 import { DetailsList, DetailsListLayoutMode, IDetailsHeaderProps, Selection, IColumn } from '@fluentui/react/lib/DetailsList';
 import { MarqueeSelection } from '@fluentui/react/lib/MarqueeSelection';
 import { mergeStyles } from '@fluentui/react/lib/Styling';
-import { CSSProperties } from 'react';
 
+// Foxglove Studio
+import Icon from "@foxglove/studio-base/components/Icon";
+
+// reaflow
+import { NodeData, EdgeData } from 'reaflow';
+
+// MDI Icons
 import SelectAllIcon from "@mdi/svg/svg/format-list-bulleted-square.svg";
 import SelectNoneIcon from "@mdi/svg/svg/format-list-checkbox.svg";
-import { useBoolean } from '@fluentui/react-hooks';
-import FoxgloveIcon from "@foxglove/studio-base/components/Icon";
 
 const exampleChildClass = mergeStyles({
   display: 'block',
   marginBottom: '10px',
 });
 
-const textFieldStyles: Partial<ITextFieldStyles> = { root: { maxWidth: '300px' } };
+export interface IButtonExampleProps {
+  // These are set based on the toggles shown above the examples (not needed in real code)
+  disabled?: boolean;
+  checked?: boolean;
+}
 
+const textFieldStyles: Partial<ITextFieldStyles> = { root: { maxWidth: '300px' } };
 const selectNoneStyle: CSSProperties = { paddingLeft: '25px' };
 
 export interface INodeListItem {
@@ -32,9 +44,6 @@ export interface INodeListState {
   selectionDetails: string;
 }
 
-function handleClickOnLink(ev: React.MouseEvent<unknown>) {
-  window.alert('clicked on Link component which is rendered as html button');
-}
 
 export class NodeList extends React.Component<{}, INodeListState> {
   private _selection: Selection;
@@ -71,26 +80,77 @@ export class NodeList extends React.Component<{}, INodeListState> {
       return null;
     }
 
-    return ( 
-        <div>
+    const [selectionDetails, setSelectionDetails] = useState({})
+    const [selection, setSelection] = useState(new Selection({
+      onSelectionChanged: () => setSelectionDetails(this._getSelectionDetails())
+    }))
+
+    useEffect(() => {
+      setSelection(new Selection({
+        onSelectionChanged: () => setSelectionDetails(this._getSelectionDetails())
+      }))
+    }, [selectionDetails])
+
+    return (
+      <div>
         <TextField
           className={exampleChildClass}
           label="Filter by name:"
           onChange={this._onFilter}
           styles={textFieldStyles}
         />
-        <br/>
-        <FoxgloveIcon style={{ color: "white" }} size="medium">
-          <SelectAllIcon />
-        </FoxgloveIcon>
-        <Link onClick={handleClickOnLink} underline>Select all</Link>
-        <FoxgloveIcon style={{ color: "white" }} size="medium">
-          <SelectNoneIcon />
-        </FoxgloveIcon>
-        <Link onClick={handleClickOnLink} underline style={selectNoneStyle}>Select none</Link>
-        <br/>
-        <br/>
-        </div>
+        <br />
+
+        <DefaultButton text="Select All"
+          styles={{
+            flexContainer: {
+              flexDirection: 'row-reverse'
+            }
+          }}
+          onClick={
+            () => {
+              const newSelection = this._selection;
+              newSelection.setItems(this._allItems);
+              for (let i = 0; i <= this._allItems.length; i++) {
+                newSelection.setKeySelected(`${i}`, true, false);
+              }
+              setSelection(newSelection);
+              setSelectionDetails(this._getSelectionDetails());
+            }
+          }
+        >
+          <Icon style={{ color: "white" }} size="medium">
+            <SelectAllIcon />
+          </Icon>
+        </DefaultButton>
+
+        <span style={selectNoneStyle}>
+          <DefaultButton text="Select None"
+            styles={{
+              flexContainer: {
+                flexDirection: 'row-reverse',
+              }
+            }}
+            onClick={
+              () => {
+                const newSelection = this._selection;
+                newSelection.setItems(this._allItems);
+                for (let i = 0; i <= this._allItems.length; i++) {
+                  newSelection.setKeySelected(`${i}`, false, false);
+                }
+                setSelection(newSelection);
+                setSelectionDetails(this._getSelectionDetails());
+              }
+            }
+          >
+            <Icon style={{ color: "white" }} size="medium">
+              <SelectNoneIcon />
+            </Icon>
+          </DefaultButton>
+        </span>
+        <br />
+        <br />
+      </div>
     );
   }
 
@@ -101,7 +161,7 @@ export class NodeList extends React.Component<{}, INodeListState> {
       <div>
         <MarqueeSelection selection={this._selection}>
           <DetailsList
-            compact={true}
+            compact={false}
             items={items}
             columns={this._columns}
             setKey="set"
