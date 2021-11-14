@@ -228,7 +228,10 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
     { id: 'e9-13', from: '9', to: '13', text: '21 Hz' },
   ]
 
+  const [selections, setSelections] = useState<string[]>([]);
   const [nodes, setNodes] = useState<NodeData[]>(initialNodes);
+
+  // <button style={{ position: 'absolute', top: 40, left: 10, zIndex: 999 }} onClick={() => canvasRef.current!.fitCanvas!()}>Fit</button>
 
   return (
     <Stack verticalFill>
@@ -247,7 +250,6 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
       >
         Add Node
       </button>
-      <button style={{ position: 'absolute', top: 40, left: 10, zIndex: 999 }} onClick={() => canvasRef.current!.fitCanvas!()}>Fit</button>
 
       <Stack grow>
         <TransformWrapper
@@ -316,12 +318,29 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
                   maxHeight={5000}
                   nodes={nodes}
                   edges={edges}
+                  selections={selections}
                   node={
                     <Node
                       icon={<Icon />}
                       linkable={false}
+                      onClick={(event, node) => {
+                        console.log('Selecting Node', event, node);
+                        setSelections([node.id]);
+                      }}
+                      onRemove={(event, node) => {
+                        console.log('Removing Node', event, node);
+                        // const result = removeAndUpsertNodes(nodes, edges, node);
+                        // setEdges(result.edges);
+                        // setNodes(result.nodes);
+                        setSelections([]);
+                      }}
                     />
                   }
+                  onCanvasClick={(event) => {
+                    console.log('Canvas Clicked', event);
+                    setSelections([]);
+                  }}
+
                   onLayoutChange={layout => console.log('Layout', layout)} />
               </TransformComponent>
             </React.Fragment>
