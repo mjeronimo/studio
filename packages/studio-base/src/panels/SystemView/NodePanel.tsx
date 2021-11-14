@@ -12,13 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// React
 import { useState } from "react";
-import React, { memo, CSSProperties } from 'react';
+import React, { memo } from 'react';
 
+// Fluent UI
 import { ChoiceGroup, IChoiceGroupOption } from '@fluentui/react/lib/ChoiceGroup';
 import { Panel } from '@fluentui/react/lib/Panel';
 import { Checkbox, PanelType, Text, useTheme } from "@fluentui/react";
 
+// reaflow
+import { NodeData, EdgeData } from 'reaflow';
+
+// SystemView
 import { NodeList } from "./NodeList";
 
 const displayOptions: IChoiceGroupOption[] = [
@@ -48,18 +54,20 @@ interface NodePanelProps {
   isOpen: boolean | undefined
   openPanel: () => void
   dismissPanel: () => void
+  nodes: NodeData<any>[]
+  edges: EdgeData<any>[]
 }
 
 const NodePanel: React.FunctionComponent<NodePanelProps> = (props) => {
 
-    const [selectedList, setSelectedList] = useState([]);
+  const [selectedList, setSelectedList] = useState([]);
 
-    const handleChange = (e: any) => {
-      let { options } = e.target;
-      options = Array.apply(null, options)
-      const selectedValues = options.filter((x: any) => x.selected).map((x: any) => x.value);
-      setSelectedList(selectedValues);
-    }
+  const handleChange = (e: any) => {
+    let { options } = e.target;
+    options = Array.apply(null, options)
+    const selectedValues = options.filter((x: any) => x.selected).map((x: any) => x.value);
+    setSelectedList(selectedValues);
+  }
 
   return (
     <div>
@@ -82,7 +90,7 @@ const NodePanel: React.FunctionComponent<NodePanelProps> = (props) => {
         <ChoiceGroup defaultSelectedKey="L" options={displayOptions} label="Node Grouping" required={false} />
         <br />
         <SectionHeader>Nodes</SectionHeader>
-        <NodeList />
+        <NodeList nodes={props.nodes} edges={props.edges} />
       </Panel>
     </div>
   );

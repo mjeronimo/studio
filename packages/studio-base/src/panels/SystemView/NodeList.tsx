@@ -44,13 +44,17 @@ export interface INodeListState {
   selectionDetails: string;
 }
 
+interface NodeListProps {
+  nodes: NodeData<any>[]
+  edges: EdgeData<any>[]
+}
 
-export class NodeList extends React.Component<{}, INodeListState> {
+export class NodeList extends React.Component<NodeListProps, INodeListState> {
   private _selection: Selection;
   private _allItems: INodeListItem[];
   private _columns: IColumn[];
 
-  constructor(props: {}) {
+  constructor(props: NodeListProps) {
     super(props);
 
     this._selection = new Selection({
@@ -58,12 +62,19 @@ export class NodeList extends React.Component<{}, INodeListState> {
     });
 
     this._allItems = [];
-    for (let i = 0; i < 12; i++) {
-      this._allItems.push({
-        key: i,
-        name: '/viper/node_' + i,
-      });
+    for (let i = 0; i < props.nodes.length; i++) {
+      var name = ""
+      if (props.nodes[i]) {
+        name = props.nodes[i]!.text
+      }
+      this._allItems.push({ key: i, name: name, })
     }
+
+    this._allItems.sort(function (a, b) {
+      if (a.name < b.name) { return -1; }
+      if (a.name > b.name) { return 1; }
+      return 0;
+    })
 
     this._columns = [
       { key: 'column1', name: 'Name', fieldName: 'name', minWidth: 200, maxWidth: 200, isResizable: true },

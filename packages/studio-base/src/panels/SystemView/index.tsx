@@ -124,7 +124,7 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
 
   const initialNodes: NodeData<any>[] = [
     {
-      id: '3', text: 'stereo_camera_controller',
+      id: '3', text: '/stereo_camera_controller',
       icon: {
         url: rosLogoURL,
         height: 25,
@@ -148,7 +148,7 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
       },
     },
     {
-      id: '5', text: 'image_adjuster_left_stereo',
+      id: '5', text: '/image_adjuster_left_stereo',
       icon: {
         url: rosLogoURL,
         height: 25,
@@ -156,7 +156,7 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
       }
     },
     {
-      id: '7', text: 'image_adjuster_right_stereo',
+      id: '7', text: '/image_adjuster_right_stereo',
       icon: {
         url: rosLogoURL,
         height: 25,
@@ -164,7 +164,7 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
       }
     },
     {
-      id: '8', text: 'disparity_node',
+      id: '8', text: '/disparity_node',
       icon: {
         url: rosLogoURL,
         height: 25,
@@ -172,7 +172,7 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
       }
     },
     {
-      id: '9', text: 'point_cloud_node',
+      id: '9', text: '/point_cloud_node',
       icon: {
         url: rosLogoURL,
         height: 25,
@@ -213,7 +213,7 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
     },
   ]
 
-const edges: EdgeData<any>[] = [
+  const edges: EdgeData<any>[] = [
     { id: 'e3-4', from: '3', to: '4', text: '10 Hz' },
     { id: 'e3-2', from: '3', to: '2', text: '11 Hz' },
     { id: 'e4-7', from: '4', to: '7', text: '12 Hz' },
@@ -235,7 +235,15 @@ const edges: EdgeData<any>[] = [
       <PanelToolbar helpContent={helpContent} floating />
       <button
         style={{ position: 'absolute', top: 10, left: 10, zIndex: 999 }}
-        onClick={() => setNodes([...nodes, { id: `a${Math.random()}`, text: `Node ${Math.random()}` }])}
+        onClick={() => setNodes([...nodes, {
+          id: `a${Math.random()}`,
+          text: `/node-${Math.random().toFixed(4)}`,
+          icon: {
+            url: rosLogoURL,
+            height: 25,
+            width: 25
+          }
+        }])}
       >
         Add Node
       </button>
@@ -319,7 +327,7 @@ const edges: EdgeData<any>[] = [
             </React.Fragment>
           )}
         </TransformWrapper>
-        <NodePanel isOpen={isOpen} openPanel={openPanel} dismissPanel={dismissPanel} />
+        <NodePanel isOpen={isOpen} openPanel={openPanel} dismissPanel={dismissPanel} nodes={nodes} edges={edges} />
       </Stack>
     </Stack>
   );
