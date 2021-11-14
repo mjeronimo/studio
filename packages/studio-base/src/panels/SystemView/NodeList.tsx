@@ -8,6 +8,11 @@ import { MarqueeSelection } from '@fluentui/react/lib/MarqueeSelection';
 import { mergeStyles } from '@fluentui/react/lib/Styling';
 import { CSSProperties } from 'react';
 
+import SelectAllIcon from "@mdi/svg/svg/format-list-bulleted-square.svg";
+import SelectNoneIcon from "@mdi/svg/svg/format-list-checkbox.svg";
+import { useBoolean } from '@fluentui/react-hooks';
+import FoxgloveIcon from "@foxglove/studio-base/components/Icon";
+
 const exampleChildClass = mergeStyles({
   display: 'block',
   marginBottom: '10px',
@@ -47,7 +52,7 @@ export class NodeList extends React.Component<{}, INodeListState> {
     for (let i = 0; i < 12; i++) {
       this._allItems.push({
         key: i,
-        name: 'Item ' + i,
+        name: '/viper/node_' + i,
       });
     }
 
@@ -68,14 +73,23 @@ export class NodeList extends React.Component<{}, INodeListState> {
 
     return ( 
         <div>
-        <Link onClick={handleClickOnLink} underline>Select all</Link>
-        <Link onClick={handleClickOnLink} underline style={selectNoneStyle}>Select none</Link>
         <TextField
           className={exampleChildClass}
           label="Filter by name:"
           onChange={this._onFilter}
           styles={textFieldStyles}
         />
+        <br/>
+        <FoxgloveIcon style={{ color: "white" }} size="medium">
+          <SelectAllIcon />
+        </FoxgloveIcon>
+        <Link onClick={handleClickOnLink} underline>Select all</Link>
+        <FoxgloveIcon style={{ color: "white" }} size="medium">
+          <SelectNoneIcon />
+        </FoxgloveIcon>
+        <Link onClick={handleClickOnLink} underline style={selectNoneStyle}>Select none</Link>
+        <br/>
+        <br/>
         </div>
     );
   }

@@ -239,6 +239,8 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
       >
         Add Node
       </button>
+      <button style={{ position: 'absolute', top: 40, left: 10, zIndex: 999 }} onClick={() => canvasRef.current!.fitCanvas!()}>Fit</button>
+
       <Stack grow>
         <TransformWrapper
           wheel={{ step: 0.1 }}

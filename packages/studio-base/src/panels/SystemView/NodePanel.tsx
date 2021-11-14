@@ -26,6 +26,7 @@ import styled from "styled-components";
 const displayOptions: IChoiceGroupOption[] = [
   { key: 'L', text: 'Logical' },
   { key: 'P', text: 'Physical' },
+  { key: 'N', text: 'No node grouping' },
 ];
 
 function SectionHeader({ children }: React.PropsWithChildren<unknown>) {
@@ -80,7 +81,7 @@ const NodePanel: React.FunctionComponent<NodePanelProps> = (props) => {
         <br />
         <Checkbox label={`Automatically display new nodes`} />
         <br />
-        <ChoiceGroup defaultSelectedKey="L" options={displayOptions} label="Node Layout" required={false} />
+        <ChoiceGroup defaultSelectedKey="L" options={displayOptions} label="Node Grouping" required={false} />
         <br />
         <SectionHeader>Nodes</SectionHeader>
         <NodeList />
