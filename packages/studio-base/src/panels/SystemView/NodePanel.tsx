@@ -23,6 +23,8 @@ import { Checkbox, PanelType, Text, useTheme } from "@fluentui/react";
 // reaflow
 import { NodeData, EdgeData } from 'reaflow';
 
+import { MyNodeData } from "./MyNodeData";
+
 // SystemView
 import { NodeList } from "./NodeList";
 
@@ -53,7 +55,7 @@ interface NodePanelProps {
   isOpen: boolean | undefined
   openPanel: () => void
   dismissPanel: () => void
-  nodes: NodeData<any>[]
+  nodes: MyNodeData[]
   edges: EdgeData<any>[]
 }
 

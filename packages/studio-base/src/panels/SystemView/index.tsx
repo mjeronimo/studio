@@ -35,7 +35,7 @@ import { colors } from "@foxglove/studio-base/util/sharedStyleConstants";
 import FoxgloveIcon from "@foxglove/studio-base/components/Icon";
 
 // Reaflow
-import { Canvas, CanvasDirection, CanvasRef, Node, NodeData, Edge, EdgeData, Icon } from 'reaflow';
+import { Canvas, CanvasDirection, CanvasRef, Node, NodeData, Edge, EdgeData, Icon, removeNode } from 'reaflow';
 
 // react-zoom-pan-pinch
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
@@ -45,6 +45,7 @@ import helpContent from "./index.help.md";
 import NodePanel from "./NodePanel";
 import { ws_connect, ws_disconnect } from "./WebSocketClient";
 import Toolbar from "./Toolbar";
+import { MyNodeData } from "./MyNodeData";
 
 const canvasRef = React.createRef<CanvasRef>();
 
@@ -102,6 +103,7 @@ const on_message = function (messageEvent: any) {
 // TODO: move this to a page load event
 ws_connect(on_message);
 
+
 const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
   // TODO: configuration
   const { minLogLevel, searchTerms } = config;
@@ -122,9 +124,11 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
   const rosLogoURL = 'https://raw.githubusercontent.com/mjeronimo/studio/a802e32713b70509f49247c7dae817231ab9ec57/packages/studio-base/src/panels/SystemView/assets/ros_logo.svg';
   const wirelessURL = 'https://raw.githubusercontent.com/mjeronimo/studio/develop/packages/studio-base/src/panels/SystemView/assets/wireless.svg';
 
-  const initialNodes: NodeData<any>[] = [
+  const initialNodes: MyNodeData[] = [
     {
       id: '3', text: '/stereo_camera_controller',
+      visible: true,
+      type: 'node',
       icon: {
         url: rosLogoURL,
         height: 25,
@@ -133,6 +137,8 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
     },
     {
       id: '2', text: '/left/image_raw',
+      visible: true,
+      type: 'topic',
       icon: {
         url: wirelessURL,
         height: 25,
@@ -141,6 +147,8 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
     },
     {
       id: '4', text: '/right/image_raw',
+      visible: true,
+      type: 'topic',
       icon: {
         url: wirelessURL,
         height: 25,
@@ -149,6 +157,8 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
     },
     {
       id: '5', text: '/image_adjuster_left_stereo',
+      visible: true,
+      type: 'node',
       icon: {
         url: rosLogoURL,
         height: 25,
@@ -157,6 +167,8 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
     },
     {
       id: '7', text: '/image_adjuster_right_stereo',
+      visible: true,
+      type: 'node',
       icon: {
         url: rosLogoURL,
         height: 25,
@@ -165,6 +177,8 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
     },
     {
       id: '8', text: '/disparity_node',
+      visible: true,
+      type: 'node',
       icon: {
         url: rosLogoURL,
         height: 25,
@@ -173,6 +187,8 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
     },
     {
       id: '9', text: '/point_cloud_node',
+      visible: true,
+      type: 'node',
       icon: {
         url: rosLogoURL,
         height: 25,
@@ -181,6 +197,8 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
     },
     {
       id: '10', text: '/left/image_raw/adjusted_stereo',
+      visible: true,
+      type: 'topic',
       icon: {
         url: wirelessURL,
         height: 25,
@@ -189,6 +207,8 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
     },
     {
       id: '11', text: '/right/image_raw/adjusted_stereo',
+      visible: true,
+      type: 'topic',
       icon: {
         url: wirelessURL,
         height: 25,
@@ -197,6 +217,8 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
     },
     {
       id: '12', text: '/disparity',
+      visible: true,
+      type: 'topic',
       icon: {
         url: wirelessURL,
         height: 25,
@@ -205,6 +227,8 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
     },
     {
       id: '13', text: '/points2',
+      visible: true,
+      type: 'topic',
       icon: {
         url: wirelessURL,
         height: 25,
@@ -229,7 +253,9 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
   ]
 
   const [selections, setSelections] = useState<string[]>([]);
-  const [nodes, setNodes] = useState<NodeData[]>(initialNodes);
+  const [nodes, setNodes] = useState<MyNodeData[]>(initialNodes);
+
+  // const [edges, setEdges] = useState<EdgeData[]>(initialEdges);
 
   // <button style={{ position: 'absolute', top: 40, left: 10, zIndex: 999 }} onClick={() => canvasRef.current!.fitCanvas!()}>Fit</button>
 
@@ -240,6 +266,8 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
         style={{ position: 'absolute', top: 10, left: 10, zIndex: 999 }}
         onClick={() => setNodes([...nodes, {
           id: `a${Math.random()}`,
+          visible: true,
+          type: 'node',
           text: `/node-${Math.random().toFixed(4)}`,
           icon: {
             url: rosLogoURL,
@@ -329,7 +357,7 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
                       }}
                       onRemove={(event, node) => {
                         console.log('Removing Node', event, node);
-                        // const result = removeAndUpsertNodes(nodes, edges, node);
+                        // const result = removeNode(nodes, edges, node.id);
                         // setEdges(result.edges);
                         // setNodes(result.nodes);
                         setSelections([]);

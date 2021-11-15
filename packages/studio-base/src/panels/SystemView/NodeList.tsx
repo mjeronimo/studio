@@ -30,6 +30,8 @@ import Icon from "@foxglove/studio-base/components/Icon";
 // reaflow
 import { NodeData, EdgeData } from 'reaflow';
 
+import { MyNodeData } from "./MyNodeData";
+
 // MDI Icons
 import SelectAllIcon from "@mdi/svg/svg/format-list-bulleted-square.svg";
 import SelectNoneIcon from "@mdi/svg/svg/format-list-checkbox.svg";
@@ -59,7 +61,7 @@ export interface INodeListState {
 }
 
 interface NodeListProps {
-  nodes: NodeData<any>[]
+  nodes: MyNodeData[]
   edges: EdgeData<any>[]
 }
 
