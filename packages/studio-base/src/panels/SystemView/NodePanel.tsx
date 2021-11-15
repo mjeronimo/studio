@@ -23,10 +23,9 @@ import { Checkbox, PanelType, Text, useTheme } from "@fluentui/react";
 // reaflow
 import { NodeData, EdgeData } from 'reaflow';
 
-import { MyNodeData } from "./MyNodeData";
-
 // SystemView
 import { NodeList } from "./NodeList";
+import { MyNodeData } from "./MyNodeData";
 
 const displayOptions: IChoiceGroupOption[] = [
   { key: 'L', text: 'Logical' },

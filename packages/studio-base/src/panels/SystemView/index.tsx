@@ -20,13 +20,6 @@ import { Stack, mergeStyleSets } from "@fluentui/react";
 import { PaneOpen24Regular } from "@fluentui/react-icons";
 import { useBoolean } from '@fluentui/react-hooks';
 
-// MDI icons
-import FitToPageIcon from "@mdi/svg/svg/fit-to-page-outline.svg";
-import ArrowLeftRightIcon from "@mdi/svg/svg/arrow-left-right.svg";
-import ArrowUpDownIcon from "@mdi/svg/svg/arrow-up-down.svg";
-import Plus from "@mdi/svg/svg/plus.svg";
-import Minus from "@mdi/svg/svg/minus.svg";
-
 // Foxglove
 import Panel from "@foxglove/studio-base/components/Panel";
 import PanelToolbar from "@foxglove/studio-base/components/PanelToolbar";
@@ -39,6 +32,13 @@ import { Canvas, CanvasDirection, CanvasRef, Node, NodeData, Edge, EdgeData, Ico
 
 // react-zoom-pan-pinch
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+
+// MDI icons
+import FitToPageIcon from "@mdi/svg/svg/fit-to-page-outline.svg";
+import ArrowLeftRightIcon from "@mdi/svg/svg/arrow-left-right.svg";
+import ArrowUpDownIcon from "@mdi/svg/svg/arrow-up-down.svg";
+import Plus from "@mdi/svg/svg/plus.svg";
+import Minus from "@mdi/svg/svg/minus.svg";
 
 // SystemView
 import helpContent from "./index.help.md";
@@ -256,7 +256,6 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
   const [nodes, setNodes] = useState<MyNodeData[]>(initialNodes);
 
   // const [edges, setEdges] = useState<EdgeData[]>(initialEdges);
-
   // <button style={{ position: 'absolute', top: 40, left: 10, zIndex: 999 }} onClick={() => canvasRef.current!.fitCanvas!()}>Fit</button>
 
   return (
@@ -334,42 +333,56 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
                   </Button>
                 </div>
               </Toolbar>
-
               <TransformComponent>
-                <Canvas
-                  ref={canvasRef}
-                  zoomable={false}
-                  fit={false}
-                  direction={direction}
-                  center={false}
-                  maxWidth={5000}
-                  maxHeight={5000}
-                  nodes={nodes}
-                  edges={edges}
-                  selections={selections}
-                  node={
-                    <Node
-                      icon={<Icon />}
-                      linkable={false}
-                      onClick={(event, node) => {
-                        console.log('Selecting Node', event, node);
-                        setSelections([node.id]);
-                      }}
-                      onRemove={(event, node) => {
-                        console.log('Removing Node', event, node);
-                        // const result = removeNode(nodes, edges, node.id);
-                        // setEdges(result.edges);
-                        // setNodes(result.nodes);
-                        setSelections([]);
-                      }}
-                    />
-                  }
-                  onCanvasClick={(event) => {
-                    console.log('Canvas Clicked', event);
-                    setSelections([]);
-                  }}
-
-                  onLayoutChange={layout => console.log('Layout', layout)} />
+                <div>
+                  <style>
+                    {`
+                      .edge {
+                        stroke: #b1b1b7;
+                        stroke-dasharray: 5;
+                        animation: dashdraw .5s linear infinite;
+                        stroke-width: 1;
+                      }
+                      @keyframes dashdraw {
+                        0% { stroke-dashoffset: 10; }
+                      }
+                    `}
+                  </style>
+                  <Canvas
+                    ref={canvasRef}
+                    zoomable={false}
+                    fit={false}
+                    direction={direction}
+                    center={false}
+                    maxWidth={5000}
+                    maxHeight={5000}
+                    nodes={nodes}
+                    edges={edges}
+                    selections={selections}
+                    node={
+                      <Node
+                        icon={<Icon />}
+                        linkable={false}
+                        onClick={(event, node) => {
+                          console.log('Selecting Node', event, node);
+                          setSelections([node.id]);
+                        }}
+                        onRemove={(event, node) => {
+                          console.log('Removing Node', event, node);
+                          // const result = removeNode(nodes, edges, node.id);
+                          // setEdges(result.edges);
+                          // setNodes(result.nodes);
+                          setSelections([]);
+                        }}
+                      />
+                    }
+                    edge={<Edge className="edge" />}
+                    onCanvasClick={(event) => {
+                      console.log('Canvas Clicked', event);
+                      setSelections([]);
+                    }}
+                    onLayoutChange={layout => console.log('Layout', layout)} />
+                </div>
               </TransformComponent>
             </React.Fragment>
           )}
