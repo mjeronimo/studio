@@ -13,10 +13,10 @@
 // limitations under the License.
 
 // React
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 // FluentUI
-import { Stack, mergeStyleSets } from "@fluentui/react";
+import { Stack, Link, MessageBar, MessageBarType, MessageBarButton, mergeStyleSets } from "@fluentui/react";
 import { PaneOpen24Regular } from "@fluentui/react-icons";
 import { useBoolean } from '@fluentui/react-hooks';
 
@@ -26,6 +26,7 @@ import PanelToolbar from "@foxglove/studio-base/components/PanelToolbar";
 import Button from "@foxglove/studio-base/components/Button";
 import { colors } from "@foxglove/studio-base/util/sharedStyleConstants";
 import FoxgloveIcon from "@foxglove/studio-base/components/Icon";
+import Flex from "@foxglove/studio-base/components/Flex";
 
 // Reaflow
 import { Canvas, CanvasDirection, CanvasRef, Node, NodeData, Edge, EdgeData, Icon, removeNode } from 'reaflow';
@@ -46,6 +47,12 @@ import NodePanel from "./NodePanel";
 import { ws_connect, ws_disconnect } from "./WebSocketClient";
 import Toolbar from "./Toolbar";
 import { MyNodeData } from "./MyNodeData";
+
+import { Portal } from 'rdk';
+import SendNotificationToastAdapter from "@foxglove/studio-base/components/SendNotificationToastAdapter";
+import StudioToastProvider from "@foxglove/studio-base/components/StudioToastProvider";
+import sendNotification from "@foxglove/studio-base/util/sendNotification";
+
 
 const canvasRef = React.createRef<CanvasRef>();
 
@@ -258,9 +265,35 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
   // const [edges, setEdges] = useState<EdgeData[]>(initialEdges);
   // <button style={{ position: 'absolute', top: 40, left: 10, zIndex: 999 }} onClick={() => canvasRef.current!.fitCanvas!()}>Fit</button>
 
+const OneInfo = (): JSX.Element => {
+  useEffect(() => {
+    sendNotification(
+      "Here's a helpful tip",
+      "These are the details of the message",
+      "user",
+      "info",
+    );
+  }, []);
+
+  return <SendNotificationToastAdapter />;
+};
+
+
   return (
+    <Flex col clip>
     <Stack verticalFill>
       <PanelToolbar helpContent={helpContent} floating />
+      <button
+        style={{ position: 'absolute', top: 40, left: 10, zIndex: 999 }}
+        onClick={() => sendNotification(
+          "There are two nodes with the same name",
+          "These are the details of the message",
+          "user",
+          "error",
+        )}
+      >
+        Send Info
+      </button>
       <button
         style={{ position: 'absolute', top: 10, left: 10, zIndex: 999 }}
         onClick={() => setNodes([...nodes, {
@@ -291,7 +324,6 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
         >
           {({ zoomIn, zoomOut, resetTransform, centerView, ...rest }) => (
             <React.Fragment>
-
               <Toolbar>
                 <div className={styles.buttons}>
                   <Button className={styles.iconButton} tooltip="Open node panel" onClick={openPanel}>
@@ -345,6 +377,14 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
                       }
                       @keyframes dashdraw {
                         0% { stroke-dashoffset: 10; }
+                        .dragger {
+                          z-index: 999;
+                          pointer-events: none;
+                          user-select: none;
+                          cursor: grabbing;
+                          height: 70px;
+                          width: 150px;
+                        }
                       }
                     `}
                   </style>
@@ -361,6 +401,9 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
                     selections={selections}
                     node={
                       <Node
+                        style = {{
+                          boxShadow: "10px 10px 8px #ff0000",
+                        }}
                         icon={<Icon />}
                         linkable={false}
                         onClick={(event, node) => {
@@ -376,13 +419,15 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
                         }}
                       />
                     }
-                    edge={<Edge className="edge" />}
-                    onCanvasClick={(event) => {
+                    edge={<Edge
+                      className="edge" />}
+                      onCanvasClick={(event) => {
                       console.log('Canvas Clicked', event);
                       setSelections([]);
                     }}
-                    onLayoutChange={layout => console.log('Layout', layout)} />
-                </div>
+                    onLayoutChange={layout => console.log('Layout', layout)} >
+              </Canvas>
+            </div>
               </TransformComponent>
             </React.Fragment>
           )}
@@ -390,8 +435,11 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
         <NodePanel isOpen={isOpen} openPanel={openPanel} dismissPanel={dismissPanel} nodes={nodes} edges={edges} />
       </Stack>
     </Stack>
+    </Flex>
   );
 });
+
+    // <StudioToastProvider />
 
 SystemViewPanel.displayName = "SystemView";
 

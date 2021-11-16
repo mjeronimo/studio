@@ -20,6 +20,29 @@ import { ChoiceGroup, IChoiceGroupOption } from '@fluentui/react/lib/ChoiceGroup
 import { Panel } from '@fluentui/react/lib/Panel';
 import { Checkbox, PanelType, Text, useTheme } from "@fluentui/react";
 
+// Foxglove
+import Radio, { RadioOption } from "@foxglove/studio-base/components/Radio";
+import SegmentedControl, { Option } from "@foxglove/studio-base/components/SegmentedControl";
+
+const OPTIONS = {
+  first: {
+    id: "logical",
+    label: "Logical",
+  },
+  second: {
+    id: "physical",
+    label: "Physical",
+  },
+  third: {
+    id: "none",
+    label: "None",
+  },
+};
+
+// const optionArr: RadioOption[] = Object.values(OPTIONS);
+ const optionArr: Option[] = Object.values(OPTIONS);
+
+
 // reaflow
 import { NodeData, EdgeData } from 'reaflow';
 
@@ -27,7 +50,7 @@ import { NodeData, EdgeData } from 'reaflow';
 import { NodeList } from "./NodeList";
 import { MyNodeData } from "./MyNodeData";
 
-const displayOptions: IChoiceGroupOption[] = [
+const nodeGroupingOptions: IChoiceGroupOption[] = [
   { key: 'L', text: 'Logical' },
   { key: 'P', text: 'Physical' },
   { key: 'N', text: 'No node grouping' },
@@ -61,6 +84,7 @@ interface NodePanelProps {
 const NodePanel: React.FunctionComponent<NodePanelProps> = (props) => {
 
   const [selectedList, setSelectedList] = useState([]);
+  const [selectedId, setSelectedId] = React.useState(OPTIONS.third.id);
 
   const handleChange = (e: any) => {
     let { options } = e.target;
@@ -87,7 +111,12 @@ const NodePanel: React.FunctionComponent<NodePanelProps> = (props) => {
         <br />
         <Checkbox label={`Automatically display new nodes`} />
         <br />
-        <ChoiceGroup defaultSelectedKey="L" options={displayOptions} label="Node Grouping" required={false} />
+        <SectionHeader>Node Grouping</SectionHeader>
+        <SegmentedControl
+          options={optionArr}
+          selectedId={selectedId}
+          onChange={(newId) => setSelectedId(newId)}
+        />
         <br />
         <SectionHeader>Node Selection</SectionHeader>
         <NodeList nodes={props.nodes} edges={props.edges} />

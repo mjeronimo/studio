@@ -30,11 +30,12 @@ import Icon from "@foxglove/studio-base/components/Icon";
 // reaflow
 import { NodeData, EdgeData } from 'reaflow';
 
-import { MyNodeData } from "./MyNodeData";
-
 // MDI Icons
 import SelectAllIcon from "@mdi/svg/svg/format-list-bulleted-square.svg";
 import SelectNoneIcon from "@mdi/svg/svg/format-list-checkbox.svg";
+
+// SystemView
+import { MyNodeData } from "./MyNodeData";
 
 const exampleChildClass = mergeStyles({
   display: 'block',
