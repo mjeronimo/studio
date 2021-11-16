@@ -20,6 +20,16 @@ import { Stack, Link, MessageBar, MessageBarType, MessageBarButton, mergeStyleSe
 import { PaneOpen24Regular } from "@fluentui/react-icons";
 import { useBoolean } from '@fluentui/react-hooks';
 
+import CursorDefault from "@mdi/svg/svg/cursor-default.svg";
+import styles from "@foxglove/studio-base/panels/ThreeDimensionalViz/sharedStyles";
+import Checkbox from "@foxglove/studio-base/components/Checkbox";
+
+import ExpandingToolbar, {
+  ToolGroup,
+  ToolGroupFixedSizePane,
+} from "@foxglove/studio-base/components/ExpandingToolbar";
+
+
 // Foxglove
 import Panel from "@foxglove/studio-base/components/Panel";
 import PanelToolbar from "@foxglove/studio-base/components/PanelToolbar";
@@ -44,7 +54,6 @@ import Minus from "@mdi/svg/svg/minus.svg";
 // SystemView
 import helpContent from "./index.help.md";
 import NodePanel from "./NodePanel";
-import { ws_connect, ws_disconnect } from "./WebSocketClient";
 import Toolbar from "./Toolbar";
 import { MyNodeData } from "./MyNodeData";
 
@@ -68,7 +77,7 @@ type Props = {
   saveConfig: (arg0: Config) => void;
 };
 
-const styles = mergeStyleSets({
+const styles2 = mergeStyleSets({
   iconButton: {
     backgroundColor: "transparent !important",
     border: "none !important",
@@ -106,9 +115,6 @@ const on_message = function (messageEvent: any) {
     console.log("error: " + wsMsg.error)
   }
 }
-
-// TODO: move this to a page load event
-ws_connect(on_message);
 
 
 const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
@@ -280,9 +286,10 @@ const OneInfo = (): JSX.Element => {
 
 
   return (
-    <Flex col clip>
     <Stack verticalFill>
       <PanelToolbar helpContent={helpContent} floating />
+
+
       <button
         style={{ position: 'absolute', top: 40, left: 10, zIndex: 999 }}
         onClick={() => sendNotification(
@@ -311,6 +318,7 @@ const OneInfo = (): JSX.Element => {
         Add Node
       </button>
 
+
       <Stack grow>
         <TransformWrapper
           wheel={{ step: 0.1 }}
@@ -324,7 +332,45 @@ const OneInfo = (): JSX.Element => {
         >
           {({ zoomIn, zoomOut, resetTransform, centerView, ...rest }) => (
             <React.Fragment>
+
+
+
+
+
+
               <Toolbar>
+              <br/>
+        <ExpandingToolbar
+          tooltip="Inspect objects"
+          icon={
+            <FoxgloveIcon style={{ color: "white" }}>
+              <CursorDefault />
+            </FoxgloveIcon>
+          }
+          className={styles.buttons}
+          selectedTab={"Foobar1"}
+          onSelectTab={(newSelectedTab) => console.log("onSelectTab")}
+        >
+          <ToolGroup name={"Foobar1"}>
+            <ToolGroupFixedSizePane>
+              <Checkbox
+                label="Open this panel automatically"
+                checked={true}
+                onChange={() => console.log("onChange")}
+              />
+            </ToolGroupFixedSizePane>
+          </ToolGroup>
+          <ToolGroup name={"Foobar2"}>
+            <ToolGroupFixedSizePane>
+              <Checkbox
+                label="Don't open this panel automatically"
+                checked={true}
+                onChange={() => console.log("onChange")}
+              />
+            </ToolGroupFixedSizePane>
+          </ToolGroup>
+        </ExpandingToolbar>
+
                 <div className={styles.buttons}>
                   <Button className={styles.iconButton} tooltip="Open node panel" onClick={openPanel}>
                     <FoxgloveIcon style={{ color: "white" }} size="small">
@@ -435,7 +481,6 @@ const OneInfo = (): JSX.Element => {
         <NodePanel isOpen={isOpen} openPanel={openPanel} dismissPanel={dismissPanel} nodes={nodes} edges={edges} />
       </Stack>
     </Stack>
-    </Flex>
   );
 });
 
