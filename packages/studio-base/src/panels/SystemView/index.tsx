@@ -284,6 +284,10 @@ const OneInfo = (): JSX.Element => {
   return <SendNotificationToastAdapter />;
 };
 
+  // background-image: repeating-radial-gradient(top center,rgba(0,0,0,.2),rgba(0,0,0,.2) 1px,transparent 0,transparent 100%);
+
+  let defaultSelectedTab = "Foobar2" ;
+  const [selectedTab, setSelectedTab] = React.useState(defaultSelectedTab);
 
   return (
     <Stack verticalFill>
@@ -332,14 +336,10 @@ const OneInfo = (): JSX.Element => {
         >
           {({ zoomIn, zoomOut, resetTransform, centerView, ...rest }) => (
             <React.Fragment>
-
-
-
-
-
-
               <Toolbar>
               <br/>
+
+
         <ExpandingToolbar
           tooltip="Inspect objects"
           icon={
@@ -348,14 +348,18 @@ const OneInfo = (): JSX.Element => {
             </FoxgloveIcon>
           }
           className={styles.buttons}
-          selectedTab={"Foobar1"}
-          onSelectTab={(newSelectedTab) => console.log("onSelectTab")}
+          selectedTab={selectedTab}
+          onSelectTab={(newSelectedTab) => {
+            console.log("onSelectTab!");
+            console.log(newSelectedTab);
+            setSelectedTab(newSelectedTab!)
+          }}
         >
           <ToolGroup name={"Foobar1"}>
             <ToolGroupFixedSizePane>
               <Checkbox
                 label="Open this panel automatically"
-                checked={true}
+                checked={false}
                 onChange={() => console.log("onChange")}
               />
             </ToolGroupFixedSizePane>
@@ -415,6 +419,26 @@ const OneInfo = (): JSX.Element => {
                 <div>
                   <style>
                     {`
+                      // Colors
+                      $bg-color: hsl(256,33,10);
+                      $dot-color: hsl(256,33,70);
+
+                      // Dimensions
+                      $dot-size: 1px;
+                      $dot-space: 22px;
+
+                      .foobar2 {
+                          //background-color: grey;
+                          // background-image: repeating-radial-gradient(red, yellow 10%, green 15%);
+                          //background-image: repeating-radial-gradient(top center,rgba(255,255,255,.2),rgba(255,255,255,.2) 4px,transparent 0,transparent 100%);
+                      }
+                      .foobar {
+                          background-color: #403366;
+                          //background:
+                            //linear-gradient(90deg, $bg-color ($dot-space - $dot-size), transparent 1%) center,
+                            //linear-gradient($bg-color ($dot-space - $dot-size), transparent 1%) center, $dot-color;
+                          //background-size: $dot-space $dot-space;
+                      }
                       .edge {
                         stroke: #b1b1b7;
                         stroke-dasharray: 5;
@@ -435,6 +459,7 @@ const OneInfo = (): JSX.Element => {
                     `}
                   </style>
                   <Canvas
+                    className={"foobar"}
                     ref={canvasRef}
                     zoomable={false}
                     fit={false}
