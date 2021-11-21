@@ -16,21 +16,21 @@
 import { useState, useCallback, useEffect } from "react";
 
 // FluentUI
-import { Stack, Link, MessageBar, MessageBarType, MessageBarButton, mergeStyleSets } from "@fluentui/react";
+import { Stack, Link, Text, useTheme, MessageBar, MessageBarType, MessageBarButton, mergeStyleSets } from "@fluentui/react";
 import { PaneOpen24Regular } from "@fluentui/react-icons";
 import { useBoolean } from '@fluentui/react-hooks';
 
-import CursorDefault from "@mdi/svg/svg/cursor-default.svg";
-import styles from "@foxglove/studio-base/panels/ThreeDimensionalViz/sharedStyles";
-import Checkbox from "@foxglove/studio-base/components/Checkbox";
-
-import ExpandingToolbar, {
-  ToolGroup,
-  ToolGroupFixedSizePane,
-} from "@foxglove/studio-base/components/ExpandingToolbar";
+import GroupIcon from "@mdi/svg/svg/group.svg";
+import CogIcon from "@mdi/svg/svg/application-cog-outline.svg";
+import SelectionIcon from "@mdi/svg/svg/checkbox-multiple-marked-outline.svg";
+import MagnifyIcon from "@mdi/svg/svg/magnify.svg";
 
 
 // Foxglove
+import styles from "@foxglove/studio-base/panels/ThreeDimensionalViz/sharedStyles";
+import Checkbox from "@foxglove/studio-base/components/Checkbox";
+import ExpandingToolbar, { ToolGroup, ToolGroupFixedSizePane, } from "@foxglove/studio-base/components/ExpandingToolbar";
+import SegmentedControl, { Option } from "@foxglove/studio-base/components/SegmentedControl";
 import Panel from "@foxglove/studio-base/components/Panel";
 import PanelToolbar from "@foxglove/studio-base/components/PanelToolbar";
 import Button from "@foxglove/studio-base/components/Button";
@@ -53,15 +53,29 @@ import Minus from "@mdi/svg/svg/minus.svg";
 
 // SystemView
 import helpContent from "./index.help.md";
-import NodePanel from "./NodePanel";
 import Toolbar from "./Toolbar";
 import { MyNodeData } from "./MyNodeData";
 
-import { Portal } from 'rdk';
 import SendNotificationToastAdapter from "@foxglove/studio-base/components/SendNotificationToastAdapter";
 import StudioToastProvider from "@foxglove/studio-base/components/StudioToastProvider";
 import sendNotification from "@foxglove/studio-base/util/sendNotification";
 
+function SectionHeader({ children }: React.PropsWithChildren<unknown>) {
+  const theme = useTheme();
+  return (
+    <Text
+      block
+      as="h2"
+      variant="large"
+      style={{
+        marginBottom: theme.spacing.s1,
+        color: theme.palette.themeSecondary,
+      }}
+    >
+      {children}
+    </Text>
+  );
+}
 
 const canvasRef = React.createRef<CanvasRef>();
 
@@ -271,29 +285,50 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
   // const [edges, setEdges] = useState<EdgeData[]>(initialEdges);
   // <button style={{ position: 'absolute', top: 40, left: 10, zIndex: 999 }} onClick={() => canvasRef.current!.fitCanvas!()}>Fit</button>
 
-const OneInfo = (): JSX.Element => {
-  useEffect(() => {
-    sendNotification(
-      "Here's a helpful tip",
-      "These are the details of the message",
-      "user",
-      "info",
-    );
-  }, []);
+  const OneInfo = (): JSX.Element => {
+    useEffect(() => {
+      sendNotification(
+        "Here's a helpful tip",
+        "These are the details of the message",
+        "user",
+        "info",
+      );
+    }, []);
 
-  return <SendNotificationToastAdapter />;
-};
+    return <SendNotificationToastAdapter />;
+  };
 
   // background-image: repeating-radial-gradient(top center,rgba(0,0,0,.2),rgba(0,0,0,.2) 1px,transparent 0,transparent 100%);
 
-  let defaultSelectedTab = "Foobar2" ;
+  let defaultSelectedTab: string | undefined;
   const [selectedTab, setSelectedTab] = React.useState(defaultSelectedTab);
+
+  let defaultSelectedTab2: string | undefined;
+  const [selectedTab2, setSelectedTab2] = React.useState(defaultSelectedTab2);
+
+
+  const OPTIONS = {
+    first: {
+      id: "logical",
+      label: "Logical",
+    },
+    second: {
+      id: "physical",
+      label: "Physical",
+    },
+    third: {
+      id: "none",
+      label: "None",
+    },
+  };
+
+  const [selectedId, setSelectedId] = React.useState(OPTIONS.third.id);
+
+  const optionArr: Option[] = Object.values(OPTIONS);
 
   return (
     <Stack verticalFill>
       <PanelToolbar helpContent={helpContent} floating />
-
-
       <button
         style={{ position: 'absolute', top: 40, left: 10, zIndex: 999 }}
         onClick={() => sendNotification(
@@ -337,50 +372,76 @@ const OneInfo = (): JSX.Element => {
           {({ zoomIn, zoomOut, resetTransform, centerView, ...rest }) => (
             <React.Fragment>
               <Toolbar>
-              <br/>
+                <br />
 
 
-        <ExpandingToolbar
-          tooltip="Inspect objects"
-          icon={
-            <FoxgloveIcon style={{ color: "white" }}>
-              <CursorDefault />
-            </FoxgloveIcon>
-          }
-          className={styles.buttons}
-          selectedTab={selectedTab}
-          onSelectTab={(newSelectedTab) => {
-            console.log("onSelectTab!");
-            console.log(newSelectedTab);
-            setSelectedTab(newSelectedTab!)
-          }}
-        >
-          <ToolGroup name={"Foobar1"}>
-            <ToolGroupFixedSizePane>
-              <Checkbox
-                label="Open this panel automatically"
-                checked={false}
-                onChange={() => console.log("onChange")}
-              />
-            </ToolGroupFixedSizePane>
-          </ToolGroup>
-          <ToolGroup name={"Foobar2"}>
-            <ToolGroupFixedSizePane>
-              <Checkbox
-                label="Don't open this panel automatically"
-                checked={true}
-                onChange={() => console.log("onChange")}
-              />
-            </ToolGroupFixedSizePane>
-          </ToolGroup>
-        </ExpandingToolbar>
+                <ExpandingToolbar
+                  tooltip="Group nodes"
+                  icon={
+                    <FoxgloveIcon style={{ color: "white" }}>
+                      <GroupIcon />
+                    </FoxgloveIcon>
+                  }
+                  className={styles.buttons}
+                  selectedTab={selectedTab}
+                  onSelectTab={(newSelectedTab) => {
+                    console.log("onSelectTab!");
+                    console.log(newSelectedTab);
+                    setSelectedTab(newSelectedTab!)
+                  }}
+                >
+                  <ToolGroup name={"Node Grouping"}>
+                    <>
+                      <br />
+                      <SegmentedControl
+                        options={optionArr}
+                        selectedId={selectedId}
+                        onChange={(newId) => setSelectedId(newId)}
+                      />
+                    </>
+                  </ToolGroup>
+                </ExpandingToolbar>
+
+
+                <ExpandingToolbar
+                  tooltip="Select nodes to display"
+                  icon={
+                    <FoxgloveIcon style={{ color: "white" }}>
+                      <SelectionIcon />
+                    </FoxgloveIcon>
+                  }
+                  className={styles.buttons}
+                  selectedTab={selectedTab2}
+                  onSelectTab={(newSelectedTab) => {
+                    setSelectedTab2(newSelectedTab!)
+                  }}
+                >
+                  <ToolGroup name={"Node List"}>
+                    <>
+                      <Checkbox
+                        label="Include hidden nodes"
+                        checked={false}
+                        onChange={() => console.log("onChange")}
+                      />
+                      <Checkbox
+                        label="Automatically display new nodes"
+                        checked={false}
+                        onChange={() => console.log("onChange")}
+                      />
+                    </>
+                  </ToolGroup>
+                </ExpandingToolbar>
 
                 <div className={styles.buttons}>
-                  <Button className={styles.iconButton} tooltip="Open node panel" onClick={openPanel}>
+                  <Button className={styles.iconButton} tooltip="Change graph orientation" onClick={toggleOrientation}>
                     <FoxgloveIcon style={{ color: "white" }} size="small">
-                      <PaneOpen24Regular />
+                      {lrOrientation ? <ArrowLeftRightIcon /> : <ArrowUpDownIcon />}
                     </FoxgloveIcon>
                   </Button>
+                </div>
+
+
+                <div className={styles.buttons}>
                   <Button className={styles.iconButton} tooltip="Fit graph to window" onClick={() => resetTransform()}>
                     <FoxgloveIcon style={{ color: "white" }} size="small">
                       <FitToPageIcon />
@@ -408,12 +469,9 @@ const OneInfo = (): JSX.Element => {
                       <Minus />
                     </FoxgloveIcon>
                   </Button>
-                  <Button className={styles.iconButton} tooltip="Change graph orientation" onClick={toggleOrientation}>
-                    <FoxgloveIcon style={{ color: "white" }} size="small">
-                      {lrOrientation ? <ArrowLeftRightIcon /> : <ArrowUpDownIcon />}
-                    </FoxgloveIcon>
-                  </Button>
+
                 </div>
+
               </Toolbar>
               <TransformComponent>
                 <div>
@@ -472,7 +530,7 @@ const OneInfo = (): JSX.Element => {
                     selections={selections}
                     node={
                       <Node
-                        style = {{
+                        style={{
                           boxShadow: "10px 10px 8px #ff0000",
                         }}
                         icon={<Icon />}
@@ -492,24 +550,24 @@ const OneInfo = (): JSX.Element => {
                     }
                     edge={<Edge
                       className="edge" />}
-                      onCanvasClick={(event) => {
+                    onCanvasClick={(event) => {
                       console.log('Canvas Clicked', event);
                       setSelections([]);
                     }}
                     onLayoutChange={layout => console.log('Layout', layout)} >
-              </Canvas>
-            </div>
+                  </Canvas>
+                </div>
               </TransformComponent>
             </React.Fragment>
           )}
         </TransformWrapper>
-        <NodePanel isOpen={isOpen} openPanel={openPanel} dismissPanel={dismissPanel} nodes={nodes} edges={edges} />
       </Stack>
     </Stack>
   );
 });
 
-    // <StudioToastProvider />
+// <NodePanel isOpen={isOpen} openPanel={openPanel} dismissPanel={dismissPanel} nodes={nodes} edges={edges} />
+// <StudioToastProvider />
 
 SystemViewPanel.displayName = "SystemView";
 

@@ -106,18 +106,6 @@ const NodePanel: React.FunctionComponent<NodePanelProps> = (props) => {
         type={PanelType.custom}
       >
         <br />
-        <SectionHeader>Options</SectionHeader>
-        <Checkbox label={`Include hidden nodes`} />
-        <br />
-        <Checkbox label={`Automatically display new nodes`} />
-        <br />
-        <SectionHeader>Node Grouping</SectionHeader>
-        <SegmentedControl
-          options={optionArr}
-          selectedId={selectedId}
-          onChange={(newId) => setSelectedId(newId)}
-        />
-        <br />
         <SectionHeader>Node Selection</SectionHeader>
         <NodeList nodes={props.nodes} edges={props.edges} />
       </Panel>
