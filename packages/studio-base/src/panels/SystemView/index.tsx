@@ -13,140 +13,65 @@
 // limitations under the License.
 
 // React
-import { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback } from "react";
 
 // FluentUI
-import { Stack, Link, Text, useTheme, MessageBar, MessageBarType, MessageBarButton, mergeStyleSets } from "@fluentui/react";
-import { PaneOpen24Regular } from "@fluentui/react-icons";
-import { useBoolean } from '@fluentui/react-hooks';
-
-import GroupIcon from "@mdi/svg/svg/group.svg";
-import CogIcon from "@mdi/svg/svg/application-cog-outline.svg";
-import SelectionIcon from "@mdi/svg/svg/checkbox-multiple-marked-outline.svg";
-import MagnifyIcon from "@mdi/svg/svg/magnify.svg";
-
+import { Stack } from "@fluentui/react";
 
 // Foxglove
-import styles from "@foxglove/studio-base/panels/ThreeDimensionalViz/sharedStyles";
-import Checkbox from "@foxglove/studio-base/components/Checkbox";
-import ExpandingToolbar, { ToolGroup, ToolGroupFixedSizePane, } from "@foxglove/studio-base/components/ExpandingToolbar";
-import SegmentedControl, { Option } from "@foxglove/studio-base/components/SegmentedControl";
 import Panel from "@foxglove/studio-base/components/Panel";
 import PanelToolbar from "@foxglove/studio-base/components/PanelToolbar";
-import Button from "@foxglove/studio-base/components/Button";
-import { colors } from "@foxglove/studio-base/util/sharedStyleConstants";
-import FoxgloveIcon from "@foxglove/studio-base/components/Icon";
-import Flex from "@foxglove/studio-base/components/Flex";
+import sendNotification from "@foxglove/studio-base/util/sendNotification";
+import { SaveConfig } from "@foxglove/studio-base/types/panels";
 
 // Reaflow
-import { Canvas, CanvasDirection, CanvasRef, Node, NodeData, Edge, EdgeData, Icon, removeNode } from 'reaflow';
+import { Canvas, CanvasDirection, CanvasRef, Node, Edge, EdgeData, Icon } from 'reaflow';
 
 // react-zoom-pan-pinch
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
-// MDI icons
-import FitToPageIcon from "@mdi/svg/svg/fit-to-page-outline.svg";
-import ArrowLeftRightIcon from "@mdi/svg/svg/arrow-left-right.svg";
-import ArrowUpDownIcon from "@mdi/svg/svg/arrow-up-down.svg";
-import Plus from "@mdi/svg/svg/plus.svg";
-import Minus from "@mdi/svg/svg/minus.svg";
-
 // SystemView
 import helpContent from "./index.help.md";
-import Toolbar from "./Toolbar";
 import { MyNodeData } from "./MyNodeData";
-
-import SendNotificationToastAdapter from "@foxglove/studio-base/components/SendNotificationToastAdapter";
-import StudioToastProvider from "@foxglove/studio-base/components/StudioToastProvider";
-import sendNotification from "@foxglove/studio-base/util/sendNotification";
-
-function SectionHeader({ children }: React.PropsWithChildren<unknown>) {
-  const theme = useTheme();
-  return (
-    <Text
-      block
-      as="h2"
-      variant="large"
-      style={{
-        marginBottom: theme.spacing.s1,
-        color: theme.palette.themeSecondary,
-      }}
-    >
-      {children}
-    </Text>
-  );
-}
+import SystemViewToolbar from "./SystemViewToolbar";
 
 const canvasRef = React.createRef<CanvasRef>();
 
-// TODO: Define the default configuration for this panel
-type Config = {
-  searchTerms: string[];
-  minLogLevel: number;
-  topicToRender: string;
-};
-
 type Props = {
-  config: Config;
-  saveConfig: (arg0: Config) => void;
+  config: unknown;
+  saveConfig: SaveConfig<unknown>;
 };
 
-const styles2 = mergeStyleSets({
-  iconButton: {
-    backgroundColor: "transparent !important",
-    border: "none !important",
-    padding: "8px 4px !important",
-    alignItems: "start !important",
-    marginRight: "4px !important",
-    marginLeft: "4px !important",
-  },
-  buttons: {
-    backgroundColor: `${colors.DARK3}`,
-    borderRadius: "4px",
-    boxShadow: "0 0px 32px rgba(8, 8, 10, 0.6)",
-    overflow: "hidden",
-    pointerEvents: "auto",
-    flexShrink: "0",
-
-    display: "flex",
-    flexDirection: "column",
-    padding: 0,
-    marginBottom: 10,
-
-    "& span.icon": {
-      width: 18,
-      height: 18,
-      fontSize: 18,
-      display: "inline-block",
-    },
-  },
-});
-
-const on_message = function (messageEvent: any) {
-  var wsMsg = messageEvent.data;
-  console.log("WebSocket MESSAGE: " + wsMsg);
-  if (wsMsg.indexOf("error") > 0) {
-    console.log("error: " + wsMsg.error)
-  }
-}
-
-
-const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
-  // TODO: configuration
-  const { minLogLevel, searchTerms } = config;
+const SystemViewPanel = React.memo(({}: Props) => {
 
   const [lrOrientation, setLROrientation] = useState<boolean>(true);
   const [direction, setDirection] = useState<CanvasDirection>('DOWN');
 
+  const myZoomIn = () => {
+    const canvas = canvasRef.current!;
+    console.log("myZoomIn");
+    if (canvas.zoomIn) {
+      canvas.zoomIn();
+    }
+  }
+
+  const myZoomOut = () => {
+    const canvas = canvasRef.current!;
+    console.log("myZoomOut");
+    if (canvas.zoomOut) {
+      canvas.zoomOut();
+    }
+  }
+
+  const myFitToWindow = () => {
+    console.log("myFitToWindow");
+  }
+
   const toggleOrientation = useCallback(() => {
     const canvas = canvasRef.current!;
-    console.log(canvas);
     setLROrientation(!lrOrientation);
     setDirection(lrOrientation ? 'RIGHT' : 'DOWN');
-    console.log(direction);
   }, [lrOrientation]);
-
-  const [isOpen, { setTrue: openPanel, setFalse: dismissPanel }] = useBoolean(false);
 
   const rosLogoURL = 'https://raw.githubusercontent.com/mjeronimo/studio/a802e32713b70509f49247c7dae817231ab9ec57/packages/studio-base/src/panels/SystemView/assets/ros_logo.svg';
   const wirelessURL = 'https://raw.githubusercontent.com/mjeronimo/studio/develop/packages/studio-base/src/panels/SystemView/assets/wireless.svg';
@@ -282,50 +207,6 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
   const [selections, setSelections] = useState<string[]>([]);
   const [nodes, setNodes] = useState<MyNodeData[]>(initialNodes);
 
-  // const [edges, setEdges] = useState<EdgeData[]>(initialEdges);
-  // <button style={{ position: 'absolute', top: 40, left: 10, zIndex: 999 }} onClick={() => canvasRef.current!.fitCanvas!()}>Fit</button>
-
-  const OneInfo = (): JSX.Element => {
-    useEffect(() => {
-      sendNotification(
-        "Here's a helpful tip",
-        "These are the details of the message",
-        "user",
-        "info",
-      );
-    }, []);
-
-    return <SendNotificationToastAdapter />;
-  };
-
-  // background-image: repeating-radial-gradient(top center,rgba(0,0,0,.2),rgba(0,0,0,.2) 1px,transparent 0,transparent 100%);
-
-  let defaultSelectedTab: string | undefined;
-  const [selectedTab, setSelectedTab] = React.useState(defaultSelectedTab);
-
-  let defaultSelectedTab2: string | undefined;
-  const [selectedTab2, setSelectedTab2] = React.useState(defaultSelectedTab2);
-
-
-  const OPTIONS = {
-    first: {
-      id: "logical",
-      label: "Logical",
-    },
-    second: {
-      id: "physical",
-      label: "Physical",
-    },
-    third: {
-      id: "none",
-      label: "None",
-    },
-  };
-
-  const [selectedId, setSelectedId] = React.useState(OPTIONS.third.id);
-
-  const optionArr: Option[] = Object.values(OPTIONS);
-
   return (
     <Stack verticalFill>
       <PanelToolbar helpContent={helpContent} floating />
@@ -357,7 +238,6 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
         Add Node
       </button>
 
-
       <Stack grow>
         <TransformWrapper
           wheel={{ step: 0.1 }}
@@ -371,108 +251,7 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
         >
           {({ zoomIn, zoomOut, resetTransform, centerView, ...rest }) => (
             <React.Fragment>
-              <Toolbar>
-                <br />
-
-
-                <ExpandingToolbar
-                  tooltip="Group nodes"
-                  icon={
-                    <FoxgloveIcon style={{ color: "white" }}>
-                      <GroupIcon />
-                    </FoxgloveIcon>
-                  }
-                  className={styles.buttons}
-                  selectedTab={selectedTab}
-                  onSelectTab={(newSelectedTab) => {
-                    console.log("onSelectTab!");
-                    console.log(newSelectedTab);
-                    setSelectedTab(newSelectedTab!)
-                  }}
-                >
-                  <ToolGroup name={"Node Grouping"}>
-                    <>
-                      <br />
-                      <SegmentedControl
-                        options={optionArr}
-                        selectedId={selectedId}
-                        onChange={(newId) => setSelectedId(newId)}
-                      />
-                    </>
-                  </ToolGroup>
-                </ExpandingToolbar>
-
-
-                <ExpandingToolbar
-                  tooltip="Select nodes to display"
-                  icon={
-                    <FoxgloveIcon style={{ color: "white" }}>
-                      <SelectionIcon />
-                    </FoxgloveIcon>
-                  }
-                  className={styles.buttons}
-                  selectedTab={selectedTab2}
-                  onSelectTab={(newSelectedTab) => {
-                    setSelectedTab2(newSelectedTab!)
-                  }}
-                >
-                  <ToolGroup name={"Node List"}>
-                    <>
-                      <Checkbox
-                        label="Include hidden nodes"
-                        checked={false}
-                        onChange={() => console.log("onChange")}
-                      />
-                      <Checkbox
-                        label="Automatically display new nodes"
-                        checked={false}
-                        onChange={() => console.log("onChange")}
-                      />
-                    </>
-                  </ToolGroup>
-                </ExpandingToolbar>
-
-                <div className={styles.buttons}>
-                  <Button className={styles.iconButton} tooltip="Change graph orientation" onClick={toggleOrientation}>
-                    <FoxgloveIcon style={{ color: "white" }} size="small">
-                      {lrOrientation ? <ArrowLeftRightIcon /> : <ArrowUpDownIcon />}
-                    </FoxgloveIcon>
-                  </Button>
-                </div>
-
-
-                <div className={styles.buttons}>
-                  <Button className={styles.iconButton} tooltip="Fit graph to window" onClick={() => resetTransform()}>
-                    <FoxgloveIcon style={{ color: "white" }} size="small">
-                      <FitToPageIcon />
-                    </FoxgloveIcon>
-                  </Button>
-                  <Button className={styles.iconButton} tooltip="Zoom in" onClick={() => {
-                    const canvas = canvasRef.current!;
-                    if (canvas.zoomIn) {
-                      canvas.zoomIn();
-                    }
-                  }
-                  }>
-                    <FoxgloveIcon style={{ color: "white" }} size="small">
-                      <Plus />
-                    </FoxgloveIcon>
-                  </Button>
-                  <Button className={styles.iconButton} tooltip="Zoom out" onClick={() => {
-                    const canvas = canvasRef.current!;
-                    if (canvas.zoomOut) {
-                      canvas.zoomOut();
-                    }
-                  }
-                  }>
-                    <FoxgloveIcon style={{ color: "white" }} size="small">
-                      <Minus />
-                    </FoxgloveIcon>
-                  </Button>
-
-                </div>
-
-              </Toolbar>
+              <SystemViewToolbar nodes={nodes} edges={edges} lrOrientation={lrOrientation} zoomIn={myZoomIn} zoomOut={myZoomOut} toggleOrientation={toggleOrientation} fitToWindow={resetTransform} />
               <TransformComponent>
                 <div>
                   <style>
@@ -566,15 +345,11 @@ const SystemViewPanel = React.memo(({ config, saveConfig }: Props) => {
   );
 });
 
-// <NodePanel isOpen={isOpen} openPanel={openPanel} dismissPanel={dismissPanel} nodes={nodes} edges={edges} />
-// <StudioToastProvider />
-
 SystemViewPanel.displayName = "SystemView";
 
 export default Panel(
   Object.assign(SystemViewPanel, {
-    // TODO: configuration
-    defaultConfig: { searchTerms: [], minLogLevel: 1, topicToRender: "/rosout" } as Config,
+    defaultConfig: {},
     panelType: "SystemView",
   }),
 );
