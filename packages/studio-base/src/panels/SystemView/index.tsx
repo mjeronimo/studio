@@ -25,14 +25,14 @@ import sendNotification from "@foxglove/studio-base/util/sendNotification";
 import { SaveConfig } from "@foxglove/studio-base/types/panels";
 
 // Reaflow
-import { Canvas, CanvasDirection, CanvasRef, Node, Edge, EdgeData, Icon } from 'reaflow';
+import { Canvas, CanvasDirection, CanvasRef, Node, Edge, EdgeData, Icon, removeNode } from 'reaflow';
 
 // react-zoom-pan-pinch
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 // SystemView
 import helpContent from "./index.help.md";
-import { MyNodeData } from "./MyNodeData";
+import { getInitialNodes, getInitialEdges, MyNodeData, NodeType } from "./MyNodeData";
 import SystemViewToolbar from "./SystemViewToolbar";
 
 const canvasRef = React.createRef<CanvasRef>();
@@ -44,152 +44,11 @@ type Props = {
 
 const SystemViewPanel = React.memo(({}: Props) => {
 
-  const [lrOrientation, setLROrientation] = useState<boolean>(true);
-  const [direction, setDirection] = useState<CanvasDirection>('DOWN');
+  const initialNodes: MyNodeData[] = getInitialNodes();
+  const _edges: EdgeData<any>[] = getInitialEdges();
 
-  const myZoomIn = () => {
-    const canvas = canvasRef.current!;
-    console.log("myZoomIn");
-    if (canvas.zoomIn) {
-      canvas.zoomIn();
-    }
-  }
-
-  const myZoomOut = () => {
-    const canvas = canvasRef.current!;
-    console.log("myZoomOut");
-    if (canvas.zoomOut) {
-      canvas.zoomOut();
-    }
-  }
-
-  const myFitToWindow = () => {
-    console.log("myFitToWindow");
-  }
-
-  const toggleOrientation = useCallback(() => {
-    const canvas = canvasRef.current!;
-    setLROrientation(!lrOrientation);
-    setDirection(lrOrientation ? 'RIGHT' : 'DOWN');
-  }, [lrOrientation]);
-
-  const rosLogoURL = 'https://raw.githubusercontent.com/mjeronimo/studio/a802e32713b70509f49247c7dae817231ab9ec57/packages/studio-base/src/panels/SystemView/assets/ros_logo.svg';
-  const wirelessURL = 'https://raw.githubusercontent.com/mjeronimo/studio/develop/packages/studio-base/src/panels/SystemView/assets/wireless.svg';
-
-  const initialNodes: MyNodeData[] = [
-    {
-      id: '3', text: '/stereo_camera_controller',
-      visible: true,
-      type: 'node',
-      icon: {
-        url: rosLogoURL,
-        height: 25,
-        width: 25,
-      },
-    },
-    {
-      id: '2', text: '/left/image_raw',
-      visible: true,
-      type: 'topic',
-      icon: {
-        url: wirelessURL,
-        height: 25,
-        width: 25
-      },
-    },
-    {
-      id: '4', text: '/right/image_raw',
-      visible: true,
-      type: 'topic',
-      icon: {
-        url: wirelessURL,
-        height: 25,
-        width: 25
-      },
-    },
-    {
-      id: '5', text: '/image_adjuster_left_stereo',
-      visible: true,
-      type: 'node',
-      icon: {
-        url: rosLogoURL,
-        height: 25,
-        width: 25
-      }
-    },
-    {
-      id: '7', text: '/image_adjuster_right_stereo',
-      visible: true,
-      type: 'node',
-      icon: {
-        url: rosLogoURL,
-        height: 25,
-        width: 25
-      }
-    },
-    {
-      id: '8', text: '/disparity_node',
-      visible: true,
-      type: 'node',
-      icon: {
-        url: rosLogoURL,
-        height: 25,
-        width: 25
-      }
-    },
-    {
-      id: '9', text: '/point_cloud_node',
-      visible: true,
-      type: 'node',
-      icon: {
-        url: rosLogoURL,
-        height: 25,
-        width: 25
-      }
-    },
-    {
-      id: '10', text: '/left/image_raw/adjusted_stereo',
-      visible: true,
-      type: 'topic',
-      icon: {
-        url: wirelessURL,
-        height: 25,
-        width: 25
-      }
-    },
-    {
-      id: '11', text: '/right/image_raw/adjusted_stereo',
-      visible: true,
-      type: 'topic',
-      icon: {
-        url: wirelessURL,
-        height: 25,
-        width: 25
-      }
-    },
-    {
-      id: '12', text: '/disparity',
-      visible: true,
-      type: 'topic',
-      icon: {
-        url: wirelessURL,
-        height: 25,
-        width: 25
-      }
-    },
-    {
-      id: '13', text: '/points2',
-      visible: true,
-      type: 'topic',
-      icon: {
-        url: wirelessURL,
-        height: 25,
-        width: 25
-      }
-    },
-  ]
-
-  const edges: EdgeData<any>[] = [
+  //const edges: EdgeData<any>[] = [
+  const initialEdges: EdgeData<any>[] = [
     { id: 'e3-4', from: '3', to: '4', text: '10 Hz' },
     { id: 'e3-2', from: '3', to: '2', text: '11 Hz' },
     { id: 'e4-7', from: '4', to: '7', text: '12 Hz' },
@@ -204,8 +63,30 @@ const SystemViewPanel = React.memo(({}: Props) => {
     { id: 'e9-13', from: '9', to: '13', text: '21 Hz' },
   ]
 
+  const [lrOrientation, setLROrientation] = useState<boolean>(true);
+  const [direction, setDirection] = useState<CanvasDirection>('DOWN');
   const [selections, setSelections] = useState<string[]>([]);
   const [nodes, setNodes] = useState<MyNodeData[]>(initialNodes);
+  const [edges, setEdges] = useState<EdgeData[]>(initialEdges);
+
+  const myZoomIn = () => {
+    const canvas = canvasRef.current!;
+    if (canvas.zoomIn) {
+      canvas.zoomIn();
+    }
+  }
+
+  const myZoomOut = () => {
+    const canvas = canvasRef.current!;
+    if (canvas.zoomOut) {
+      canvas.zoomOut();
+    }
+  }
+
+  const toggleOrientation = useCallback(() => {
+    setLROrientation(!lrOrientation);
+    setDirection(lrOrientation ? 'RIGHT' : 'DOWN');
+  }, [lrOrientation]);
 
   return (
     <Stack verticalFill>
@@ -226,10 +107,10 @@ const SystemViewPanel = React.memo(({}: Props) => {
         onClick={() => setNodes([...nodes, {
           id: `a${Math.random()}`,
           visible: true,
-          type: 'node',
+          type: NodeType.NODE,
           text: `/node-${Math.random().toFixed(4)}`,
           icon: {
-            url: rosLogoURL,
+            url: 'https://raw.githubusercontent.com/mjeronimo/studio/a802e32713b70509f49247c7dae817231ab9ec57/packages/studio-base/src/panels/SystemView/assets/ros_logo.svg',
             height: 25,
             width: 25
           }
@@ -251,7 +132,15 @@ const SystemViewPanel = React.memo(({}: Props) => {
         >
           {({ zoomIn, zoomOut, resetTransform, centerView, ...rest }) => (
             <React.Fragment>
-              <SystemViewToolbar nodes={nodes} edges={edges} lrOrientation={lrOrientation} zoomIn={myZoomIn} zoomOut={myZoomOut} toggleOrientation={toggleOrientation} fitToWindow={resetTransform} />
+              <SystemViewToolbar
+                nodes={nodes}
+                edges={edges}
+                lrOrientation={lrOrientation}
+                zoomIn={myZoomIn}
+                zoomOut={myZoomOut}
+                toggleOrientation={toggleOrientation}
+                fitToWindow={resetTransform}
+              />
               <TransformComponent>
                 <div>
                   <style>
@@ -315,22 +204,28 @@ const SystemViewPanel = React.memo(({}: Props) => {
                         icon={<Icon />}
                         linkable={false}
                         onClick={(event, node) => {
-                          console.log('Selecting Node', event, node);
                           setSelections([node.id]);
                         }}
                         onRemove={(event, node) => {
-                          console.log('Removing Node', event, node);
-                          // const result = removeNode(nodes, edges, node.id);
-                          // setEdges(result.edges);
-                          // setNodes(result.nodes);
+                          (node as MyNodeData).visible = false;
                           setSelections([]);
+
+                          const visibleNodes: MyNodeData[] = [];
+                          nodes.forEach(function (node): void {
+                          if (node.visible) {
+                              visibleNodes.push(node);
+                            }
+                          });
+
+                          const result = removeNode(nodes, edges, node.id);
+
+                          setNodes(result.nodes);
+                          setEdges(result.edges);
                         }}
                       />
                     }
-                    edge={<Edge
-                      className="edge" />}
+                    edge={<Edge className="edge" />}
                     onCanvasClick={(event) => {
-                      console.log('Canvas Clicked', event);
                       setSelections([]);
                     }}
                     onLayoutChange={layout => console.log('Layout', layout)} >

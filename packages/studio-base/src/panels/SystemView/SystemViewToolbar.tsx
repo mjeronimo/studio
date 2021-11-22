@@ -41,7 +41,7 @@ import Minus from "@mdi/svg/svg/minus.svg";
 import Plus from "@mdi/svg/svg/plus.svg";
 import SelectionIcon from "@mdi/svg/svg/checkbox-multiple-marked-outline.svg";
 
-export type ToolbarProps = {
+export type Props = {
   nodes: MyNodeData[]
   edges: EdgeData[]
   lrOrientation: boolean
@@ -51,7 +51,7 @@ export type ToolbarProps = {
   fitToWindow: () => void
 };
 
-export default function SystemViewToolbar(props: ToolbarProps): JSX.Element {
+export default function SystemViewToolbar(props: Props): JSX.Element {
 
   let defaultSelectedTab: string | undefined;
   const [selectedTab, setSelectedTab] = React.useState(defaultSelectedTab);
@@ -66,7 +66,7 @@ export default function SystemViewToolbar(props: ToolbarProps): JSX.Element {
   };
 
   const [selectedId, setSelectedId] = React.useState(GroupingOptions.third.id);
-  const optionArr: Option[] = Object.values(GroupingOptions);
+  const optionArray: Option[] = Object.values(GroupingOptions);
 
   return (
     <Toolbar>
@@ -88,7 +88,7 @@ export default function SystemViewToolbar(props: ToolbarProps): JSX.Element {
           <>
             <br />
             <SegmentedControl
-              options={optionArr}
+              options={optionArray}
               selectedId={selectedId}
               onChange={(newId) => setSelectedId(newId)}
             />
@@ -111,7 +111,7 @@ export default function SystemViewToolbar(props: ToolbarProps): JSX.Element {
         <ToolGroup name={"Node List"}>
           <NodeList nodes={props.nodes} edges={props.edges} />
         </ToolGroup>
-        <ToolGroup name={"Node List Options"}>
+        <ToolGroup name={"Options"}>
           <>
             <Checkbox
               label="Include hidden nodes"
@@ -125,7 +125,6 @@ export default function SystemViewToolbar(props: ToolbarProps): JSX.Element {
             />
           </>
         </ToolGroup>
-
       </ExpandingToolbar>
       <div className={styles.buttons}>
         <Button className={styles.iconButton} tooltip="Change graph orientation" onClick={props.toggleOrientation}>
