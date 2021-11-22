@@ -35,7 +35,7 @@ import { NodeList } from "./NodeList";
 // MDI icons
 import ArrowLeftRightIcon from "@mdi/svg/svg/arrow-left-right.svg";
 import ArrowUpDownIcon from "@mdi/svg/svg/arrow-up-down.svg";
-import FitToPageIcon from "@mdi/svg/svg/fit-to-page-outline.svg";
+import FitToPageIcon from "./assets/icons/fitview.svg";
 import GroupIcon from "@mdi/svg/svg/group.svg";
 import Minus from "@mdi/svg/svg/minus.svg";
 import Plus from "@mdi/svg/svg/plus.svg";
@@ -134,14 +134,6 @@ export default function SystemViewToolbar(props: Props): JSX.Element {
         </Button>
       </div>
       <div className={styles.buttons}>
-        <Button className={styles.iconButton} tooltip="Fit graph to window" onClick={() => {
-          props.fitToWindow()
-        }
-        }>
-          <FoxgloveIcon style={{ color: "white" }} size="small">
-            <FitToPageIcon />
-          </FoxgloveIcon>
-        </Button>
         <Button className={styles.iconButton} tooltip="Zoom in" onClick={() => {
           props.zoomIn();
         }
@@ -156,6 +148,14 @@ export default function SystemViewToolbar(props: Props): JSX.Element {
         }>
           <FoxgloveIcon style={{ color: "white" }} size="small">
             <Minus />
+          </FoxgloveIcon>
+        </Button>
+        <Button className={styles.iconButton} tooltip="Fit graph to window" onClick={() => {
+          props.fitToWindow()
+        }
+        }>
+          <FoxgloveIcon style={{ color: "white" }} size="small">
+            <FitToPageIcon />
           </FoxgloveIcon>
         </Button>
       </div>
