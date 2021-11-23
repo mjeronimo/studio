@@ -24,12 +24,8 @@ import FoxgloveIcon from "@foxglove/studio-base/components/Icon";
 import SegmentedControl, { Option } from "@foxglove/studio-base/components/SegmentedControl";
 import styles from "@foxglove/studio-base/panels/ThreeDimensionalViz/sharedStyles";
 
-// Reaflow
-import { EdgeData } from 'reaflow';
-
 // SystemView
 import Toolbar from "./Toolbar";
-import { MyNodeData } from "./MyNodeData";
 import { NodeList } from "./NodeList";
 
 // MDI icons
@@ -42,13 +38,13 @@ import Plus from "@mdi/svg/svg/plus.svg";
 import SelectionIcon from "@mdi/svg/svg/checkbox-multiple-marked-outline.svg";
 
 export type Props = {
-  nodes: MyNodeData[]
-  edges: EdgeData[]
-  lrOrientation: boolean
-  zoomIn: () => void
-  zoomOut: () => void
-  toggleOrientation: () => void
-  fitToWindow: () => void
+  nodes: any[]
+  edges: any[]
+  lrOrientation?: boolean
+  zoomIn?: () => void
+  zoomOut?: () => void
+  toggleOrientation?: () => void
+  fitToWindow?: () => void
 };
 
 export default function SystemViewToolbar(props: Props): JSX.Element {
@@ -135,7 +131,7 @@ export default function SystemViewToolbar(props: Props): JSX.Element {
       </div>
       <div className={styles.buttons}>
         <Button className={styles.iconButton} tooltip="Zoom in" onClick={() => {
-          props.zoomIn();
+          props.zoomIn?.();
         }
         }>
           <FoxgloveIcon style={{ color: "white" }} size="small">
@@ -143,7 +139,7 @@ export default function SystemViewToolbar(props: Props): JSX.Element {
           </FoxgloveIcon>
         </Button>
         <Button className={styles.iconButton} tooltip="Zoom out" onClick={() => {
-          props.zoomOut();
+          props.zoomOut?.();
         }
         }>
           <FoxgloveIcon style={{ color: "white" }} size="small">
@@ -151,7 +147,7 @@ export default function SystemViewToolbar(props: Props): JSX.Element {
           </FoxgloveIcon>
         </Button>
         <Button className={styles.iconButton} tooltip="Fit graph to window" onClick={() => {
-          props.fitToWindow()
+          props.fitToWindow?.()
         }
         }>
           <FoxgloveIcon style={{ color: "white" }} size="small">

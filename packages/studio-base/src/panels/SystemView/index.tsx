@@ -78,6 +78,7 @@ function SystemViewPanel(props: Props) {
             <button onClick={() => onLayout('RIGHT')}>horizontal layout</button>
           </div>
         </ReactFlowProvider>
+        <SystemViewToolbar edges={[]} nodes={[]} />
       </div>
     )
     }</>

@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import { storiesOf } from "@storybook/react";
-import { EdgeData } from 'reaflow';
 import MockPanelContextProvider from "@foxglove/studio-base/components/MockPanelContextProvider";
 import SystemViewToolbar from "./SystemViewToolbar";
 import { MyNodeData, NodeType } from "./MyNodeData";
