@@ -13,238 +13,80 @@
 // limitations under the License.
 
 // React
-import React, { useState, useCallback } from "react";
-
-// FluentUI
-import { Stack } from "@fluentui/react";
+import React, { useState, useEffect, useCallback } from 'react';
 
 // Foxglove
 import Panel from "@foxglove/studio-base/components/Panel";
-import PanelToolbar from "@foxglove/studio-base/components/PanelToolbar";
-import sendNotification from "@foxglove/studio-base/util/sendNotification";
 import { SaveConfig } from "@foxglove/studio-base/types/panels";
 
-// Reaflow
-import { Canvas, CanvasDirection, CanvasRef, Node, Edge, EdgeData, Icon, removeNode } from 'reaflow';
-
-// react-zoom-pan-pinch
-import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+// ReactFlow
+import ReactFlow, { ReactFlowProvider, Elements, Background, useZoomPanHelper } from 'react-flow-renderer';
 
 // SystemView
-import helpContent from "./index.help.md";
-import { getInitialNodes, getInitialEdges, MyNodeData, NodeType } from "./MyNodeData";
+import initialElements from './initial-elements';
+import { createGraphLayout } from "./layout";
+import './layouting.css';
+import SizeToolbar from "./SizeToolbar";
 import SystemViewToolbar from "./SystemViewToolbar";
-
-const canvasRef = React.createRef<CanvasRef>();
 
 type Props = {
   config: unknown;
   saveConfig: SaveConfig<unknown>;
-};
+}
 
-const SystemViewPanel = React.memo(({}: Props) => {
+function SystemViewPanel(props: Props) {
 
-  const initialNodes: MyNodeData[] = getInitialNodes();
-  const _edges: EdgeData<any>[] = getInitialEdges();
+  const { config, saveConfig } = props
+  const [elements, setElements] = useState<Elements>(initialElements)
 
-  //const edges: EdgeData<any>[] = [
-  const initialEdges: EdgeData<any>[] = [
-    { id: 'e3-4', from: '3', to: '4', text: '10 Hz' },
-    { id: 'e3-2', from: '3', to: '2', text: '11 Hz' },
-    { id: 'e4-7', from: '4', to: '7', text: '12 Hz' },
-    { id: 'e2-5', from: '2', to: '5', text: '13 Hz' },
-    { id: 'e7-11', from: '7', to: '11', text: '14 Hz' },
-    { id: 'e10-8', from: '10', to: '8', text: '17 Hz' },
-    { id: 'e10-9', from: '10', to: '9', text: '18 Hz' },
-    { id: 'e5-10', from: '5', to: '10', text: '15 Hz' },
-    { id: 'e11-8', from: '11', to: '8', text: '16 Hz' },
-    { id: 'e12-9', from: '12', to: '9', text: '20 Hz' },
-    { id: 'e8-12', from: '8', to: '12', text: '19 Hz' },
-    { id: 'e9-13', from: '9', to: '13', text: '21 Hz' },
-  ]
+  useEffect(() => {
+    createGraphLayout(initialElements)
+      .then(els => {
+        setElements(els)
+        // const { project } = useZoomPanHelper();
+        // console.log(project);
+      })
+      .catch(err => console.error(err))
+  }, [])
 
-  const [lrOrientation, setLROrientation] = useState<boolean>(true);
-  const [direction, setDirection] = useState<CanvasDirection>('DOWN');
-  const [selections, setSelections] = useState<string[]>([]);
-  const [nodes, setNodes] = useState<MyNodeData[]>(initialNodes);
-  const [edges, setEdges] = useState<EdgeData[]>(initialEdges);
-
-  const myZoomIn = () => {
-    const canvas = canvasRef.current!;
-    if (canvas.zoomIn) {
-      canvas.zoomIn();
-    }
-  }
-
-  const myZoomOut = () => {
-    const canvas = canvasRef.current!;
-    if (canvas.zoomOut) {
-      canvas.zoomOut();
-    }
-  }
-
-  const toggleOrientation = useCallback(() => {
-    setLROrientation(!lrOrientation);
-    setDirection(lrOrientation ? 'RIGHT' : 'DOWN');
-  }, [lrOrientation]);
+  const onLayout = useCallback(
+    (direction: any) => {
+      createGraphLayout(elements, direction)
+        .then(els => setElements(els))
+        .catch(err => console.error(err))
+    },
+    [elements]
+  );
 
   return (
-    <Stack verticalFill>
-      <PanelToolbar helpContent={helpContent} floating />
-      <button
-        style={{ position: 'absolute', top: 40, left: 10, zIndex: 999 }}
-        onClick={() => sendNotification(
-          "There are two nodes with the same name",
-          "These are the details of the message",
-          "user",
-          "error",
-        )}
-      >
-        Send Info
-      </button>
-      <button
-        style={{ position: 'absolute', top: 10, left: 10, zIndex: 999 }}
-        onClick={() => setNodes([...nodes, {
-          id: `a${Math.random()}`,
-          visible: true,
-          type: NodeType.NODE,
-          text: `/node-${Math.random().toFixed(4)}`,
-          icon: {
-            url: 'https://raw.githubusercontent.com/mjeronimo/studio/a802e32713b70509f49247c7dae817231ab9ec57/packages/studio-base/src/panels/SystemView/assets/ros_logo.svg',
-            height: 25,
-            width: 25
-          }
-        }])}
-      >
-        Add Node
-      </button>
-
-      <Stack grow>
-        <TransformWrapper
-          wheel={{ step: 0.1 }}
-          pinch={{ step: 5 }}
-          doubleClick={{ step: 0.5 }}
-          minScale={0.2}
-          centerOnInit={true}
-          centerZoomedOut={false}
-          panning={{ velocityDisabled: true }}
-          limitToBounds={false}
-        >
-          {({ zoomIn, zoomOut, resetTransform, centerView, ...rest }) => (
-            <React.Fragment>
-              <SystemViewToolbar
-                nodes={nodes}
-                edges={edges}
-                lrOrientation={lrOrientation}
-                zoomIn={myZoomIn}
-                zoomOut={myZoomOut}
-                toggleOrientation={toggleOrientation}
-                fitToWindow={resetTransform}
-              />
-              <TransformComponent>
-                <div>
-                  <style>
-                    {`
-                      // Colors
-                      $bg-color: hsl(256,33,10);
-                      $dot-color: hsl(256,33,70);
-
-                      // Dimensions
-                      $dot-size: 1px;
-                      $dot-space: 22px;
-
-                      .foobar2 {
-                          //background-color: grey;
-                          // background-image: repeating-radial-gradient(red, yellow 10%, green 15%);
-                          //background-image: repeating-radial-gradient(top center,rgba(255,255,255,.2),rgba(255,255,255,.2) 4px,transparent 0,transparent 100%);
-                      }
-                      .foobar {
-                          background-color: #403366;
-                          //background:
-                            //linear-gradient(90deg, $bg-color ($dot-space - $dot-size), transparent 1%) center,
-                            //linear-gradient($bg-color ($dot-space - $dot-size), transparent 1%) center, $dot-color;
-                          //background-size: $dot-space $dot-space;
-                      }
-                      .edge {
-                        stroke: #b1b1b7;
-                        stroke-dasharray: 5;
-                        animation: dashdraw .5s linear infinite;
-                        stroke-width: 1;
-                      }
-                      @keyframes dashdraw {
-                        0% { stroke-dashoffset: 10; }
-                        .dragger {
-                          z-index: 999;
-                          pointer-events: none;
-                          user-select: none;
-                          cursor: grabbing;
-                          height: 70px;
-                          width: 150px;
-                        }
-                      }
-                    `}
-                  </style>
-                  <Canvas
-                    className={"foobar"}
-                    ref={canvasRef}
-                    zoomable={false}
-                    fit={false}
-                    direction={direction}
-                    center={false}
-                    maxWidth={5000}
-                    maxHeight={5000}
-                    nodes={nodes}
-                    edges={edges}
-                    selections={selections}
-                    node={
-                      <Node
-                        style={{
-                          boxShadow: "10px 10px 8px #ff0000",
-                        }}
-                        icon={<Icon />}
-                        linkable={false}
-                        onClick={(event, node) => {
-                          setSelections([node.id]);
-                        }}
-                        onRemove={(event, node) => {
-                          (node as MyNodeData).visible = false;
-                          setSelections([]);
-
-                          const visibleNodes: MyNodeData[] = [];
-                          nodes.forEach(function (node): void {
-                          if (node.visible) {
-                              visibleNodes.push(node);
-                            }
-                          });
-
-                          const result = removeNode(nodes, edges, node.id);
-
-                          setNodes(result.nodes);
-                          setEdges(result.edges);
-                        }}
-                      />
-                    }
-                    edge={<Edge className="edge" />}
-                    onCanvasClick={(event) => {
-                      setSelections([]);
-                    }}
-                    onLayoutChange={layout => console.log('Layout', layout)} >
-                  </Canvas>
-                </div>
-              </TransformComponent>
-            </React.Fragment>
-          )}
-        </TransformWrapper>
-      </Stack>
-    </Stack>
-  );
-});
+    <>{!elements ? (
+        <p>Loading ...</p>
+    ) : (
+      <div className="layoutflow">
+        <ReactFlowProvider>
+          <ReactFlow
+            elements={elements}
+            snapToGrid={true}
+            snapGrid={[15,15]}
+            // {...otherProps}
+          >
+            <Background color="#aaa" gap={16} />
+            <SizeToolbar />
+          </ReactFlow>
+          <div className="controls">
+            <button onClick={() => onLayout('DOWN')}>vertical layout</button>
+            <button onClick={() => onLayout('RIGHT')}>horizontal layout</button>
+          </div>
+        </ReactFlowProvider>
+      </div>
+    )
+    }</>
+  )
+};
 
 SystemViewPanel.displayName = "SystemView";
+SystemViewPanel.panelType = "SystemView";
+SystemViewPanel.defaultConfig = {};
+SystemViewPanel.supportsStrictMode = false;
 
-export default Panel(
-  Object.assign(SystemViewPanel, {
-    defaultConfig: {},
-    panelType: "SystemView",
-  }),
-);
+export default Panel(SystemViewPanel);

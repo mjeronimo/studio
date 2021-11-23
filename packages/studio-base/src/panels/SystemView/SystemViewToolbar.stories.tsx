@@ -78,7 +78,7 @@ const nodes: MyNodeData[] = [
 const SystemViewToolbarWrapper = (props: any) => (
   <div style={containerStyle}>
     <MockPanelContextProvider>
-      <SystemViewToolbar 
+      <SystemViewToolbar
         nodes={nodes}
         edges={[]}
         lrOrientation={true}

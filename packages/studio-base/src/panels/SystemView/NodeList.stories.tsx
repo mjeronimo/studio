@@ -141,7 +141,7 @@ const containerStyle = {
 const NodeListWrapper = (props: any) => (
   <div style={containerStyle}>
     <MockPanelContextProvider>
-      <NodeList 
+      <NodeList
         nodes={nodes}
         edges={[]}
       />

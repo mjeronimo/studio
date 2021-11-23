@@ -61,17 +61,17 @@ export interface INodeListState {
   selectionDetails: string;
 }
 
-interface NodeListProps {
+interface Props {
   nodes: MyNodeData[]
   edges: EdgeData<any>[]
 }
 
-export class NodeList extends React.Component<NodeListProps, INodeListState> {
+export class NodeList extends React.Component<Props, INodeListState> {
   private _selection: Selection;
   private _allItems: INodeListItem[];
   private _columns: IColumn[];
 
-  constructor(props: NodeListProps) {
+  constructor(props: Props) {
     super(props);
 
     this._selection = new Selection({
