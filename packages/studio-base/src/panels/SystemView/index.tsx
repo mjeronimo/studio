@@ -20,14 +20,14 @@ import Panel from "@foxglove/studio-base/components/Panel";
 import { SaveConfig } from "@foxglove/studio-base/types/panels";
 
 // ReactFlow
-import ReactFlow, { ReactFlowProvider, Elements, Background, useZoomPanHelper } from 'react-flow-renderer';
+import ReactFlow, { ReactFlowProvider, Elements, Background } from 'react-flow-renderer';
 
 // SystemView
 import initialElements from './initial-elements';
 import { createGraphLayout } from "./layout";
-import './layouting.css';
-import SizeToolbar from "./SizeToolbar";
 import { SystemViewToolbar } from "./SystemViewToolbar";
+import SizeToolbar from "./SizeToolbar";
+import './layouting.css';
 
 type Props = {
   config: unknown;
@@ -39,14 +39,11 @@ const SystemViewPanel = (props: Props) => {
 
   const { config, saveConfig } = props
   const [elements, setElements] = useState<Elements>(initialElements)
-  // const { zoomIn } = useZoomPanHelper();
 
   useEffect(() => {
     createGraphLayout(initialElements)
       .then(els => {
         setElements(els)
-        // const { project } = useZoomPanHelper();
-        // console.log(project);
       })
       .catch(err => console.error(err))
   }, [])
@@ -73,19 +70,18 @@ const SystemViewPanel = (props: Props) => {
           <ReactFlow
             elements={elements}
             snapToGrid={true}
-            snapGrid={[15,15]}
-            // {...otherProps}
+            snapGrid={[15, 15]}
+          // {...otherProps}
           >
             <Background color="#aaa" gap={16} />
-            <SizeToolbar />
           </ReactFlow>
+          <SystemViewToolbar
+            nodes={elements}
+            edges={[]}
+            lrOrientation={true}
+            onToggleOrientation={toggleOrientation}
+          />
         </ReactFlowProvider>
-        <SystemViewToolbar
-          nodes={elements} 
-          edges={[]} 
-          lrOrientation={true} 
-          onToggleOrientation={toggleOrientation} 
-        />
       </div>
     )
     }</>

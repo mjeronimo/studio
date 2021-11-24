@@ -32,10 +32,7 @@ import SizeToolbar from "./SizeToolbar";
 // MDI icons
 import ArrowLeftRightIcon from "@mdi/svg/svg/arrow-left-right.svg";
 import ArrowUpDownIcon from "@mdi/svg/svg/arrow-up-down.svg";
-import FitToPageIcon from "./assets/icons/fitview.svg";
 import GroupIcon from "@mdi/svg/svg/group.svg";
-import MinusIcon from "@mdi/svg/svg/minus.svg";
-import PlusIcon from "@mdi/svg/svg/plus.svg";
 import SelectionIcon from "@mdi/svg/svg/checkbox-multiple-marked-outline.svg";
 
 export type Props = {
@@ -49,7 +46,6 @@ export type Props = {
 };
 
 // export default function SystemViewToolbar(props: Props): JSX.Element {
-
 export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
 
   const [lrOrientation, setLROrientation] = useState<boolean>(props.lrOrientation);
@@ -127,6 +123,7 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
           </>
         </ToolGroup>
       </ExpandingToolbar>
+
       <div className={styles.buttons}>
         <Button className={styles.iconButton} tooltip="Change graph orientation" onClick={
         () => {
@@ -137,6 +134,10 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
             {lrOrientation ? <ArrowLeftRightIcon /> : <ArrowUpDownIcon />}
           </FoxgloveIcon>
         </Button>
+      </div>
+
+      <div className={styles.buttons}>
+      <SizeToolbar />
       </div>
     </Toolbar>
   );

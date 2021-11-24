@@ -63,6 +63,15 @@ const initialElements: Elements = [
     targetPosition: Position.Top,
     style: { width: 175, height: 40 },
   },
+  {
+    id: '6',
+    isHidden: false,
+    data: { label: '_a_hidden_node' },
+    position,
+    sourcePosition: Position.Bottom,
+    targetPosition: Position.Top,
+    style: { width: 175, height: 40 },
+  },
 
   // Edges
   { 
