@@ -15,111 +15,7 @@
 import { storiesOf } from "@storybook/react";
 import MockPanelContextProvider from "@foxglove/studio-base/components/MockPanelContextProvider";
 import { NodeList } from "./NodeList";
-
-const rosLogoURL = 'https://raw.githubusercontent.com/mjeronimo/studio/a802e32713b70509f49247c7dae817231ab9ec57/packages/studio-base/src/panels/SystemView/assets/ros_logo.svg';
-const wirelessURL = 'https://raw.githubusercontent.com/mjeronimo/studio/develop/packages/studio-base/src/panels/SystemView/assets/wireless.svg';
-
-const nodes: any[] = [
-  {
-    id: '3', text: '/stereo_camera_controller',
-    isHidden: false,
-    icon: {
-      url: rosLogoURL,
-      height: 25,
-      width: 25,
-    },
-  },
-  {
-    id: '2', text: '/left/image_raw',
-    isHidden: false,
-    icon: {
-      url: wirelessURL,
-      height: 25,
-      width: 25
-    },
-  },
-  {
-    id: '4', text: '/right/image_raw',
-    isHidden: false,
-    icon: {
-      url: wirelessURL,
-      height: 25,
-      width: 25
-    },
-  },
-  {
-    id: '5', text: '/image_adjuster_left_stereo',
-    isHidden: false,
-    icon: {
-      url: rosLogoURL,
-      height: 25,
-      width: 25
-    }
-  },
-  {
-    id: '7', text: '/image_adjuster_right_stereo',
-    isHidden: false,
-    icon: {
-      url: rosLogoURL,
-      height: 25,
-      width: 25
-    }
-  },
-  {
-    id: '8', text: '/disparity_node',
-    isHidden: false,
-    icon: {
-      url: rosLogoURL,
-      height: 25,
-      width: 25
-    }
-  },
-  {
-    id: '9', text: '/point_cloud_node',
-    isHidden: false,
-    icon: {
-      url: rosLogoURL,
-      height: 25,
-      width: 25
-    }
-  },
-  {
-    id: '10', text: '/left/image_raw/adjusted_stereo',
-    isHidden: false,
-    icon: {
-      url: wirelessURL,
-      height: 25,
-      width: 25
-    }
-  },
-  {
-    id: '11', text: '/right/image_raw/adjusted_stereo',
-    isHidden: false,
-    icon: {
-      url: wirelessURL,
-      height: 25,
-      width: 25
-    }
-  },
-  {
-    id: '12', text: '/disparity',
-    isHidden: false,
-    icon: {
-      url: wirelessURL,
-      height: 25,
-      width: 25
-    }
-  },
-  {
-    id: '13', text: '/points2',
-    isHidden: false,
-    icon: {
-      url: wirelessURL,
-      height: 25,
-      width: 25
-    }
-  },
-]
+import initialElements from './initial-elements';
 
 const containerStyle = {
   margin: 8,
@@ -130,7 +26,7 @@ const NodeListWrapper = (props: any) => (
   <div style={containerStyle}>
     <MockPanelContextProvider>
       <NodeList
-        nodes={nodes}
+        nodes={initialElements}
         edges={[]}
       />
     </MockPanelContextProvider>

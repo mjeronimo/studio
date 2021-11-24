@@ -13,8 +13,10 @@
 // limitations under the License.
 
 import { storiesOf } from "@storybook/react";
+import { ReactFlowProvider } from 'react-flow-renderer';
+import { SystemViewToolbar } from "./SystemViewToolbar";
 import MockPanelContextProvider from "@foxglove/studio-base/components/MockPanelContextProvider";
-import SystemViewToolbar from "./SystemViewToolbar";
+import initialElements from './initial-elements';
 
 const containerStyle = {
   margin: 8,
@@ -29,8 +31,13 @@ const zoomOut = () => {
   console.log("zoomOut");
 }
 
-const fitToWindow = () => {
-  console.log("fitToWindow");
+const fitView = () => {
+  console.log("fitView");
+}
+
+const interactiveChange = (isInteractive: boolean) => {
+  console.log("interactiveChange: isInteractive");
+  console.log(isInteractive);
 }
 
 const toggleOrientation = (lrOrientation: boolean) => {
@@ -38,51 +45,21 @@ const toggleOrientation = (lrOrientation: boolean) => {
   console.log(lrOrientation);
 }
 
-const rosLogoURL = 'https://raw.githubusercontent.com/mjeronimo/studio/a802e32713b70509f49247c7dae817231ab9ec57/packages/studio-base/src/panels/SystemView/assets/ros_logo.svg';
-const wirelessURL = 'https://raw.githubusercontent.com/mjeronimo/studio/develop/packages/studio-base/src/panels/SystemView/assets/wireless.svg';
-
-const nodes: any[] = [
-  {
-    id: '1', text: '/stereo_camera_controller',
-    visible: true,
-    icon: {
-      url: rosLogoURL,
-      height: 25,
-      width: 25,
-    },
-  },
-  {
-    id: '2', text: '/left/image_raw',
-    visible: true,
-    icon: {
-      url: wirelessURL,
-      height: 25,
-      width: 25
-    },
-  },
-  {
-    id: '3', text: '/right/image_raw',
-    visible: true,
-    icon: {
-      url: wirelessURL,
-      height: 25,
-      width: 25
-    },
-  },
-];
-
 const SystemViewToolbarWrapper = (props: any) => (
   <div style={containerStyle}>
     <MockPanelContextProvider>
-      <SystemViewToolbar
-        nodes={nodes}
-        edges={[]}
-        lrOrientation={true}
-        onZoomIn={zoomIn}
-        onZoomOut={zoomOut}
-        onToggleOrientation={toggleOrientation}
-        onFitToWindow={fitToWindow}
-      />
+      <ReactFlowProvider>
+        <SystemViewToolbar
+          nodes={initialElements}
+          edges={[]}
+          lrOrientation={true}
+          onZoomIn={zoomIn}
+          onZoomOut={zoomOut}
+          onInteractiveChange={interactiveChange}
+          onToggleOrientation={toggleOrientation}
+          onFitview={fitView}
+        />
+      </ReactFlowProvider>
     </MockPanelContextProvider>
   </div>
 );

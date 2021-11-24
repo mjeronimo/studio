@@ -27,9 +27,6 @@ import { mergeStyles } from '@fluentui/react/lib/Styling';
 // Foxglove Studio
 import Icon from "@foxglove/studio-base/components/Icon";
 
-// reaflow
-import { NodeData, EdgeData } from 'reaflow';
-
 // MDI Icons
 import SelectAllIcon from "@mdi/svg/svg/format-list-bulleted-square.svg";
 import SelectNoneIcon from "@mdi/svg/svg/format-list-checkbox.svg";

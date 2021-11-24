@@ -26,7 +26,6 @@ import ReactFlow, { ReactFlowProvider, Elements, Background } from 'react-flow-r
 import initialElements from './initial-elements';
 import { createGraphLayout } from "./layout";
 import { SystemViewToolbar } from "./SystemViewToolbar";
-import SizeToolbar from "./SizeToolbar";
 import './layouting.css';
 
 type Props = {
@@ -34,7 +33,6 @@ type Props = {
   saveConfig: SaveConfig<unknown>;
 }
 
-// function SystemViewPanel(props: Props) {
 const SystemViewPanel = (props: Props) => {
 
   const { config, saveConfig } = props
@@ -71,7 +69,7 @@ const SystemViewPanel = (props: Props) => {
             elements={elements}
             snapToGrid={true}
             snapGrid={[15, 15]}
-          // {...otherProps}
+          //{...otherProps}
           >
             <Background color="#aaa" gap={16} />
           </ReactFlow>

@@ -34,14 +34,12 @@ import { NodeList } from "./NodeList";
 // MDI icons
 import ArrowLeftRightIcon from "@mdi/svg/svg/arrow-left-right.svg";
 import ArrowUpDownIcon from "@mdi/svg/svg/arrow-up-down.svg";
-import GroupIcon from "@mdi/svg/svg/group.svg";
-import SelectionIcon from "@mdi/svg/svg/checkbox-multiple-marked-outline.svg";
-
-// MDI icons
 import FitviewIcon from "./assets/icons/fitview.svg";
+import GroupIcon from "@mdi/svg/svg/group.svg";
+import LockIcon from "@mdi/svg/svg/lock-outline.svg";
 import MinusIcon from "@mdi/svg/svg/minus.svg";
 import PlusIcon from "@mdi/svg/svg/plus.svg";
-import LockIcon from "@mdi/svg/svg/lock-outline.svg";
+import SelectionIcon from "@mdi/svg/svg/checkbox-multiple-marked-outline.svg";
 import UnlockIcon from "@mdi/svg/svg/lock-open-variant-outline.svg";
 
 export type Props = {
@@ -79,6 +77,11 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
   const setInteractive = useStoreActions((actions) => actions.setInteractive);
   const isInteractive = useStoreState((s) => s.nodesDraggable && s.nodesConnectable && s.elementsSelectable);
 
+  const onToggleOrientation = useCallback(() => {
+    setLROrientation(!lrOrientation);
+    props.onToggleOrientation?.(lrOrientation);
+  }, [lrOrientation, props.onToggleOrientation]);
+
   const onZoomInHandler = useCallback(() => {
     zoomIn?.();
     props.onZoomIn?.();
@@ -95,8 +98,6 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
   }, [fitView, props.fitViewParams, props.onFitview]);
 
   const onInteractiveChangeHandler = useCallback(() => {
-    console.log("onInteractiveChangeHandler");
-    console.log(isInteractive);
     setInteractive?.(!isInteractive);
     props.onInteractiveChange?.(!isInteractive);
   }, [isInteractive, setInteractive, props.onInteractiveChange]);
@@ -159,19 +160,13 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
           </>
         </ToolGroup>
       </ExpandingToolbar>
-
       <div className={styles.buttons}>
-        <Button className={styles.iconButton} tooltip="Change graph orientation" onClick={
-        () => {
-            setLROrientation(!lrOrientation);
-            props.onToggleOrientation?.(lrOrientation);
-          }}>
+        <Button className={styles.iconButton} tooltip="Change graph orientation" onClick={onToggleOrientation}>
           <FoxgloveIcon style={{ color: "white" }} size="small">
             {lrOrientation ? <ArrowLeftRightIcon /> : <ArrowUpDownIcon />}
           </FoxgloveIcon>
         </Button>
       </div>
-
       <div className={styles.buttons}>
         <Button className={styles.iconButton} tooltip="Zoom in graph" onClick={onZoomInHandler}>
           <FoxgloveIcon style={{ color: "white" }} size="small">
@@ -194,7 +189,6 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
           </FoxgloveIcon>
         </Button>
       </div>
-
     </Toolbar>
   );
 };
