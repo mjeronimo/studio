@@ -148,12 +148,17 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
         <ToolGroup name={"Options"}>
           <>
             <Checkbox
+              label="Automatically display new nodes"
+              checked={false}
+              onChange={() => console.log("onChange")}
+            />
+            <Checkbox
               label="Include hidden nodes"
               checked={false}
               onChange={() => console.log("onChange")}
             />
             <Checkbox
-              label="Automatically display new nodes"
+              label="Include hidden topics"
               checked={false}
               onChange={() => console.log("onChange")}
             />

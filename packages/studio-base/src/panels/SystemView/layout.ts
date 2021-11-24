@@ -166,12 +166,17 @@ export const createGraphLayout = async (elements: Elements, direction = 'DOWN'):
   const edges: ElkPrimitiveEdge[] = []
 
   elements.forEach((el) => {
+    // TODO: ROS hidden nodes and topics
     if (isNode(el)) {
-      nodes.push({
-        id: el.id,
-        width: el.__rf?.width ?? DEFAULT_WIDTH,
-        height: el.__rf?.height ?? DEFAULT_HEIGHT
-      })
+      if (!el.data.label.startsWith("_")) {
+        nodes.push({
+          id: el.id,
+          width: el.__rf?.width ?? DEFAULT_WIDTH,
+          height: el.__rf?.height ?? DEFAULT_HEIGHT
+        })
+      } else {
+        el.isHidden = true;
+      }
     } else {
       edges.push({
         id: el.id,

@@ -74,77 +74,77 @@ const initialElements: Elements = [
   },
 
   // Edges
-  { 
-    id: 'edge-1-1', 
+  {
+    id: 'edge-1-1',
     isHidden: false,
-    label: '10Hz', 
-    labelStyle: { fill: 'white' }, 
+    label: '10Hz',
+    labelStyle: { fill: 'white' },
     labelBgStyle: { fill: 'rgba(0,0,0,0)' },
-    source: '1', 
-    target: '2', 
-    type: 'smoothstep', 
-    animated: true, 
-    arrowHeadType: ArrowHeadType.Arrow 
+    source: '1',
+    target: '2',
+    type: 'default',
+    animated: true,
+    arrowHeadType: ArrowHeadType.Arrow
   },
-  { 
-    id: 'edge-1-3', 
+  {
+    id: 'edge-1-3',
     isHidden: false,
-    label: '11Hz', 
-    labelStyle: { fill: 'white' }, 
+    label: '11Hz',
+    labelStyle: { fill: 'white' },
     labelBgStyle: { fill: 'rgba(0,0,0,0)' },
-    source: '1', 
-    target: '3', 
-    type: 'smoothstep', 
-    animated: true, 
-    arrowHeadType: ArrowHeadType.Arrow 
+    source: '1',
+    target: '3',
+    type: 'default',
+    animated: true,
+    arrowHeadType: ArrowHeadType.Arrow
   },
-  { 
-    id: 'edge-2-4', 
+  {
+    id: 'edge-2-4',
     isHidden: false,
-    label: '12Hz', 
-    labelStyle: { fill: 'white' }, 
+    label: '12Hz',
+    labelStyle: { fill: 'white' },
     labelBgStyle: { fill: 'rgba(0,0,0,0)' },
-    source: '2', 
-    target: '4', 
-    type: 'smoothstep', 
-    animated: true, 
-    arrowHeadType: ArrowHeadType.Arrow 
+    source: '2',
+    target: '4',
+    type: 'default',
+    animated: true,
+    arrowHeadType: ArrowHeadType.Arrow
   },
-  { 
-    id: 'edge-3-4', 
+  {
+    id: 'edge-3-4',
     isHidden: false,
-    label: '13Hz', 
-    labelStyle: { fill: 'white' }, 
+    label: '13Hz',
+    labelStyle: { fill: 'white' },
     labelBgStyle: { fill: 'rgba(0,0,0,0)' },
-    source: '3', 
-    target: '4', 
-    type: 'smoothstep', 
-    animated: true, 
-    arrowHeadType: ArrowHeadType.Arrow 
+    source: '3',
+    target: '4',
+    type: 'default',
+    animated: true,
+    arrowHeadType: ArrowHeadType.Arrow
   },
-  { 
-    id: 'edge-4-5', 
+  {
+    id: 'edge-4-5',
     isHidden: false,
-    label: '14Hz', 
-    labelStyle: { fill: 'white' }, 
+    label: '14Hz',
+    labelStyle: { fill: 'white' },
     labelBgStyle: { fill: 'rgba(0,0,0,0)' },
-    source: '4', 
-    target: '5', 
-    type: 'smoothstep', 
-    animated: true, 
-    arrowHeadType: ArrowHeadType.Arrow 
+    source: '4',
+    target: '5',
+    type: 'default',
+    animated: true,
+    arrowHeadType: ArrowHeadType.Arrow
   },
-  { 
-    id: 'edge-2-5', 
+  {
+    id: 'edge-2-5',
     isHidden: false,
-    label: '14Hz', 
-    labelStyle: { fill: 'white' }, 
+    label: '15Hz',
+    labelStyle: { fill: 'white' },
     labelBgStyle: { fill: 'rgba(0,0,0,0)' },
-    source: '2', 
-    target: '5', 
-    type: 'smoothstep', 
-    animated: true, 
-    arrowHeadType: ArrowHeadType.Arrow 
+    source: '2',
+    target: '5',
+    type: 'default',
+    animated: true,
+    arrowHeadType: ArrowHeadType.Arrow
   },
 ];
 
