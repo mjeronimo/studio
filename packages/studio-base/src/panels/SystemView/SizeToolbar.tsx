@@ -1,7 +1,7 @@
 import React, { memo, useCallback, HTMLAttributes, FC, useEffect, useState } from 'react';
 import cc from 'classcat';
 import Button from "@foxglove/studio-base/components/Button";
-import ReactFlow, { useStoreState, useStoreActions, useZoomPanHelper, FitViewParams } from 'react-flow-renderer';
+import { useStoreState, useStoreActions, useZoomPanHelper, FitViewParams } from 'react-flow-renderer';
 import FoxgloveIcon from "@foxglove/studio-base/components/Icon";
 import styles from "@foxglove/studio-base/panels/ThreeDimensionalViz/sharedStyles";
 

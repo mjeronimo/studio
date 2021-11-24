@@ -14,7 +14,7 @@
 // limitations under the License.
 
 // React
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 
 // Foxglove
 import Button from "@foxglove/studio-base/components/Button";
@@ -24,10 +24,12 @@ import FoxgloveIcon from "@foxglove/studio-base/components/Icon";
 import SegmentedControl, { Option } from "@foxglove/studio-base/components/SegmentedControl";
 import styles from "@foxglove/studio-base/panels/ThreeDimensionalViz/sharedStyles";
 
+// ReactFlow
+import { useStoreActions, useStoreState, useZoomPanHelper, FitViewParams } from 'react-flow-renderer';
+
 // SystemView
 import Toolbar from "./Toolbar";
 import { NodeList } from "./NodeList";
-import SizeToolbar from "./SizeToolbar";
 
 // MDI icons
 import ArrowLeftRightIcon from "@mdi/svg/svg/arrow-left-right.svg";
@@ -35,17 +37,25 @@ import ArrowUpDownIcon from "@mdi/svg/svg/arrow-up-down.svg";
 import GroupIcon from "@mdi/svg/svg/group.svg";
 import SelectionIcon from "@mdi/svg/svg/checkbox-multiple-marked-outline.svg";
 
+// MDI icons
+import FitviewIcon from "./assets/icons/fitview.svg";
+import MinusIcon from "@mdi/svg/svg/minus.svg";
+import PlusIcon from "@mdi/svg/svg/plus.svg";
+import LockIcon from "@mdi/svg/svg/lock-outline.svg";
+import UnlockIcon from "@mdi/svg/svg/lock-open-variant-outline.svg";
+
 export type Props = {
   nodes: any[]
   edges: any[]
   lrOrientation: boolean
+  fitViewParams?: FitViewParams
   onZoomIn?: () => void
   onZoomOut?: () => void
+  onFitview?: () => void
+  onInteractiveChange?: (isInteractive: boolean) => void
   onToggleOrientation?: (lrOrientation: boolean) => void
-  onFitToWindow?: () => void
 };
 
-// export default function SystemViewToolbar(props: Props): JSX.Element {
 export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
 
   const [lrOrientation, setLROrientation] = useState<boolean>(props.lrOrientation);
@@ -64,6 +74,32 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
 
   const [selectedId, setSelectedId] = React.useState(GroupingOptions.third.id);
   const optionArray: Option[] = Object.values(GroupingOptions);
+
+  const { zoomIn, zoomOut, fitView } = useZoomPanHelper();
+  const setInteractive = useStoreActions((actions) => actions.setInteractive);
+  const isInteractive = useStoreState((s) => s.nodesDraggable && s.nodesConnectable && s.elementsSelectable);
+
+  const onZoomInHandler = useCallback(() => {
+    zoomIn?.();
+    props.onZoomIn?.();
+  }, [zoomIn, props.onZoomIn]);
+
+  const onZoomOutHandler = useCallback(() => {
+    zoomOut?.();
+    props.onZoomOut?.();
+  }, [zoomOut, props.onZoomOut]);
+
+  const onFitViewHandler = useCallback(() => {
+    fitView?.(props.fitViewParams);
+    props.onFitview?.();
+  }, [fitView, props.fitViewParams, props.onFitview]);
+
+  const onInteractiveChangeHandler = useCallback(() => {
+    console.log("onInteractiveChangeHandler");
+    console.log(isInteractive);
+    setInteractive?.(!isInteractive);
+    props.onInteractiveChange?.(!isInteractive);
+  }, [isInteractive, setInteractive, props.onInteractiveChange]);
 
   return (
     <Toolbar>
@@ -137,8 +173,28 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
       </div>
 
       <div className={styles.buttons}>
-      <SizeToolbar />
+        <Button className={styles.iconButton} tooltip="Zoom in graph" onClick={onZoomInHandler}>
+          <FoxgloveIcon style={{ color: "white" }} size="small">
+            <PlusIcon />
+          </FoxgloveIcon>
+        </Button>
+        <Button className={styles.iconButton} tooltip="Zoom out graph" onClick={onZoomOutHandler}>
+          <FoxgloveIcon style={{ color: "white" }} size="small">
+            <MinusIcon />
+          </FoxgloveIcon>
+        </Button>
+        <Button className={styles.iconButton} tooltip="Fit graph to window" onClick={onFitViewHandler}>
+          <FoxgloveIcon style={{ color: "white" }} size="small">
+            <FitviewIcon />
+          </FoxgloveIcon>
+        </Button>
+        <Button className={styles.iconButton} tooltip="Lock/unlock the node positions" onClick={onInteractiveChangeHandler}>
+          <FoxgloveIcon style={{ color: "white" }} size="small">
+            {isInteractive ? <UnlockIcon /> : <LockIcon />}
+          </FoxgloveIcon>
+        </Button>
       </div>
+
     </Toolbar>
   );
 };
