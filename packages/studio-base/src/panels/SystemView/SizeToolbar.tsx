@@ -1,19 +1,16 @@
 import React, { memo, useCallback, HTMLAttributes, FC, useEffect, useState } from 'react';
 import cc from 'classcat';
-
-// import { useStoreState, useStoreActions } from '../../store/hooks';
-
+import Button from "@foxglove/studio-base/components/Button";
 import ReactFlow, { useStoreState, useStoreActions, useZoomPanHelper, FitViewParams } from 'react-flow-renderer';
+import FoxgloveIcon from "@foxglove/studio-base/components/Icon";
+import styles from "@foxglove/studio-base/panels/ThreeDimensionalViz/sharedStyles";
 
 // MDI icons
 import FitviewIcon from "./assets/icons/fitview.svg";
 import MinusIcon from "@mdi/svg/svg/minus.svg";
 import PlusIcon from "@mdi/svg/svg/plus.svg";
-
-//import LockIcon from '../../../assets/icons/lock.svg';
-//import UnlockIcon from '../../../assets/icons/unlock.svg';
-import LockIcon from "@mdi/svg/svg/plus.svg";
-import UnlockIcon from "@mdi/svg/svg/minus.svg";
+import LockIcon from "@mdi/svg/svg/lock-outline.svg";
+import UnlockIcon from "@mdi/svg/svg/lock-open-variant-outline.svg";
 
 export interface ControlProps extends HTMLAttributes<HTMLDivElement> {
   showZoom?: boolean;
@@ -84,26 +81,36 @@ const Controls: FC<ControlProps> = ({
 
   return (
     <div className={mapClasses} style={style}>
+      <div className={styles.buttons}>
       {showZoom && (
         <>
-          <ControlButton onClick={onZoomInHandler} className="react-flow__controls-zoomin">
+        <Button className={styles.iconButton} tooltip="Zoom in graph" onClick={onZoomInHandler}>
+          <FoxgloveIcon style={{ color: "white" }} size="small">
             <PlusIcon />
-          </ControlButton>
-          <ControlButton onClick={onZoomOutHandler} className="react-flow__controls-zoomout">
+          </FoxgloveIcon>
+        </Button>
+        <Button className={styles.iconButton} tooltip="Zoom out graph" onClick={onZoomOutHandler}>
+          <FoxgloveIcon style={{ color: "white" }} size="small">
             <MinusIcon />
-          </ControlButton>
+          </FoxgloveIcon>
+        </Button>
         </>
       )}
       {showFitView && (
-        <ControlButton className="react-flow__controls-fitview" onClick={onFitViewHandler}>
-          <FitviewIcon />
-        </ControlButton>
+        <Button className={styles.iconButton} tooltip="Fit graph to window" onClick={onFitViewHandler}>
+          <FoxgloveIcon style={{ color: "white" }} size="small">
+            <FitviewIcon />
+          </FoxgloveIcon>
+        </Button>
       )}
       {showInteractive && (
-        <ControlButton className="react-flow__controls-interactive" onClick={onInteractiveChangeHandler}>
-          {isInteractive ? <UnlockIcon /> : <LockIcon />}
-        </ControlButton>
+        <Button className={styles.iconButton} tooltip="Lock/unlock the node positions" onClick={onInteractiveChangeHandler}>
+          <FoxgloveIcon style={{ color: "white" }} size="small">
+            {isInteractive ? <UnlockIcon /> : <LockIcon />}
+          </FoxgloveIcon>
+        </Button>
       )}
+      </div>
       {children}
     </div>
   );

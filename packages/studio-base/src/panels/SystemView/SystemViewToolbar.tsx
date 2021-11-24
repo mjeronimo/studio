@@ -27,27 +27,32 @@ import styles from "@foxglove/studio-base/panels/ThreeDimensionalViz/sharedStyle
 // SystemView
 import Toolbar from "./Toolbar";
 import { NodeList } from "./NodeList";
+import SizeToolbar from "./SizeToolbar";
 
 // MDI icons
 import ArrowLeftRightIcon from "@mdi/svg/svg/arrow-left-right.svg";
 import ArrowUpDownIcon from "@mdi/svg/svg/arrow-up-down.svg";
 import FitToPageIcon from "./assets/icons/fitview.svg";
 import GroupIcon from "@mdi/svg/svg/group.svg";
-import Minus from "@mdi/svg/svg/minus.svg";
-import Plus from "@mdi/svg/svg/plus.svg";
+import MinusIcon from "@mdi/svg/svg/minus.svg";
+import PlusIcon from "@mdi/svg/svg/plus.svg";
 import SelectionIcon from "@mdi/svg/svg/checkbox-multiple-marked-outline.svg";
 
 export type Props = {
   nodes: any[]
   edges: any[]
-  lrOrientation?: boolean
-  zoomIn?: () => void
-  zoomOut?: () => void
-  toggleOrientation?: () => void
-  fitToWindow?: () => void
+  lrOrientation: boolean
+  onZoomIn?: () => void
+  onZoomOut?: () => void
+  onToggleOrientation?: (lrOrientation: boolean) => void
+  onFitToWindow?: () => void
 };
 
-export default function SystemViewToolbar(props: Props): JSX.Element {
+// export default function SystemViewToolbar(props: Props): JSX.Element {
+
+export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
+
+  const [lrOrientation, setLROrientation] = useState<boolean>(props.lrOrientation);
 
   let defaultSelectedTab: string | undefined;
   const [selectedTab, setSelectedTab] = React.useState(defaultSelectedTab);
@@ -123,38 +128,16 @@ export default function SystemViewToolbar(props: Props): JSX.Element {
         </ToolGroup>
       </ExpandingToolbar>
       <div className={styles.buttons}>
-        <Button className={styles.iconButton} tooltip="Change graph orientation" onClick={props.toggleOrientation}>
+        <Button className={styles.iconButton} tooltip="Change graph orientation" onClick={
+        () => {
+            setLROrientation(!lrOrientation);
+            props.onToggleOrientation?.(lrOrientation);
+          }}>
           <FoxgloveIcon style={{ color: "white" }} size="small">
-            {props.lrOrientation ? <ArrowLeftRightIcon /> : <ArrowUpDownIcon />}
-          </FoxgloveIcon>
-        </Button>
-      </div>
-      <div className={styles.buttons}>
-        <Button className={styles.iconButton} tooltip="Zoom in" onClick={() => {
-          props.zoomIn?.();
-        }
-        }>
-          <FoxgloveIcon style={{ color: "white" }} size="small">
-            <Plus />
-          </FoxgloveIcon>
-        </Button>
-        <Button className={styles.iconButton} tooltip="Zoom out" onClick={() => {
-          props.zoomOut?.();
-        }
-        }>
-          <FoxgloveIcon style={{ color: "white" }} size="small">
-            <Minus />
-          </FoxgloveIcon>
-        </Button>
-        <Button className={styles.iconButton} tooltip="Fit graph to window" onClick={() => {
-          props.fitToWindow?.()
-        }
-        }>
-          <FoxgloveIcon style={{ color: "white" }} size="small">
-            <FitToPageIcon />
+            {lrOrientation ? <ArrowLeftRightIcon /> : <ArrowUpDownIcon />}
           </FoxgloveIcon>
         </Button>
       </div>
     </Toolbar>
   );
-}
+};

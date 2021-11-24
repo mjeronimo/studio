@@ -34,9 +34,6 @@ import { NodeData, EdgeData } from 'reaflow';
 import SelectAllIcon from "@mdi/svg/svg/format-list-bulleted-square.svg";
 import SelectNoneIcon from "@mdi/svg/svg/format-list-checkbox.svg";
 
-// SystemView
-import { MyNodeData } from "./MyNodeData";
-
 const exampleChildClass = mergeStyles({
   display: 'block',
   marginBottom: '10px',
@@ -62,8 +59,8 @@ export interface INodeListState {
 }
 
 interface Props {
-  nodes: MyNodeData[]
-  edges: EdgeData<any>[]
+  nodes: any[]
+  edges: any[]
 }
 
 export class NodeList extends React.Component<Props, INodeListState> {
@@ -80,11 +77,12 @@ export class NodeList extends React.Component<Props, INodeListState> {
 
     this._allItems = [];
     for (let i = 0; i < props.nodes.length; i++) {
-      var name = ""
       if (props.nodes[i]) {
-        name = props.nodes[i]!.text
+        if (props.nodes[i]!.data) {
+          const name = props.nodes[i]!.data.label
+          this._allItems.push({ key: i, name: name, })
+        }
       }
-      this._allItems.push({ key: i, name: name, })
     }
 
     this._allItems.sort(function (a, b) {

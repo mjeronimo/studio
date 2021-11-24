@@ -27,17 +27,19 @@ import initialElements from './initial-elements';
 import { createGraphLayout } from "./layout";
 import './layouting.css';
 import SizeToolbar from "./SizeToolbar";
-import SystemViewToolbar from "./SystemViewToolbar";
+import { SystemViewToolbar } from "./SystemViewToolbar";
 
 type Props = {
   config: unknown;
   saveConfig: SaveConfig<unknown>;
 }
 
-function SystemViewPanel(props: Props) {
+// function SystemViewPanel(props: Props) {
+const SystemViewPanel = (props: Props) => {
 
   const { config, saveConfig } = props
   const [elements, setElements] = useState<Elements>(initialElements)
+  // const { zoomIn } = useZoomPanHelper();
 
   useEffect(() => {
     createGraphLayout(initialElements)
@@ -58,9 +60,13 @@ function SystemViewPanel(props: Props) {
     [elements]
   );
 
+  const toggleOrientation = useCallback((lrOrientation: boolean) => {
+    onLayout(lrOrientation ? 'RIGHT' : 'DOWN');
+  }, []);
+
   return (
     <>{!elements ? (
-        <p>Loading ...</p>
+      <p>Loading ...</p>
     ) : (
       <div className="layoutflow">
         <ReactFlowProvider>
@@ -73,12 +79,13 @@ function SystemViewPanel(props: Props) {
             <Background color="#aaa" gap={16} />
             <SizeToolbar />
           </ReactFlow>
-          <div className="controls">
-            <button onClick={() => onLayout('DOWN')}>vertical layout</button>
-            <button onClick={() => onLayout('RIGHT')}>horizontal layout</button>
-          </div>
         </ReactFlowProvider>
-        <SystemViewToolbar edges={[]} nodes={[]} />
+        <SystemViewToolbar
+          nodes={elements} 
+          edges={[]} 
+          lrOrientation={true} 
+          onToggleOrientation={toggleOrientation} 
+        />
       </div>
     )
     }</>

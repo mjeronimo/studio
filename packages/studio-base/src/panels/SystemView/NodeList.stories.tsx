@@ -15,16 +15,14 @@
 import { storiesOf } from "@storybook/react";
 import MockPanelContextProvider from "@foxglove/studio-base/components/MockPanelContextProvider";
 import { NodeList } from "./NodeList";
-import { MyNodeData, NodeType } from "./MyNodeData";
 
 const rosLogoURL = 'https://raw.githubusercontent.com/mjeronimo/studio/a802e32713b70509f49247c7dae817231ab9ec57/packages/studio-base/src/panels/SystemView/assets/ros_logo.svg';
 const wirelessURL = 'https://raw.githubusercontent.com/mjeronimo/studio/develop/packages/studio-base/src/panels/SystemView/assets/wireless.svg';
 
-const nodes: MyNodeData[] = [
+const nodes: any[] = [
   {
     id: '3', text: '/stereo_camera_controller',
-    visible: true,
-    type: NodeType.NODE,
+    isHidden: false,
     icon: {
       url: rosLogoURL,
       height: 25,
@@ -33,8 +31,7 @@ const nodes: MyNodeData[] = [
   },
   {
     id: '2', text: '/left/image_raw',
-    visible: true,
-    type: NodeType.TOPIC,
+    isHidden: false,
     icon: {
       url: wirelessURL,
       height: 25,
@@ -43,8 +40,7 @@ const nodes: MyNodeData[] = [
   },
   {
     id: '4', text: '/right/image_raw',
-    visible: true,
-    type: NodeType.TOPIC,
+    isHidden: false,
     icon: {
       url: wirelessURL,
       height: 25,
@@ -53,8 +49,7 @@ const nodes: MyNodeData[] = [
   },
   {
     id: '5', text: '/image_adjuster_left_stereo',
-    visible: true,
-    type: NodeType.NODE,
+    isHidden: false,
     icon: {
       url: rosLogoURL,
       height: 25,
@@ -63,8 +58,7 @@ const nodes: MyNodeData[] = [
   },
   {
     id: '7', text: '/image_adjuster_right_stereo',
-    visible: true,
-    type: NodeType.NODE,
+    isHidden: false,
     icon: {
       url: rosLogoURL,
       height: 25,
@@ -73,8 +67,7 @@ const nodes: MyNodeData[] = [
   },
   {
     id: '8', text: '/disparity_node',
-    visible: true,
-    type: NodeType.NODE,
+    isHidden: false,
     icon: {
       url: rosLogoURL,
       height: 25,
@@ -83,8 +76,7 @@ const nodes: MyNodeData[] = [
   },
   {
     id: '9', text: '/point_cloud_node',
-    visible: true,
-    type: NodeType.NODE,
+    isHidden: false,
     icon: {
       url: rosLogoURL,
       height: 25,
@@ -93,8 +85,7 @@ const nodes: MyNodeData[] = [
   },
   {
     id: '10', text: '/left/image_raw/adjusted_stereo',
-    visible: true,
-    type: NodeType.TOPIC,
+    isHidden: false,
     icon: {
       url: wirelessURL,
       height: 25,
@@ -103,8 +94,7 @@ const nodes: MyNodeData[] = [
   },
   {
     id: '11', text: '/right/image_raw/adjusted_stereo',
-    visible: true,
-    type: NodeType.TOPIC,
+    isHidden: false,
     icon: {
       url: wirelessURL,
       height: 25,
@@ -113,8 +103,7 @@ const nodes: MyNodeData[] = [
   },
   {
     id: '12', text: '/disparity',
-    visible: true,
-    type: NodeType.TOPIC,
+    isHidden: false,
     icon: {
       url: wirelessURL,
       height: 25,
@@ -123,8 +112,7 @@ const nodes: MyNodeData[] = [
   },
   {
     id: '13', text: '/points2',
-    visible: true,
-    type: NodeType.TOPIC,
+    isHidden: false,
     icon: {
       url: wirelessURL,
       height: 25,
