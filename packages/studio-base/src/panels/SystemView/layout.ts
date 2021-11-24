@@ -190,7 +190,10 @@ export const createGraphLayout = async (elements: Elements, direction = 'DOWN'):
     id: 'root',
     children: nodes,
     edges: edges,
-    layoutOptions: { 'elk.direction': direction }
+    layoutOptions: {
+      'elk.direction': direction,
+      'elk.spacing.nodeNode': isHorizontal ? '150' : '75',
+    }
   })
   return elements.map((el) => {
     if (isNode(el)) {
