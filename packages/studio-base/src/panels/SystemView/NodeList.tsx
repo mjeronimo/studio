@@ -16,6 +16,9 @@
 import * as React from 'react';
 import { CSSProperties, useEffect, useState } from 'react';
 
+// ReactFlow
+import { Elements } from 'react-flow-renderer';
+
 // Fluent UI
 import { DefaultButton } from "@fluentui/react";
 import { TextField, ITextFieldStyles } from '@fluentui/react/lib/TextField';
@@ -30,6 +33,7 @@ import Icon from "@foxglove/studio-base/components/Icon";
 // MDI Icons
 import SelectAllIcon from "@mdi/svg/svg/format-list-bulleted-square.svg";
 import SelectNoneIcon from "@mdi/svg/svg/format-list-checkbox.svg";
+import { Texture } from 'three';
 
 const exampleChildClass = mergeStyles({
   display: 'block',
@@ -52,12 +56,15 @@ export interface INodeListItem {
 
 export interface INodeListState {
   items: INodeListItem[];
-  selectionDetails: string;
+  selectionDetails: string,
 }
 
 interface Props {
-  nodes: any[]
-  edges: any[]
+  nodes: Elements
+  edges: Elements
+  lrOrientation: boolean
+  setElements?: any // TODO
+  onLayout?: any
 }
 
 export class NodeList extends React.Component<Props, INodeListState> {
@@ -69,7 +76,29 @@ export class NodeList extends React.Component<Props, INodeListState> {
     super(props);
 
     this._selection = new Selection({
-      onSelectionChanged: () => this.setState({ selectionDetails: this._getSelectionDetails() }),
+      onSelectionChanged: () => {
+        this.setState({ selectionDetails: this._getSelectionDetails() });
+
+        const items = this._selection.getItems();
+        const selectedItems = this._selection.getSelectedIndices();
+
+        const newElements = props.nodes.filter(node => {
+          const selectedNames: string[] = selectedItems.map((item) => { 
+            return (items[+item] as INodeListItem).name;
+          });
+
+          if (node.data && node.data.label && selectedNames.includes(node.data.label)) {
+            // node.isHidden = false;
+            return true;
+          }
+
+          // node.isHidden = true;
+          return false;
+        });
+
+        props.setElements(newElements);
+        // props.onLayout!(props.lrOrientation);
+      }
     });
 
     this._allItems = [];
@@ -222,6 +251,6 @@ export class NodeList extends React.Component<Props, INodeListState> {
   };
 
   private _onItemInvoked(item: INodeListItem): void {
-    alert(`Item invoked: ${item.name}`);
+    console.log(`Item invoked: ${item.name}`);
   }
 }

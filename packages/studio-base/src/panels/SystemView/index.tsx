@@ -23,7 +23,7 @@ import { SaveConfig } from "@foxglove/studio-base/types/panels";
 import ReactFlow, { ReactFlowProvider, Elements, Background } from 'react-flow-renderer';
 
 // SystemView
-import initialElements from './initial-elements';
+import { initialNodes, initialEdges } from './initial-elements';
 import { createGraphLayout } from "./layout";
 import { SystemViewToolbar } from "./SystemViewToolbar";
 import './layouting.css';
@@ -36,10 +36,11 @@ type Props = {
 const SystemViewPanel = (props: Props) => {
 
   const { config, saveConfig } = props
-  const [elements, setElements] = useState<Elements>(initialElements)
+  const [elements, setElements] = useState<Elements>(initialNodes)
+  const [edges, setEdges] = useState<Elements>(initialEdges)
 
   useEffect(() => {
-    createGraphLayout(initialElements)
+    createGraphLayout(elements.concat(edges))
       .then(els => {
         setElements(els)
       })
@@ -48,7 +49,7 @@ const SystemViewPanel = (props: Props) => {
 
   const onLayout = useCallback(
     (direction: any) => {
-      createGraphLayout(elements, direction)
+      createGraphLayout(elements.concat(edges), direction)
         .then(els => setElements(els))
         .catch(err => console.error(err))
     },
@@ -66,18 +67,20 @@ const SystemViewPanel = (props: Props) => {
       <div className="layoutflow">
         <ReactFlowProvider>
           <ReactFlow
-            elements={elements}
+            elements={elements.concat(edges)}
             snapToGrid={true}
             snapGrid={[15, 15]}
-          //{...otherProps}
+            //{...otherProps}
           >
             <Background color="#aaa" gap={16} />
           </ReactFlow>
           <SystemViewToolbar
             nodes={elements}
-            edges={[]}
+            edges={edges}
+            setElements={setElements}
             lrOrientation={true}
             onToggleOrientation={toggleOrientation}
+            onLayout={onLayout}
           />
         </ReactFlowProvider>
       </div>

@@ -16,7 +16,7 @@ import { Elements, Position, XYPosition, ArrowHeadType } from 'react-flow-render
 
 const position: XYPosition = { x: 0, y: 0 };
 
-const initialElements: Elements = [
+export const initialNodes: Elements = [
   // Nodes
   {
     id: '1',
@@ -82,7 +82,7 @@ const initialElements: Elements = [
     position,
     sourcePosition: Position.Bottom,
     targetPosition: Position.Top,
-    style: { width: 175, height: 40 },
+    style: { width: 125, height: 40 },
   },
   {
     id: '102',
@@ -91,7 +91,7 @@ const initialElements: Elements = [
     position,
     sourcePosition: Position.Bottom,
     targetPosition: Position.Top,
-    style: { width: 175, height: 40 },
+    style: { width: 125, height: 40 },
   },
   {
     id: '103',
@@ -100,7 +100,7 @@ const initialElements: Elements = [
     position,
     sourcePosition: Position.Bottom,
     targetPosition: Position.Top,
-    style: { width: 175, height: 40 },
+    style: { width: 125, height: 40 },
   },
   {
     id: '104',
@@ -109,7 +109,7 @@ const initialElements: Elements = [
     position,
     sourcePosition: Position.Bottom,
     targetPosition: Position.Top,
-    style: { width: 175, height: 40 },
+    style: { width: 125, height: 40 },
   },
   {
     id: '105',
@@ -118,7 +118,7 @@ const initialElements: Elements = [
     position,
     sourcePosition: Position.Bottom,
     targetPosition: Position.Top,
-    style: { width: 175, height: 40 },
+    style: { width: 125, height: 40 },
   },
   {
     id: '106',
@@ -127,9 +127,11 @@ const initialElements: Elements = [
     position,
     sourcePosition: Position.Bottom,
     targetPosition: Position.Top,
-    style: { width: 175, height: 40 },
+    style: { width: 125, height: 40 },
   },
+];
 
+export const initialEdges: Elements = [
   // Edges
   {
     id: 'edge-1-101',
@@ -277,5 +279,3 @@ const initialElements: Elements = [
     arrowHeadType: ArrowHeadType.Arrow
   },
 ];
-
-export default initialElements;

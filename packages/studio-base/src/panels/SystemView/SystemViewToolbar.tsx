@@ -25,7 +25,7 @@ import SegmentedControl, { Option } from "@foxglove/studio-base/components/Segme
 import styles from "@foxglove/studio-base/panels/ThreeDimensionalViz/sharedStyles";
 
 // ReactFlow
-import { useStoreActions, useStoreState, useZoomPanHelper, FitViewParams } from 'react-flow-renderer';
+import { useStoreActions, useStoreState, useZoomPanHelper, FitViewParams, Elements } from 'react-flow-renderer';
 
 // SystemView
 import Toolbar from "./Toolbar";
@@ -43,15 +43,17 @@ import SelectionIcon from "@mdi/svg/svg/checkbox-multiple-marked-outline.svg";
 import UnlockIcon from "@mdi/svg/svg/lock-open-variant-outline.svg";
 
 export type Props = {
-  nodes: any[]
-  edges: any[]
+  nodes: Elements
+  edges: Elements
   lrOrientation: boolean
   fitViewParams?: FitViewParams
+  setElements?: any     // TODO
   onZoomIn?: () => void
   onZoomOut?: () => void
   onFitview?: () => void
   onInteractiveChange?: (isInteractive: boolean) => void
   onToggleOrientation?: (lrOrientation: boolean) => void
+  onLayout?: any // TODO
 };
 
 export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
@@ -143,7 +145,7 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
         }}
       >
         <ToolGroup name={"Node List"}>
-          <NodeList nodes={props.nodes} edges={props.edges} />
+          <NodeList nodes={props.nodes} edges={props.edges} setElements={props.setElements} lrOrientation={props.lrOrientation} onLayout={props.onLayout} />
         </ToolGroup>
         <ToolGroup name={"Options"}>
           <>

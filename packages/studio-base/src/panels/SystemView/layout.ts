@@ -153,9 +153,10 @@ const elk = new ELK({
     'spacing.nodeNodeBetweenLayers': '125',
 
     'elk.spacing.nodeNode': '75',
+
+    // 'org.eclipse.elk.zoomToFit': 'true',
+    'zoomToFit': 'true',
   }
-
-
 })
 
 export const createGraphLayout = async (elements: Elements, direction = 'DOWN'): Promise<Elements> => {
@@ -168,11 +169,15 @@ export const createGraphLayout = async (elements: Elements, direction = 'DOWN'):
   elements.forEach((el) => {
     // TODO: ROS hidden nodes and topics
     if (isNode(el)) {
-      if (!el.data.label.startsWith("_")) {
+      console.log('Node is hidden: ');
+      console.log(el.isHidden);
+      if (!el.data.label.startsWith("_") && !el.isHidden) {
         nodes.push({
           id: el.id,
-          width: el.__rf?.width ?? DEFAULT_WIDTH,
-          height: el.__rf?.height ?? DEFAULT_HEIGHT
+          // width: el.__rf?.width ?? DEFAULT_WIDTH,
+          // height: el.__rf?.height ?? DEFAULT_HEIGHT
+          width: +el.style!.width!, 
+          height: +el.style!.height!, 
         })
       } else {
         el.isHidden = true;
