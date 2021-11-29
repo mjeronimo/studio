@@ -1,4 +1,4 @@
-import ReactFlow, { Elements, isNode, Position } from 'react-flow-renderer';
+import ReactFlow, { isNode, Position, Node, Edge, Elements } from 'react-flow-renderer';
 
 import ELK, { ElkNode, ElkPrimitiveEdge } from 'elkjs/lib/elk.bundled';
 
@@ -159,59 +159,55 @@ const elk = new ELK({
   }
 })
 
-export const createGraphLayout = async (elements: Elements, direction = 'DOWN'): Promise<Elements> => {
+export const createGraphLayout = async (nodes: Elements, edges: Elements, direction = 'DOWN'): Promise<Elements> => {
 
-  const isHorizontal = direction === 'RIGHT';
-
-  const nodes: ElkNode[] = []
-  const edges: ElkPrimitiveEdge[] = []
-
-  elements.forEach((el) => {
-    // TODO: ROS hidden nodes and topics
-    if (isNode(el)) {
-      console.log('Node is hidden: ');
-      console.log(el.isHidden);
-      if (!el.data.label.startsWith("_") && !el.isHidden) {
-        nodes.push({
-          id: el.id,
-          // width: el.__rf?.width ?? DEFAULT_WIDTH,
-          // height: el.__rf?.height ?? DEFAULT_HEIGHT
-          width: +el.style!.width!, 
-          height: +el.style!.height!, 
-        })
-      } else {
-        el.isHidden = true;
-      }
-    } else {
-      edges.push({
-        id: el.id,
-        target: el.target,
-        source: el.source
+  const elk_nodes: ElkNode[] = []
+  nodes.forEach((el) => {
+    if (!el.isHidden) {
+      elk_nodes.push({
+        id: el.id,        
+        // width: el.__rf?.width ?? DEFAULT_WIDTH,
+        // height: el.__rf?.height ?? DEFAULT_HEIGHT
+        width: +el.style!.width!, 
+        height: +el.style!.height!, 
       })
     }
-  })
+  });
 
+  const elk_edges: ElkPrimitiveEdge[] = []
+  edges.forEach((el) => {
+    const edge: Edge = el as Edge;
+    elk_edges.push({
+      id: edge.id,
+      target: edge.target,
+      source: edge.source
+    })
+  });
+
+  const isHorizontal = direction === 'RIGHT';
   const newGraph = await elk.layout({
     id: 'root',
-    children: nodes,
-    edges: edges,
+    children: elk_nodes,
+    edges: elk_edges,
     layoutOptions: {
       'elk.direction': direction,
       'elk.spacing.nodeNode': isHorizontal ? '150' : '75',
     }
   })
-  return elements.map((el) => {
+
+  return nodes.map((el) => {
+    const temp = Object.assign({}, el) as Node;
     if (isNode(el)) {
       const node = newGraph?.children?.find((n) => n.id === el.id)
       if (node?.x && node?.y && node?.width && node?.height) {
-        el.position = {
+        temp.position = {
           x: node.x - node.width / 2 + Math.random() / 1000,
           y: node.y - node.height / 2
         }
       }
-      el.targetPosition = isHorizontal ? Position.Left : Position.Top;
-      el.sourcePosition = isHorizontal ? Position.Right : Position.Bottom;
+      temp.targetPosition = isHorizontal ? Position.Left : Position.Top;
+      temp.sourcePosition = isHorizontal ? Position.Right : Position.Bottom;
     }
-    return el
-  })
+    return temp;
+  });
 }

@@ -82,19 +82,26 @@ export class NodeList extends React.Component<Props, INodeListState> {
         const items = this._selection.getItems();
         const selectedItems = this._selection.getSelectedIndices();
 
-        const newElements = props.nodes.filter(node => {
+        // TODO: #1
+        const newElements = props.nodes.map(node => {
           const selectedNames: string[] = selectedItems.map((item) => { 
             return (items[+item] as INodeListItem).name;
           });
 
           if (node.data && node.data.label && selectedNames.includes(node.data.label)) {
-            // node.isHidden = false;
-            return true;
+            return {
+              ...node,
+              isHidden: false
+            }
           }
 
-          // node.isHidden = true;
-          return false;
+          return {
+            ...node,
+            isHidden: true
+          }
         });
+
+        console.log(newElements);
 
         props.setElements(newElements);
         // props.onLayout!(props.lrOrientation);
@@ -107,6 +114,7 @@ export class NodeList extends React.Component<Props, INodeListState> {
         if (props.nodes[i]!.data) {
           const name = props.nodes[i]!.data.label
           this._allItems.push({ key: i, name: name, })
+          //this._selection.setKeySelected(`${i}`, true, false);
         }
       }
     }

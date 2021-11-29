@@ -66,7 +66,7 @@ export const initialNodes: Elements = [
   },
   {
     id: '6',
-    isHidden: false,
+    isHidden: true,
     data: { label: '_a_hidden_node' },
     position,
     sourcePosition: Position.Bottom,
@@ -111,6 +111,7 @@ export const initialNodes: Elements = [
     targetPosition: Position.Top,
     style: { width: 125, height: 40 },
   },
+
   {
     id: '105',
     isHidden: false,
@@ -132,7 +133,6 @@ export const initialNodes: Elements = [
 ];
 
 export const initialEdges: Elements = [
-  // Edges
   {
     id: 'edge-1-101',
     isHidden: false,

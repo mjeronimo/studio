@@ -20,7 +20,7 @@ import Panel from "@foxglove/studio-base/components/Panel";
 import { SaveConfig } from "@foxglove/studio-base/types/panels";
 
 // ReactFlow
-import ReactFlow, { ReactFlowProvider, Elements, Background } from 'react-flow-renderer';
+import ReactFlow, { ReactFlowProvider, Node, Edge, Background } from 'react-flow-renderer';
 
 // SystemView
 import { initialNodes, initialEdges } from './initial-elements';
@@ -35,25 +35,23 @@ type Props = {
 
 const SystemViewPanel = (props: Props) => {
 
-  const { config, saveConfig } = props
-  const [elements, setElements] = useState<Elements>(initialNodes)
-  const [edges, setEdges] = useState<Elements>(initialEdges)
+  const { config, saveConfig } = props;
+  const [nodes, setNodes] = useState(initialNodes);
+  const [edges, setEdges] = useState(initialEdges);
 
   useEffect(() => {
-    createGraphLayout(elements.concat(edges))
-      .then(els => {
-        setElements(els)
-      })
+    createGraphLayout(nodes, edges)
+      .then(els => setNodes(els))
       .catch(err => console.error(err))
   }, [])
 
   const onLayout = useCallback(
     (direction: any) => {
-      createGraphLayout(elements.concat(edges), direction)
-        .then(els => setElements(els))
+      createGraphLayout(nodes, edges, direction)
+        .then(els => setNodes(els))
         .catch(err => console.error(err))
     },
-    [elements]
+    [nodes]
   );
 
   const toggleOrientation = useCallback((lrOrientation: boolean) => {
@@ -61,13 +59,13 @@ const SystemViewPanel = (props: Props) => {
   }, []);
 
   return (
-    <>{!elements ? (
+    <>{!nodes ? (
       <p>Loading ...</p>
     ) : (
       <div className="layoutflow">
         <ReactFlowProvider>
           <ReactFlow
-            elements={elements.concat(edges)}
+            elements={nodes.concat(edges)}
             snapToGrid={true}
             snapGrid={[15, 15]}
             //{...otherProps}
@@ -75,9 +73,9 @@ const SystemViewPanel = (props: Props) => {
             <Background color="#aaa" gap={16} />
           </ReactFlow>
           <SystemViewToolbar
-            nodes={elements}
+            nodes={nodes}
             edges={edges}
-            setElements={setElements}
+            setElements={setNodes}
             lrOrientation={true}
             onToggleOrientation={toggleOrientation}
             onLayout={onLayout}
