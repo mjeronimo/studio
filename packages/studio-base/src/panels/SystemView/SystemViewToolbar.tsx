@@ -47,7 +47,8 @@ export type Props = {
   edges: Elements
   lrOrientation: boolean
   fitViewParams?: FitViewParams
-  setElements?: any     // TODO
+  setNodes?: any     // TODO
+  setEdges?: any     // TODO
   onZoomIn?: () => void
   onZoomOut?: () => void
   onFitview?: () => void
@@ -145,7 +146,7 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
         }}
       >
         <ToolGroup name={"Node List"}>
-          <NodeList nodes={props.nodes} edges={props.edges} setElements={props.setElements} lrOrientation={props.lrOrientation} onLayout={props.onLayout} />
+          <NodeList nodes={props.nodes} edges={props.edges} setNodes={props.setNodes} setEdges={props.setEdges} lrOrientation={props.lrOrientation} onLayout={props.onLayout} />
         </ToolGroup>
         <ToolGroup name={"Options"}>
           <>

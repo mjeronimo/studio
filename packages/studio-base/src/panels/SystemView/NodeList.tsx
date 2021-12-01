@@ -17,7 +17,7 @@ import * as React from 'react';
 import { CSSProperties, useEffect, useState } from 'react';
 
 // ReactFlow
-import { Elements } from 'react-flow-renderer';
+import { Elements, Edge } from 'react-flow-renderer';
 
 // Fluent UI
 import { DefaultButton } from "@fluentui/react";
@@ -50,7 +50,7 @@ const textFieldStyles: Partial<ITextFieldStyles> = { root: { maxWidth: '300px' }
 const selectNoneStyle: CSSProperties = { paddingLeft: '25px' };
 
 export interface INodeListItem {
-  key: number;
+  key: string;
   name: string;
 }
 
@@ -63,7 +63,8 @@ interface Props {
   nodes: Elements
   edges: Elements
   lrOrientation: boolean
-  setElements?: any // TODO
+  setNodes?: any // TODO
+  setEdges?: any // TODO
   onLayout?: any
 }
 
@@ -74,16 +75,19 @@ export class NodeList extends React.Component<Props, INodeListState> {
 
   constructor(props: Props) {
     super(props);
+    console.log("NodeList constructor");
 
-    this._selection = new Selection({
+    this._selection = new Selection( {
+
       onSelectionChanged: () => {
         this.setState({ selectionDetails: this._getSelectionDetails() });
 
+        console.log("onSelectionChanged");
+
         const items = this._selection.getItems();
         const selectedItems = this._selection.getSelectedIndices();
-
-        // TODO: #1
-        const newElements = props.nodes.map(node => {
+        
+        const newNodes = props.nodes.map(node => {
           const selectedNames: string[] = selectedItems.map((item) => { 
             return (items[+item] as INodeListItem).name;
           });
@@ -101,10 +105,30 @@ export class NodeList extends React.Component<Props, INodeListState> {
           }
         });
 
-        console.log(newElements);
+        const newEdges = props.edges.map(edge => {
+          const selectedIDs: string[] = selectedItems.map((item) => { 
+            items
+            return (items[+item] as INodeListItem).key as string;
+          });
 
-        props.setElements(newElements);
-        // props.onLayout!(props.lrOrientation);
+          if (selectedIDs.includes((edge as Edge<any>).source) || selectedIDs.includes((edge as Edge<any>).target)) {
+            return {
+              ...edge,
+              isHidden: false
+            }
+          }
+
+          return {
+            ...edge,
+            isHidden: true
+          }
+        });
+
+        console.log("onSelectionChanged: nodes: ");
+        console.log(newNodes);
+
+        props.setEdges(newEdges);
+        props.setNodes(newNodes);
       }
     });
 
@@ -112,9 +136,14 @@ export class NodeList extends React.Component<Props, INodeListState> {
     for (let i = 0; i < props.nodes.length; i++) {
       if (props.nodes[i]) {
         if (props.nodes[i]!.data) {
-          const name = props.nodes[i]!.data.label
-          this._allItems.push({ key: i, name: name, })
-          //this._selection.setKeySelected(`${i}`, true, false);
+          const id = props.nodes[i]!.id;
+          const name = props.nodes[i]!.data.label;
+
+          console.log(id);
+          console.log(name);
+
+          // this._allItems.push({ key: i.toString(), name: name, })
+          this._allItems.push({ key: props.nodes[i]!.id, name: name, })
         }
       }
     }
@@ -133,6 +162,16 @@ export class NodeList extends React.Component<Props, INodeListState> {
       items: this._allItems,
       selectionDetails: this._getSelectionDetails(),
     };
+  }
+
+  public override componentDidMount() {
+    this._selection.setChangeEvents(false, true);
+    for (let i = 0; i < this.props.nodes.length; i++) {
+      const key = this._allItems[i]!.key;
+      const item = this.props.nodes.find(obj => obj.id === key);
+      this._selection.setKeySelected(`${key}`, !item!.isHidden, false);
+    }
+    this._selection.setChangeEvents(true, true);
   }
 
   private onRenderDetailsHeader: IRenderFunction<IDetailsHeaderProps> = (props, defaultRender) => {
@@ -171,8 +210,9 @@ export class NodeList extends React.Component<Props, INodeListState> {
             () => {
               const newSelection = this._selection;
               newSelection.setItems(this._allItems);
-              for (let i = 0; i <= this._allItems.length; i++) {
-                newSelection.setKeySelected(`${i}`, true, false);
+              for (let i = 0; i < this._allItems.length; i++) {
+                const key = this._allItems[i]!.key;
+                newSelection.setKeySelected(`${key}`, true, false);
               }
               setSelection(newSelection);
               setSelectionDetails(this._getSelectionDetails());
@@ -195,8 +235,11 @@ export class NodeList extends React.Component<Props, INodeListState> {
               () => {
                 const newSelection = this._selection;
                 newSelection.setItems(this._allItems);
-                for (let i = 0; i <= this._allItems.length; i++) {
-                  newSelection.setKeySelected(`${i}`, false, false);
+                for (let i = 0; i < this._allItems.length; i++) {
+                  // newSelection.setKeySelected(`${this._allItems[i]!.key}`, false, false);
+                  //const key = this._allItems[i]!.key;
+                  //const item = this.props.nodes.find(obj => obj.id === key);
+                  //newSelection.setKeySelected(`${key}`, false, false);
                 }
                 setSelection(newSelection);
                 setSelectionDetails(this._getSelectionDetails());

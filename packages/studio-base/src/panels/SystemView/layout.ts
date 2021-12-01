@@ -161,6 +161,9 @@ const elk = new ELK({
 
 export const createGraphLayout = async (nodes: Elements, edges: Elements, direction = 'DOWN'): Promise<Elements> => {
 
+  console.log("createGraphLayout");
+  console.log(nodes);
+
   const elk_nodes: ElkNode[] = []
   nodes.forEach((el) => {
     if (!el.isHidden) {

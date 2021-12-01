@@ -40,6 +40,7 @@ const SystemViewPanel = (props: Props) => {
   const [edges, setEdges] = useState(initialEdges);
 
   useEffect(() => {
+    console.log("SystemViewPanel: useEffect");
     createGraphLayout(nodes, edges)
       .then(els => setNodes(els))
       .catch(err => console.error(err))
@@ -47,6 +48,9 @@ const SystemViewPanel = (props: Props) => {
 
   const onLayout = useCallback(
     (direction: any) => {
+      console.log("SystemViewPanel: onLayout");
+      console.log(nodes);
+      console.log("onLayout: calling createGraphLayout");
       createGraphLayout(nodes, edges, direction)
         .then(els => setNodes(els))
         .catch(err => console.error(err))
@@ -75,7 +79,8 @@ const SystemViewPanel = (props: Props) => {
           <SystemViewToolbar
             nodes={nodes}
             edges={edges}
-            setElements={setNodes}
+            setNodes={setNodes}
+            setEdges={setEdges}
             lrOrientation={true}
             onToggleOrientation={toggleOrientation}
             onLayout={onLayout}
