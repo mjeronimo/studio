@@ -123,8 +123,13 @@ export class NodeList extends React.Component<Props, INodeListState> {
             () => {
               const newSelection = this._selection;
               newSelection.setItems(this.props.nodes);
+              this._selection.setChangeEvents(false, true);
               for (let i = 0; i < this.props.nodes.length; i++) {
                 const key = this.props.nodes[i]!.key;
+                // Avoid updating the graph 'til the last selection change
+                if (i == this.props.nodes.length-1) {
+                  this._selection.setChangeEvents(true, true);
+                }
                 newSelection.setKeySelected(`${key}`, true, false);
               }
               setSelection(newSelection);

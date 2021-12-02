@@ -160,11 +160,6 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
               checked={false}
               onChange={() => console.log("onChange")}
             />
-            <Checkbox
-              label="Include hidden topics"
-              checked={false}
-              onChange={() => console.log("onChange")}
-            />
           </>
         </ToolGroup>
       </ExpandingToolbar>
