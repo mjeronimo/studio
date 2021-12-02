@@ -16,9 +16,6 @@
 import * as React from 'react';
 import { CSSProperties, useEffect, useState } from 'react';
 
-// ReactFlow
-import { Elements, Edge } from 'react-flow-renderer';
-
 // Fluent UI
 import { DefaultButton } from "@fluentui/react";
 import { TextField, ITextFieldStyles } from '@fluentui/react/lib/TextField';
@@ -33,18 +30,11 @@ import Icon from "@foxglove/studio-base/components/Icon";
 // MDI Icons
 import SelectAllIcon from "@mdi/svg/svg/format-list-bulleted-square.svg";
 import SelectNoneIcon from "@mdi/svg/svg/format-list-checkbox.svg";
-import { Texture } from 'three';
 
 const exampleChildClass = mergeStyles({
   display: 'block',
   marginBottom: '10px',
 });
-
-export interface IButtonExampleProps {
-  // These are set based on the toggles shown above the examples (not needed in real code)
-  disabled?: boolean;
-  checked?: boolean;
-}
 
 const textFieldStyles: Partial<ITextFieldStyles> = { root: { maxWidth: '300px' } };
 const selectNoneStyle: CSSProperties = { paddingLeft: '25px' };
@@ -52,124 +42,55 @@ const selectNoneStyle: CSSProperties = { paddingLeft: '25px' };
 export interface INodeListItem {
   key: string;
   name: string;
+  isHidden: boolean;
 }
 
 export interface INodeListState {
   items: INodeListItem[];
-  selectionDetails: string,
 }
 
 interface Props {
-  nodes: Elements
-  edges: Elements
+  nodes: INodeListItem[]
   lrOrientation: boolean
-  setNodes?: any // TODO
-  setEdges?: any // TODO
-  onLayout?: any
+  onSelectionChange: (selectedNodes: string[]) => void
 }
 
 export class NodeList extends React.Component<Props, INodeListState> {
   private _selection: Selection;
-  private _allItems: INodeListItem[];
   private _columns: IColumn[];
 
   constructor(props: Props) {
     super(props);
-    console.log("NodeList constructor");
 
     this._selection = new Selection( {
 
       onSelectionChanged: () => {
-        this.setState({ selectionDetails: this._getSelectionDetails() });
-
-        console.log("onSelectionChanged");
-
         const items = this._selection.getItems();
         const selectedItems = this._selection.getSelectedIndices();
-        
-        const newNodes = props.nodes.map(node => {
-          const selectedNames: string[] = selectedItems.map((item) => { 
-            return (items[+item] as INodeListItem).name;
-          });
 
-          if (node.data && node.data.label && selectedNames.includes(node.data.label)) {
-            return {
-              ...node,
-              isHidden: false
-            }
-          }
-
-          return {
-            ...node,
-            isHidden: true
-          }
+        const selectedNames: string[] = selectedItems.map((item) => { 
+          return (items[+item] as INodeListItem).name;
         });
 
-        const newEdges = props.edges.map(edge => {
-          const selectedIDs: string[] = selectedItems.map((item) => { 
-            items
-            return (items[+item] as INodeListItem).key as string;
-          });
-
-          if (selectedIDs.includes((edge as Edge<any>).source) || selectedIDs.includes((edge as Edge<any>).target)) {
-            return {
-              ...edge,
-              isHidden: false
-            }
-          }
-
-          return {
-            ...edge,
-            isHidden: true
-          }
-        });
-
-        console.log("onSelectionChanged: nodes: ");
-        console.log(newNodes);
-
-        props.setEdges(newEdges);
-        props.setNodes(newNodes);
+        props.onSelectionChange(selectedNames);
       }
     });
-
-    this._allItems = [];
-    for (let i = 0; i < props.nodes.length; i++) {
-      if (props.nodes[i]) {
-        if (props.nodes[i]!.data) {
-          const id = props.nodes[i]!.id;
-          const name = props.nodes[i]!.data.label;
-
-          console.log(id);
-          console.log(name);
-
-          // this._allItems.push({ key: i.toString(), name: name, })
-          this._allItems.push({ key: props.nodes[i]!.id, name: name, })
-        }
-      }
-    }
-
-    this._allItems.sort(function (a, b) {
-      if (a.name < b.name) { return -1; }
-      if (a.name > b.name) { return 1; }
-      return 0;
-    })
 
     this._columns = [
       { key: 'column1', name: 'Name', fieldName: 'name', minWidth: 200, maxWidth: 200, isResizable: true },
     ];
 
     this.state = {
-      items: this._allItems,
-      selectionDetails: this._getSelectionDetails(),
+      items: props.nodes
     };
   }
 
   public override componentDidMount() {
     this._selection.setChangeEvents(false, true);
     for (let i = 0; i < this.props.nodes.length; i++) {
-      const key = this._allItems[i]!.key;
-      const item = this.props.nodes.find(obj => obj.id === key);
-      this._selection.setKeySelected(`${key}`, !item!.isHidden, false);
+      const key = this.props.nodes[i]!.key;
+      const isHidden = this.props.nodes[i]!.isHidden;
+      this._selection.setKeySelected(`${key}`, !isHidden, false);
     }
     this._selection.setChangeEvents(true, true);
   }
@@ -179,16 +100,8 @@ export class NodeList extends React.Component<Props, INodeListState> {
       return null;
     }
 
-    const [selectionDetails, setSelectionDetails] = useState({})
-    const [selection, setSelection] = useState(new Selection({
-      onSelectionChanged: () => setSelectionDetails(this._getSelectionDetails())
-    }))
-
-    useEffect(() => {
-      setSelection(new Selection({
-        onSelectionChanged: () => setSelectionDetails(this._getSelectionDetails())
-      }))
-    }, [selectionDetails])
+    const [selection, setSelection] = useState(new Selection())
+    useEffect(() => { setSelection(new Selection()) }, [])
 
     return (
       <div>
@@ -209,13 +122,12 @@ export class NodeList extends React.Component<Props, INodeListState> {
           onClick={
             () => {
               const newSelection = this._selection;
-              newSelection.setItems(this._allItems);
-              for (let i = 0; i < this._allItems.length; i++) {
-                const key = this._allItems[i]!.key;
+              newSelection.setItems(this.props.nodes);
+              for (let i = 0; i < this.props.nodes.length; i++) {
+                const key = this.props.nodes[i]!.key;
                 newSelection.setKeySelected(`${key}`, true, false);
               }
               setSelection(newSelection);
-              setSelectionDetails(this._getSelectionDetails());
             }
           }
         >
@@ -234,15 +146,8 @@ export class NodeList extends React.Component<Props, INodeListState> {
             onClick={
               () => {
                 const newSelection = this._selection;
-                newSelection.setItems(this._allItems);
-                for (let i = 0; i < this._allItems.length; i++) {
-                  // newSelection.setKeySelected(`${this._allItems[i]!.key}`, false, false);
-                  //const key = this._allItems[i]!.key;
-                  //const item = this.props.nodes.find(obj => obj.id === key);
-                  //newSelection.setKeySelected(`${key}`, false, false);
-                }
+                newSelection.setItems(this.props.nodes);
                 setSelection(newSelection);
-                setSelectionDetails(this._getSelectionDetails());
               }
             }
           >
@@ -258,7 +163,7 @@ export class NodeList extends React.Component<Props, INodeListState> {
   }
 
   public override render(): JSX.Element {
-    const { items, selectionDetails } = this.state;
+    const { items } = this.state;
 
     return (
       <div>
@@ -271,7 +176,6 @@ export class NodeList extends React.Component<Props, INodeListState> {
             layoutMode={DetailsListLayoutMode.justified}
             selection={this._selection}
             selectionPreservedOnEmptyClick={true}
-            onItemInvoked={this._onItemInvoked}
             onRenderDetailsHeader={this.onRenderDetailsHeader}
             ariaLabelForSelectionColumn="Toggle selection"
             ariaLabelForSelectAllCheckbox="Toggle selection for all items"
@@ -282,26 +186,9 @@ export class NodeList extends React.Component<Props, INodeListState> {
     );
   }
 
-  private _getSelectionDetails(): string {
-    const selectionCount = this._selection.getSelectedCount();
-
-    switch (selectionCount) {
-      case 0:
-        return 'No items selected';
-      case 1:
-        return '1 item selected: ' + (this._selection.getSelection()[0] as INodeListItem).name;
-      default:
-        return `${selectionCount} items selected`;
-    }
-  }
-
   private _onFilter = (ev: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, text: string | undefined): void => {
     this.setState({
-      items: text ? this._allItems.filter(i => i.name.toLowerCase().indexOf(text) > -1) : this._allItems,
+      items: text ? this.props.nodes.filter(i => i.name.toLowerCase().indexOf(text) > -1) : this.props.nodes,
     });
   };
-
-  private _onItemInvoked(item: INodeListItem): void {
-    console.log(`Item invoked: ${item.name}`);
-  }
 }

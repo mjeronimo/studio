@@ -161,9 +161,6 @@ const elk = new ELK({
 
 export const createGraphLayout = async (nodes: Elements, edges: Elements, direction = 'DOWN'): Promise<Elements> => {
 
-  console.log("createGraphLayout");
-  console.log(nodes);
-
   const elk_nodes: ElkNode[] = []
   nodes.forEach((el) => {
     if (!el.isHidden) {
@@ -179,12 +176,14 @@ export const createGraphLayout = async (nodes: Elements, edges: Elements, direct
 
   const elk_edges: ElkPrimitiveEdge[] = []
   edges.forEach((el) => {
-    const edge: Edge = el as Edge;
-    elk_edges.push({
-      id: edge.id,
-      target: edge.target,
-      source: edge.source
-    })
+    if (!el.isHidden) {
+      const edge: Edge = el as Edge;
+      elk_edges.push({
+        id: edge.id,
+        target: edge.target,
+        source: edge.source
+      })
+    }
   });
 
   const isHorizontal = direction === 'RIGHT';

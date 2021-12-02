@@ -54,7 +54,7 @@ export type Props = {
   onFitview?: () => void
   onInteractiveChange?: (isInteractive: boolean) => void
   onToggleOrientation?: (lrOrientation: boolean) => void
-  onLayout?: any // TODO
+  onSelectionChange: (selectedNodes: string[]) => void
 };
 
 export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
@@ -146,7 +146,7 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
         }}
       >
         <ToolGroup name={"Node List"}>
-          <NodeList nodes={props.nodes} edges={props.edges} setNodes={props.setNodes} setEdges={props.setEdges} lrOrientation={props.lrOrientation} onLayout={props.onLayout} />
+          <NodeList nodes={props.nodes.map((node) => { return { key: node.id, name: node.data.label as string, isHidden: node.isHidden as boolean } })} lrOrientation={props.lrOrientation} onSelectionChange={props.onSelectionChange} />
         </ToolGroup>
         <ToolGroup name={"Options"}>
           <>

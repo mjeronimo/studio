@@ -16,7 +16,8 @@ import { storiesOf } from "@storybook/react";
 import { ReactFlowProvider } from 'react-flow-renderer';
 import { SystemViewToolbar } from "./SystemViewToolbar";
 import MockPanelContextProvider from "@foxglove/studio-base/components/MockPanelContextProvider";
-import initialElements from './initial-elements';
+import { initialNodes } from './initial-elements';
+
 
 const containerStyle = {
   margin: 8,
@@ -50,7 +51,7 @@ const SystemViewToolbarWrapper = (props: any) => (
     <MockPanelContextProvider>
       <ReactFlowProvider>
         <SystemViewToolbar
-          nodes={initialElements}
+          nodes={initialNodes}
           edges={[]}
           lrOrientation={true}
           onZoomIn={zoomIn}

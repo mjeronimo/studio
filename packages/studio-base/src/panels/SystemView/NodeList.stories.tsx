@@ -15,7 +15,7 @@
 import { storiesOf } from "@storybook/react";
 import MockPanelContextProvider from "@foxglove/studio-base/components/MockPanelContextProvider";
 import { NodeList } from "./NodeList";
-import initialElements from './initial-elements';
+import { initialNodes } from './initial-elements';
 
 const containerStyle = {
   margin: 8,
@@ -26,8 +26,8 @@ const NodeListWrapper = (props: any) => (
   <div style={containerStyle}>
     <MockPanelContextProvider>
       <NodeList
-        nodes={initialElements}
-        edges={[]}
+        nodes={initialNodes.map((node) => { return { key: node.id, name: node.data.label as string, isHidden: node.isHidden as boolean } })} 
+        lrOrientation={true}
       />
     </MockPanelContextProvider>
   </div>

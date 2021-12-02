@@ -40,7 +40,6 @@ const SystemViewPanel = (props: Props) => {
   const [edges, setEdges] = useState(initialEdges);
 
   useEffect(() => {
-    console.log("SystemViewPanel: useEffect");
     createGraphLayout(nodes, edges)
       .then(els => setNodes(els))
       .catch(err => console.error(err))
@@ -48,19 +47,53 @@ const SystemViewPanel = (props: Props) => {
 
   const onLayout = useCallback(
     (direction: any) => {
-      console.log("SystemViewPanel: onLayout");
-      console.log(nodes);
-      console.log("onLayout: calling createGraphLayout");
       createGraphLayout(nodes, edges, direction)
         .then(els => setNodes(els))
         .catch(err => console.error(err))
     },
-    [nodes]
+    []
   );
 
-  const toggleOrientation = useCallback((lrOrientation: boolean) => {
-    onLayout(lrOrientation ? 'RIGHT' : 'DOWN');
-  }, []);
+  const onSelectionChange = async (selectedNames: string[]) => {
+    const newNodes = nodes.map(node => {
+      if (node.data && node.data.label && selectedNames.includes(node.data.label)) {
+        return {
+          ...node,
+          isHidden: false
+        }
+      }
+      return {
+        ...node,
+        isHidden: true
+      }
+    });
+
+    const selectedNodes = newNodes.filter(node => { return !(node as Node).isHidden });
+    const selectedIds = selectedNodes.map(node => { return node.id })
+
+    const newEdges = edges.map(edge => {
+      if (selectedIds.includes((edge as Edge<any>).source) && selectedIds.includes((edge as Edge<any>).target)) {
+        return {
+          ...edge,
+          isHidden: false
+        }
+      }
+      return {
+        ...edge,
+        isHidden: true
+      }
+    });
+
+    createGraphLayout(newNodes, newEdges, 'DOWN')
+      .then(els => { setNodes(els); setEdges(newEdges); })
+      .catch(err => console.error(err))
+  }
+
+  const toggleOrientation = async (lrOrientation: boolean) => {
+    createGraphLayout(nodes, edges, lrOrientation? 'RIGHT' : 'DOWN')
+      .then(els => { setNodes(els); } )
+      .catch(err => console.error(err))
+  }
 
   return (
     <>{!nodes ? (
@@ -83,7 +116,7 @@ const SystemViewPanel = (props: Props) => {
             setEdges={setEdges}
             lrOrientation={true}
             onToggleOrientation={toggleOrientation}
-            onLayout={onLayout}
+            onSelectionChange={onSelectionChange}
           />
         </ReactFlowProvider>
       </div>
