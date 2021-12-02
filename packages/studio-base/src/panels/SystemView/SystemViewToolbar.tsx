@@ -80,30 +80,31 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
   const setInteractive = useStoreActions((actions) => actions.setInteractive);
   const isInteractive = useStoreState((s) => s.nodesDraggable && s.nodesConnectable && s.elementsSelectable);
 
-  const onToggleOrientation = useCallback(() => {
-    setLROrientation(!lrOrientation);
-    props.onToggleOrientation?.(lrOrientation);
-  }, [lrOrientation, props.onToggleOrientation]);
+  const onToggleOrientation = () => { 
+    const newOrientation = !lrOrientation;
+    setLROrientation(newOrientation);
+    props.onToggleOrientation?.(newOrientation);
+  }
 
-  const onZoomInHandler = useCallback(() => {
+  const onZoomInHandler = () => {
     zoomIn?.();
     props.onZoomIn?.();
-  }, [zoomIn, props.onZoomIn]);
+  }
 
-  const onZoomOutHandler = useCallback(() => {
+  const onZoomOutHandler = () => {
     zoomOut?.();
     props.onZoomOut?.();
-  }, [zoomOut, props.onZoomOut]);
+  }
 
-  const onFitViewHandler = useCallback(() => {
+  const onFitViewHandler = () => {
     fitView?.(props.fitViewParams);
     props.onFitview?.();
-  }, [fitView, props.fitViewParams, props.onFitview]);
+  }
 
-  const onInteractiveChangeHandler = useCallback(() => {
+  const onInteractiveChangeHandler = () => {
     setInteractive?.(!isInteractive);
     props.onInteractiveChange?.(!isInteractive);
-  }, [isInteractive, setInteractive, props.onInteractiveChange]);
+  }
 
   return (
     <Toolbar>
@@ -146,7 +147,7 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
         }}
       >
         <ToolGroup name={"Node List"}>
-          <NodeList nodes={props.nodes.map((node) => { return { key: node.id, name: node.data.label as string, isHidden: node.isHidden as boolean } })} lrOrientation={props.lrOrientation} onSelectionChange={props.onSelectionChange} />
+          <NodeList nodes={props.nodes.map((node) => { return { key: node.id, name: node.data.label as string, isHidden: node.isHidden as boolean } })} onSelectionChange={props.onSelectionChange} />
         </ToolGroup>
         <ToolGroup name={"Options"}>
           <>
@@ -166,7 +167,7 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
       <div className={styles.buttons}>
         <Button className={styles.iconButton} tooltip="Change graph orientation" onClick={onToggleOrientation}>
           <FoxgloveIcon style={{ color: "white" }} size="small">
-            {lrOrientation ? <ArrowLeftRightIcon /> : <ArrowUpDownIcon />}
+            {lrOrientation ? <ArrowUpDownIcon /> : <ArrowLeftRightIcon />}
           </FoxgloveIcon>
         </Button>
       </div>

@@ -51,7 +51,6 @@ export interface INodeListState {
 
 interface Props {
   nodes: INodeListItem[]
-  lrOrientation: boolean
   onSelectionChange: (selectedNodes: string[]) => void
 }
 

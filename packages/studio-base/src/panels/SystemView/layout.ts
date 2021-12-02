@@ -159,7 +159,9 @@ const elk = new ELK({
   }
 })
 
-export const createGraphLayout = async (nodes: Elements, edges: Elements, direction = 'DOWN'): Promise<Elements> => {
+export const createGraphLayout = async (nodes: Elements, edges: Elements, lrOrientation: boolean): Promise<Elements> => {
+
+  const direction = lrOrientation ? 'RIGHT' : 'DOWN';
 
   const elk_nodes: ElkNode[] = []
   nodes.forEach((el) => {

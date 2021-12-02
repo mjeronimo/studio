@@ -13,7 +13,7 @@
 // limitations under the License.
 
 // React
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 
 // Foxglove
 import Panel from "@foxglove/studio-base/components/Panel";
@@ -38,21 +38,13 @@ const SystemViewPanel = (props: Props) => {
   const { config, saveConfig } = props;
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
+  const [lrOrientation, setLROrientation] = useState(false);
 
   useEffect(() => {
-    createGraphLayout(nodes, edges)
+    createGraphLayout(nodes, edges, lrOrientation)
       .then(els => setNodes(els))
       .catch(err => console.error(err))
   }, [])
-
-  const onLayout = useCallback(
-    (direction: any) => {
-      createGraphLayout(nodes, edges, direction)
-        .then(els => setNodes(els))
-        .catch(err => console.error(err))
-    },
-    []
-  );
 
   const onSelectionChange = async (selectedNames: string[]) => {
     const newNodes = nodes.map(node => {
@@ -84,13 +76,14 @@ const SystemViewPanel = (props: Props) => {
       }
     });
 
-    createGraphLayout(newNodes, newEdges, 'DOWN')
+    createGraphLayout(newNodes, newEdges, lrOrientation)
       .then(els => { setNodes(els); setEdges(newEdges); })
       .catch(err => console.error(err))
   }
 
   const toggleOrientation = async (lrOrientation: boolean) => {
-    createGraphLayout(nodes, edges, lrOrientation? 'RIGHT' : 'DOWN')
+    setLROrientation(lrOrientation);
+    createGraphLayout(nodes, edges, lrOrientation)
       .then(els => { setNodes(els); } )
       .catch(err => console.error(err))
   }
@@ -114,7 +107,7 @@ const SystemViewPanel = (props: Props) => {
             edges={edges}
             setNodes={setNodes}
             setEdges={setEdges}
-            lrOrientation={true}
+            lrOrientation={lrOrientation}
             onToggleOrientation={toggleOrientation}
             onSelectionChange={onSelectionChange}
           />
