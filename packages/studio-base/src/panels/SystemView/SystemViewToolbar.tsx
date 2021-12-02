@@ -29,7 +29,7 @@ import { useStoreActions, useStoreState, useZoomPanHelper, FitViewParams, Elemen
 
 // SystemView
 import Toolbar from "./Toolbar";
-import { NodeList } from "./NodeList";
+import { NodeList, INodeListItem } from "./NodeList";
 
 // MDI icons
 import ArrowLeftRightIcon from "@mdi/svg/svg/arrow-left-right.svg";
@@ -60,6 +60,7 @@ export type Props = {
 export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
 
   const [lrOrientation, setLROrientation] = useState<boolean>(props.lrOrientation);
+  const [includeHiddenNodes, setIncludeHiddenNotes] = useState<boolean>(false);
 
   let defaultSelectedTab: string | undefined;
   const [selectedTab, setSelectedTab] = React.useState(defaultSelectedTab);
@@ -80,7 +81,7 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
   const setInteractive = useStoreActions((actions) => actions.setInteractive);
   const isInteractive = useStoreState((s) => s.nodesDraggable && s.nodesConnectable && s.elementsSelectable);
 
-  const onToggleOrientation = () => { 
+  const onToggleOrientation = () => {
     const newOrientation = !lrOrientation;
     setLROrientation(newOrientation);
     props.onToggleOrientation?.(newOrientation);
@@ -104,6 +105,26 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
   const onInteractiveChangeHandler = () => {
     setInteractive?.(!isInteractive);
     props.onInteractiveChange?.(!isInteractive);
+  }
+
+  const onCheckboxChange = (isChecked: boolean) => {
+    setIncludeHiddenNotes(isChecked);
+  }
+
+  const filterNodeList = (nodes: Elements): INodeListItem[] => {
+    const elements: INodeListItem[] = props.nodes.map((node) => { return { key: node.id, name: node.data.label as string, isHidden: node.isHidden as boolean } });
+    const newElements = elements.reduce(function(filtered: INodeListItem[], item: INodeListItem) {
+      if (item.name.startsWith('_')) {
+        if (includeHiddenNodes) {
+          filtered.push(item);
+        }
+      } else {
+        filtered.push(item);
+      }
+      return filtered;
+    }, []);
+
+    return newElements;
   }
 
   return (
@@ -147,7 +168,11 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
         }}
       >
         <ToolGroup name={"Node List"}>
-          <NodeList nodes={props.nodes.map((node) => { return { key: node.id, name: node.data.label as string, isHidden: node.isHidden as boolean } })} onSelectionChange={props.onSelectionChange} />
+          <NodeList
+            //nodes={props.nodes.map((node) => { return { key: node.id, name: node.data.label as string, isHidden: node.isHidden as boolean } })}
+            nodes={filterNodeList(props.nodes)}
+            onSelectionChange={props.onSelectionChange}
+          />
         </ToolGroup>
         <ToolGroup name={"Options"}>
           <>
@@ -158,8 +183,8 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
             />
             <Checkbox
               label="Include hidden nodes"
-              checked={false}
-              onChange={() => console.log("onChange")}
+              checked={includeHiddenNodes}
+              onChange={onCheckboxChange}
             />
           </>
         </ToolGroup>

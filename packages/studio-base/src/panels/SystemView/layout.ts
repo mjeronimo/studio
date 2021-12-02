@@ -153,9 +153,7 @@ const elk = new ELK({
     'spacing.nodeNodeBetweenLayers': '125',
 
     'elk.spacing.nodeNode': '75',
-
-    // 'org.eclipse.elk.zoomToFit': 'true',
-    'zoomToFit': 'true',
+    'elk.zoomToFit': 'true',
   }
 })
 
