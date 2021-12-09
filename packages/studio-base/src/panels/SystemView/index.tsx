@@ -20,7 +20,9 @@ import Panel from "@foxglove/studio-base/components/Panel";
 import { SaveConfig } from "@foxglove/studio-base/types/panels";
 
 // ReactFlow
-import ReactFlow, { ReactFlowProvider, Node, Edge, Background } from 'react-flow-renderer';
+import ReactFlow, { ReactFlowProvider, Node, Edge, Background, OnLoadParams } from 'react-flow-renderer';
+import { useStoreActions, useStoreState, FitViewParams } from 'react-flow-renderer';
+
 
 // SystemView
 import { initialNodes, initialEdges } from './initial-elements';
@@ -39,14 +41,27 @@ const SystemViewPanel = (props: Props) => {
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
   const [lrOrientation, setLROrientation] = useState(false);
+  const [reactFlowInstance, setReactFlowInstance] = useState<OnLoadParams>();
+
+  // const { zoomIn, zoomOut, fitView } = useZoomPanHelper();
+  //const setInteractive = useStoreActions((actions) => actions.setInteractive);
+  const setInteractive = (isInteractive: boolean) => {}
+  //const isInteractive = useStoreState((s) => s.nodesDraggable && s.nodesConnectable && s.elementsSelectable);
+  const isInteractive = false; 
+
+  const onLoad = async (_reactFlowInstance: OnLoadParams) => {
+    console.log("onLoad");
+    setReactFlowInstance(_reactFlowInstance);
+  }
 
   useEffect(() => {
+    console.log("useEffect");
     createGraphLayout(nodes, edges, lrOrientation)
-      .then(els => setNodes(els))
+      .then(els => { setNodes(els); reactFlowInstance!.fitView(); reactFlowInstance!.zoomTo(1.0); })
       .catch(err => console.error(err))
   }, [])
 
-  const onSelectionChange = async (selectedNames: string[]) => {
+  const selectionChange = async (selectedNames: string[]) => {
     const newNodes = nodes.map(node => {
       if (node.data && node.data.label && selectedNames.includes(node.data.label)) {
         return {
@@ -81,10 +96,26 @@ const SystemViewPanel = (props: Props) => {
       .catch(err => console.error(err))
   }
 
+  const zoomIn = () => {
+    reactFlowInstance?.zoomIn();
+  }
+
+  const zoomOut = () => {
+    reactFlowInstance?.zoomOut();
+  }
+
+  const fitView = () => {
+    reactFlowInstance?.fitView();
+  }
+
+  const interactiveChange = (isInteractive: boolean) => {
+    setInteractive?.(isInteractive);
+  }
+
   const toggleOrientation = async (lrOrientation: boolean) => {
     setLROrientation(lrOrientation);
     createGraphLayout(nodes, edges, lrOrientation)
-      .then(els => { setNodes(els); } )
+      .then(els => { setNodes(els); reactFlowInstance!.zoomTo(1.0); reactFlowInstance!.fitView(); })
       .catch(err => console.error(err))
   }
 
@@ -98,18 +129,24 @@ const SystemViewPanel = (props: Props) => {
             elements={nodes.concat(edges)}
             snapToGrid={true}
             snapGrid={[15, 15]}
+            defaultZoom={1.0}
+            minZoom={0.2}
+            maxZoom={4}
+            onLoad={onLoad}
             //{...otherProps}
           >
             <Background color="#aaa" gap={16} />
           </ReactFlow>
           <SystemViewToolbar
             nodes={nodes}
-            edges={edges}
-            setNodes={setNodes}
-            setEdges={setEdges}
             lrOrientation={lrOrientation}
+            isInteractive={isInteractive}
+            onZoomIn={zoomIn}
+            onZoomOut={zoomOut}
+            onFitview={fitView}
+            onInteractiveChange={interactiveChange}
             onToggleOrientation={toggleOrientation}
-            onSelectionChange={onSelectionChange}
+            onSelectionChange={selectionChange}
           />
         </ReactFlowProvider>
       </div>

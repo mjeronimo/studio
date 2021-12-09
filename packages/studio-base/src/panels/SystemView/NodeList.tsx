@@ -17,10 +17,10 @@ import * as React from 'react';
 import { CSSProperties, useEffect, useState } from 'react';
 
 // Fluent UI
-import { DefaultButton } from "@fluentui/react";
+import { DefaultButton, Checkbox } from "@fluentui/react";
 import { TextField, ITextFieldStyles } from '@fluentui/react/lib/TextField';
 import { IRenderFunction } from '@fluentui/utilities';
-import { DetailsList, DetailsListLayoutMode, IDetailsHeaderProps, Selection, IColumn } from '@fluentui/react/lib/DetailsList';
+import { DetailsList, DetailsRow, IDetailsListProps, IDetailsListCheckboxProps, IDetailsRowStyles, DetailsListLayoutMode, IDetailsHeaderProps, Selection, IColumn, DEFAULT_ROW_HEIGHTS } from '@fluentui/react/lib/DetailsList';
 import { MarqueeSelection } from '@fluentui/react/lib/MarqueeSelection';
 import { mergeStyles } from '@fluentui/react/lib/Styling';
 
@@ -60,7 +60,6 @@ export class NodeList extends React.Component<Props, INodeListState> {
 
   constructor(props: Props) {
     super(props);
-
     this._selection = new Selection( {
 
       onSelectionChanged: () => {
@@ -76,7 +75,7 @@ export class NodeList extends React.Component<Props, INodeListState> {
     });
 
     this._columns = [
-      { key: 'column1', name: 'Name', fieldName: 'name', minWidth: 200, maxWidth: 200, isResizable: true },
+      { key: 'column1', name: 'Name', fieldName: 'name', minWidth: 250, maxWidth: 250, isResizable: true },
     ];
 
     this.state = {
@@ -166,6 +165,38 @@ export class NodeList extends React.Component<Props, INodeListState> {
     );
   }
 
+  private onRenderCheckbox(props: IDetailsListCheckboxProps | undefined) {
+    const styles = {
+      checkbox: {
+        width: '15px',
+        height: '15px',
+      }
+    };
+    return (
+      <div style={{ pointerEvents: 'none' }}>
+        <Checkbox checked={props!.checked} styles={styles}/>
+      </div>
+    );
+  }
+
+  private onRenderRow: IDetailsListProps['onRenderRow'] = props => {
+    if (!props) {
+      return null;
+    }
+
+    const customStyles: Partial<IDetailsRowStyles> = {
+    };
+
+    //customStyles.root = { border: '0px solid green', margin: 0, padding: 0 };
+    //customStyles.cell = { border: '0px solid white', margin: 0, paddingTop: 14, minHeight: 0, height: rowHeight};
+    customStyles.cell = { border: '0px solid white', paddingTop: 9 };
+    customStyles.checkCell = { border: '0px solid yellow', width: '32px' };
+    customStyles.check = { border: '0px solid orange', width: '32px', maxWidth: '32px' };
+    //customStyles.fields = { border: '0px solid red', margin: 0, padding: 0 };
+
+    return <DetailsRow {...props} styles={customStyles} />;
+  };
+
   public override render(): JSX.Element {
     const { items } = this.state;
 
@@ -173,14 +204,21 @@ export class NodeList extends React.Component<Props, INodeListState> {
       <div>
         <MarqueeSelection selection={this._selection}>
           <DetailsList
-            compact={false}
+            compact={true}
             items={items}
             columns={this._columns}
             setKey="set"
-            layoutMode={DetailsListLayoutMode.justified}
+            //layoutMode={DetailsListLayoutMode.justified}
+            cellStyleProps={{
+              cellLeftPadding: 0,
+              cellRightPadding: 5,
+              cellExtraRightPadding: 0,
+            }}
             selection={this._selection}
             selectionPreservedOnEmptyClick={true}
             onRenderDetailsHeader={this.onRenderDetailsHeader}
+            onRenderRow={this.onRenderRow}
+            onRenderCheckbox={this.onRenderCheckbox}
             ariaLabelForSelectionColumn="Toggle selection"
             ariaLabelForSelectAllCheckbox="Toggle selection for all items"
             checkButtonAriaLabel="select row"
@@ -196,3 +234,8 @@ export class NodeList extends React.Component<Props, INodeListState> {
     });
   };
 }
+
+// export function(props: Props) {
+//  const theme = useTheme();
+//  return <NodeList {...props} theme={theme}/>
+//}

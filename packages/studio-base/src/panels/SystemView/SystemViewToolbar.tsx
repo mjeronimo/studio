@@ -14,7 +14,7 @@
 // limitations under the License.
 
 // React
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 
 // Foxglove
 import Button from "@foxglove/studio-base/components/Button";
@@ -25,7 +25,7 @@ import SegmentedControl, { Option } from "@foxglove/studio-base/components/Segme
 import styles from "@foxglove/studio-base/panels/ThreeDimensionalViz/sharedStyles";
 
 // ReactFlow
-import { useStoreActions, useStoreState, useZoomPanHelper, FitViewParams, Elements } from 'react-flow-renderer';
+import { Elements } from 'react-flow-renderer';
 
 // SystemView
 import Toolbar from "./Toolbar";
@@ -44,11 +44,8 @@ import UnlockIcon from "@mdi/svg/svg/lock-open-variant-outline.svg";
 
 export type Props = {
   nodes: Elements
-  edges: Elements
   lrOrientation: boolean
-  fitViewParams?: FitViewParams
-  setNodes?: any     // TODO
-  setEdges?: any     // TODO
+  isInteractive: boolean
   onZoomIn?: () => void
   onZoomOut?: () => void
   onFitview?: () => void
@@ -60,6 +57,7 @@ export type Props = {
 export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
 
   const [lrOrientation, setLROrientation] = useState<boolean>(props.lrOrientation);
+  const [isInteractive, setInteractive] = useState<boolean>(props.isInteractive);
   const [includeHiddenNodes, setIncludeHiddenNotes] = useState<boolean>(false);
 
   let defaultSelectedTab: string | undefined;
@@ -77,34 +75,28 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
   const [selectedId, setSelectedId] = React.useState(GroupingOptions.third.id);
   const optionArray: Option[] = Object.values(GroupingOptions);
 
-  const { zoomIn, zoomOut, fitView } = useZoomPanHelper();
-  const setInteractive = useStoreActions((actions) => actions.setInteractive);
-  const isInteractive = useStoreState((s) => s.nodesDraggable && s.nodesConnectable && s.elementsSelectable);
-
   const onToggleOrientation = () => {
     const newOrientation = !lrOrientation;
     setLROrientation(newOrientation);
     props.onToggleOrientation?.(newOrientation);
   }
 
+  const onInteractiveChangeHandler = () => {
+    const newInteractive = !isInteractive;
+    setInteractive(newInteractive);
+    props.onInteractiveChange?.(newInteractive);
+  }
+
   const onZoomInHandler = () => {
-    zoomIn?.();
     props.onZoomIn?.();
   }
 
   const onZoomOutHandler = () => {
-    zoomOut?.();
     props.onZoomOut?.();
   }
 
   const onFitViewHandler = () => {
-    fitView?.(props.fitViewParams);
     props.onFitview?.();
-  }
-
-  const onInteractiveChangeHandler = () => {
-    setInteractive?.(!isInteractive);
-    props.onInteractiveChange?.(!isInteractive);
   }
 
   const onCheckboxChange = (isChecked: boolean) => {
@@ -112,7 +104,7 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
   }
 
   const filterNodeList = (nodes: Elements): INodeListItem[] => {
-    const elements: INodeListItem[] = props.nodes.map((node) => { return { key: node.id, name: node.data.label as string, isHidden: node.isHidden as boolean } });
+    const elements: INodeListItem[] = nodes.map((node) => { return { key: node.id, name: node.data.label as string, isHidden: node.isHidden as boolean } });
     const newElements = elements.reduce(function(filtered: INodeListItem[], item: INodeListItem) {
       if (item.name.startsWith('_')) {
         if (includeHiddenNodes) {
@@ -169,7 +161,6 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
       >
         <ToolGroup name={"Node List"}>
           <NodeList
-            //nodes={props.nodes.map((node) => { return { key: node.id, name: node.data.label as string, isHidden: node.isHidden as boolean } })}
             nodes={filterNodeList(props.nodes)}
             onSelectionChange={props.onSelectionChange}
           />

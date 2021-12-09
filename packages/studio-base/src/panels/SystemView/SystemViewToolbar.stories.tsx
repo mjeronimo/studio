@@ -18,7 +18,6 @@ import { SystemViewToolbar } from "./SystemViewToolbar";
 import MockPanelContextProvider from "@foxglove/studio-base/components/MockPanelContextProvider";
 import { initialNodes } from './initial-elements';
 
-
 const containerStyle = {
   margin: 8,
   display: "inline-block",
@@ -52,7 +51,6 @@ const SystemViewToolbarWrapper = (props: any) => (
       <ReactFlowProvider>
         <SystemViewToolbar
           nodes={initialNodes}
-          edges={[]}
           lrOrientation={true}
           onZoomIn={zoomIn}
           onZoomOut={zoomOut}
