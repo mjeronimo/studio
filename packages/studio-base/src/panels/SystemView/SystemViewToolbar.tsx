@@ -1,5 +1,4 @@
-
-// Copyright 2021 Open Source Robotics Foundation, Inc.
+// Copyright 2022 Open Source Robotics Foundation, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -13,34 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// React
-import React, { useState } from "react";
-
-// Foxglove
-import Button from "@foxglove/studio-base/components/Button";
-import Checkbox from "@foxglove/studio-base/components/Checkbox";
-import ExpandingToolbar, { ToolGroup } from "@foxglove/studio-base/components/ExpandingToolbar";
-import FoxgloveIcon from "@foxglove/studio-base/components/Icon";
-import SegmentedControl, { Option } from "@foxglove/studio-base/components/SegmentedControl";
-import styles from "@foxglove/studio-base/panels/ThreeDimensionalViz/sharedStyles";
-
-// ReactFlow
-import { Elements } from 'react-flow-renderer';
-
-// SystemView
-import Toolbar from "./Toolbar";
-import { NodeList, INodeListItem } from "./NodeList";
-
-// MDI icons
 import ArrowLeftRightIcon from "@mdi/svg/svg/arrow-left-right.svg";
 import ArrowUpDownIcon from "@mdi/svg/svg/arrow-up-down.svg";
-import FitviewIcon from "./assets/icons/fitview.svg";
+import SelectionIcon from "@mdi/svg/svg/checkbox-multiple-marked-outline.svg";
 import GroupIcon from "@mdi/svg/svg/group.svg";
+import UnlockIcon from "@mdi/svg/svg/lock-open-variant-outline.svg";
 import LockIcon from "@mdi/svg/svg/lock-outline.svg";
 import MinusIcon from "@mdi/svg/svg/minus.svg";
 import PlusIcon from "@mdi/svg/svg/plus.svg";
-import SelectionIcon from "@mdi/svg/svg/checkbox-multiple-marked-outline.svg";
-import UnlockIcon from "@mdi/svg/svg/lock-open-variant-outline.svg";
+import React, { useState } from "react";
+import { Elements } from 'react-flow-renderer';
+
+import Button from "@foxglove/studio-base/components/Button";
+import Checkbox from "@foxglove/studio-base/components/Checkbox";
+import ExpandingToolbar, { ToolGroup } from "@foxglove/studio-base/components/ExpandingToolbar";
+import Icon from "@foxglove/studio-base/components/Icon";
+import SegmentedControl, { Option } from "@foxglove/studio-base/components/SegmentedControl";
+import styles from "@foxglove/studio-base/panels/ThreeDimensionalViz/sharedStyles";
+
+import { NodeList, INodeListItem } from "./NodeList";
+import Toolbar from "./Toolbar";
+import FitviewIcon from "./assets/icons/fitview.svg";
 
 export type Props = {
   nodes: Elements
@@ -125,9 +117,9 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
       <ExpandingToolbar
         tooltip="Group nodes"
         icon={
-          <FoxgloveIcon style={{ color: "white" }}>
+          <Icon style={{ color: "white" }}>
             <GroupIcon />
-          </FoxgloveIcon>
+          </Icon>
         }
         className={styles.buttons}
         selectedTab={selectedTab}
@@ -149,9 +141,9 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
       <ExpandingToolbar
         tooltip="Select nodes to display"
         icon={
-          <FoxgloveIcon style={{ color: "white" }}>
+          <Icon style={{ color: "white" }}>
             <SelectionIcon />
-          </FoxgloveIcon>
+          </Icon>
         }
         className={styles.buttons}
         selectedTab={selectedTab2}
@@ -182,31 +174,31 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
       </ExpandingToolbar>
       <div className={styles.buttons}>
         <Button className={styles.iconButton} tooltip="Change graph orientation" onClick={onToggleOrientation}>
-          <FoxgloveIcon style={{ color: "white" }} size="small">
+          <Icon style={{ color: "white" }} size="small">
             {lrOrientation ? <ArrowUpDownIcon /> : <ArrowLeftRightIcon />}
-          </FoxgloveIcon>
+          </Icon>
         </Button>
       </div>
       <div className={styles.buttons}>
         <Button className={styles.iconButton} tooltip="Zoom in graph" onClick={onZoomInHandler}>
-          <FoxgloveIcon style={{ color: "white" }} size="small">
+          <Icon style={{ color: "white" }} size="small">
             <PlusIcon />
-          </FoxgloveIcon>
+          </Icon>
         </Button>
         <Button className={styles.iconButton} tooltip="Zoom out graph" onClick={onZoomOutHandler}>
-          <FoxgloveIcon style={{ color: "white" }} size="small">
+          <Icon style={{ color: "white" }} size="small">
             <MinusIcon />
-          </FoxgloveIcon>
+          </Icon>
         </Button>
         <Button className={styles.iconButton} tooltip="Fit graph to window" onClick={onFitViewHandler}>
-          <FoxgloveIcon style={{ color: "white" }} size="small">
+          <Icon style={{ color: "white" }} size="small">
             <FitviewIcon />
-          </FoxgloveIcon>
+          </Icon>
         </Button>
         <Button className={styles.iconButton} tooltip="Lock/unlock the node positions" onClick={onInteractiveChangeHandler}>
-          <FoxgloveIcon style={{ color: "white" }} size="small">
+          <Icon style={{ color: "white" }} size="small">
             {isInteractive ? <UnlockIcon /> : <LockIcon />}
-          </FoxgloveIcon>
+          </Icon>
         </Button>
       </div>
     </Toolbar>

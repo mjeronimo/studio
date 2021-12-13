@@ -1,4 +1,4 @@
-// Copyright 2021 Open Source Robotics Foundation, Inc.
+// Copyright 2022 Open Source Robotics Foundation, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,24 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// React
-import * as React from 'react';
-import { CSSProperties, useEffect, useState } from 'react';
 
-// Fluent UI
 import { DefaultButton, Checkbox } from "@fluentui/react";
-import { TextField, ITextFieldStyles } from '@fluentui/react/lib/TextField';
-import { IRenderFunction } from '@fluentui/utilities';
-import { DetailsList, DetailsRow, IDetailsListProps, IDetailsListCheckboxProps, IDetailsRowStyles, DetailsListLayoutMode, IDetailsHeaderProps, Selection, IColumn, DEFAULT_ROW_HEIGHTS } from '@fluentui/react/lib/DetailsList';
+import { DetailsList, DetailsRow, IDetailsListProps, IDetailsListCheckboxProps, IDetailsRowStyles, IDetailsHeaderProps, Selection, IColumn } from '@fluentui/react/lib/DetailsList';
 import { MarqueeSelection } from '@fluentui/react/lib/MarqueeSelection';
 import { mergeStyles } from '@fluentui/react/lib/Styling';
-
-// Foxglove Studio
-import Icon from "@foxglove/studio-base/components/Icon";
-
-// MDI Icons
+import { TextField, ITextFieldStyles } from '@fluentui/react/lib/TextField';
+import { IRenderFunction } from '@fluentui/utilities';
 import SelectAllIcon from "@mdi/svg/svg/format-list-bulleted-square.svg";
 import SelectNoneIcon from "@mdi/svg/svg/format-list-checkbox.svg";
+import { CSSProperties, useEffect, useState } from 'react';
+import * as React from 'react';
+
+import Icon from "@foxglove/studio-base/components/Icon";
 
 const exampleChildClass = mergeStyles({
   display: 'block',
@@ -60,13 +55,13 @@ export class NodeList extends React.Component<Props, INodeListState> {
 
   constructor(props: Props) {
     super(props);
-    this._selection = new Selection( {
+    this._selection = new Selection({
 
       onSelectionChanged: () => {
         const items = this._selection.getItems();
         const selectedItems = this._selection.getSelectedIndices();
 
-        const selectedNames: string[] = selectedItems.map((item) => { 
+        const selectedNames: string[] = selectedItems.map((item) => {
           return (items[+item] as INodeListItem).name;
         });
 
@@ -125,7 +120,7 @@ export class NodeList extends React.Component<Props, INodeListState> {
               for (let i = 0; i < this.props.nodes.length; i++) {
                 const key = this.props.nodes[i]!.key;
                 // Avoid updating the graph 'til the last selection change
-                if (i == this.props.nodes.length-1) {
+                if (i == this.props.nodes.length - 1) {
                   this._selection.setChangeEvents(true, true);
                 }
                 newSelection.setKeySelected(`${key}`, true, false);
@@ -174,7 +169,7 @@ export class NodeList extends React.Component<Props, INodeListState> {
     };
     return (
       <div style={{ pointerEvents: 'none' }}>
-        <Checkbox checked={props!.checked} styles={styles}/>
+        <Checkbox checked={props!.checked} styles={styles} />
       </div>
     );
   }

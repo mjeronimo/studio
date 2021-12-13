@@ -1,4 +1,4 @@
-// Copyright 2021 Open Source Robotics Foundation, Inc.
+// Copyright 2022 Open Source Robotics Foundation, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,23 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// React
-import React, { useState, useEffect } from 'react';
+import { ReactFlowProvider } from 'react-flow-renderer';
 
-// Foxglove
 import Panel from "@foxglove/studio-base/components/Panel";
 import { SaveConfig } from "@foxglove/studio-base/types/panels";
 
-// ReactFlow
-import ReactFlow, { ReactFlowProvider, Node, Edge, Background, OnLoadParams } from 'react-flow-renderer';
-import { useStoreActions, useStoreState, FitViewParams } from 'react-flow-renderer';
-
-
-// SystemView
-import { initialNodes, initialEdges } from './initial-elements';
-import { createGraphLayout } from "./layout";
-import { SystemViewToolbar } from "./SystemViewToolbar";
-import './layouting.css';
+import { SystemViewer } from "./SystemViewer";
 
 type Props = {
   config: unknown;
@@ -36,122 +25,10 @@ type Props = {
 }
 
 const SystemViewPanel = (props: Props) => {
-
-  const { config, saveConfig } = props;
-  const [nodes, setNodes] = useState(initialNodes);
-  const [edges, setEdges] = useState(initialEdges);
-  const [lrOrientation, setLROrientation] = useState(false);
-  const [reactFlowInstance, setReactFlowInstance] = useState<OnLoadParams>();
-
-  // const { zoomIn, zoomOut, fitView } = useZoomPanHelper();
-  //const setInteractive = useStoreActions((actions) => actions.setInteractive);
-  const setInteractive = (isInteractive: boolean) => {}
-  //const isInteractive = useStoreState((s) => s.nodesDraggable && s.nodesConnectable && s.elementsSelectable);
-  const isInteractive = false; 
-
-  const onLoad = async (_reactFlowInstance: OnLoadParams) => {
-    console.log("onLoad");
-    setReactFlowInstance(_reactFlowInstance);
-  }
-
-  useEffect(() => {
-    console.log("useEffect");
-    createGraphLayout(nodes, edges, lrOrientation)
-      .then(els => { setNodes(els); reactFlowInstance!.fitView(); reactFlowInstance!.zoomTo(1.0); })
-      .catch(err => console.error(err))
-  }, [])
-
-  const selectionChange = async (selectedNames: string[]) => {
-    const newNodes = nodes.map(node => {
-      if (node.data && node.data.label && selectedNames.includes(node.data.label)) {
-        return {
-          ...node,
-          isHidden: false
-        }
-      }
-      return {
-        ...node,
-        isHidden: true
-      }
-    });
-
-    const selectedNodes = newNodes.filter(node => { return !(node as Node).isHidden });
-    const selectedIds = selectedNodes.map(node => { return node.id })
-
-    const newEdges = edges.map(edge => {
-      if (selectedIds.includes((edge as Edge<any>).source) && selectedIds.includes((edge as Edge<any>).target)) {
-        return {
-          ...edge,
-          isHidden: false
-        }
-      }
-      return {
-        ...edge,
-        isHidden: true
-      }
-    });
-
-    createGraphLayout(newNodes, newEdges, lrOrientation)
-      .then(els => { setNodes(els); setEdges(newEdges); })
-      .catch(err => console.error(err))
-  }
-
-  const zoomIn = () => {
-    reactFlowInstance?.zoomIn();
-  }
-
-  const zoomOut = () => {
-    reactFlowInstance?.zoomOut();
-  }
-
-  const fitView = () => {
-    reactFlowInstance?.fitView();
-  }
-
-  const interactiveChange = (isInteractive: boolean) => {
-    setInteractive?.(isInteractive);
-  }
-
-  const toggleOrientation = async (lrOrientation: boolean) => {
-    setLROrientation(lrOrientation);
-    createGraphLayout(nodes, edges, lrOrientation)
-      .then(els => { setNodes(els); reactFlowInstance!.zoomTo(1.0); reactFlowInstance!.fitView(); })
-      .catch(err => console.error(err))
-  }
-
   return (
-    <>{!nodes ? (
-      <p>Loading ...</p>
-    ) : (
-      <div className="layoutflow">
-        <ReactFlowProvider>
-          <ReactFlow
-            elements={nodes.concat(edges)}
-            snapToGrid={true}
-            snapGrid={[15, 15]}
-            defaultZoom={1.0}
-            minZoom={0.2}
-            maxZoom={4}
-            onLoad={onLoad}
-            //{...otherProps}
-          >
-            <Background color="#aaa" gap={16} />
-          </ReactFlow>
-          <SystemViewToolbar
-            nodes={nodes}
-            lrOrientation={lrOrientation}
-            isInteractive={isInteractive}
-            onZoomIn={zoomIn}
-            onZoomOut={zoomOut}
-            onFitview={fitView}
-            onInteractiveChange={interactiveChange}
-            onToggleOrientation={toggleOrientation}
-            onSelectionChange={selectionChange}
-          />
-        </ReactFlowProvider>
-      </div>
-    )
-    }</>
+    <ReactFlowProvider>
+      <SystemViewer />
+    </ReactFlowProvider>
   )
 };
 
