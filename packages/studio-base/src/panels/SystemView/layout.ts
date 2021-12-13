@@ -1,12 +1,14 @@
-import ReactFlow, { isNode, Position, Node, Edge, Elements } from 'react-flow-renderer';
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/
 
-import ELK, { ElkNode, ElkPrimitiveEdge } from 'elkjs/lib/elk.bundled';
+import ELK, { ElkNode, ElkPrimitiveEdge } from "elkjs/lib/elk.bundled";
+import { isNode, Position, Node, Edge, Elements } from "react-flow-renderer";
 
-const DEFAULT_WIDTH = 175
-const DEFAULT_HEIGHT = 30
+const DEFAULT_WIDTH = 200;
+const DEFAULT_HEIGHT = 50;
 
 const elk = new ELK({
-
   //  defaultLayoutOptions: {
   //    'elk.algorithm': 'org.eclipse.elk.layered',
   //    'elk.direction': 'RIGHT',
@@ -28,7 +30,7 @@ const elk = new ELK({
      *
      * @see https://www.eclipse.org/elk/reference/options/org-eclipse-elk-nodeLabels-placement.html
      */
-    'elk.nodeLabels.placement': 'INSIDE V_CENTER H_RIGHT',
+    "elk.nodeLabels.placement": "INSIDE V_CENTER H_RIGHT",
 
     /**
      * Select a specific layout algorithm.
@@ -44,21 +46,21 @@ const elk = new ELK({
      * @see https://www.eclipse.org/elk/reference/algorithms/org-eclipse-elk-layered.html
      */
     //'elk.algorithm': 'org.eclipse.elk.layered',
-    'elk.algorithm': 'layered',
+    "elk.algorithm": "layered",
 
     /**
      * Overall direction of edges: horizontal (right / left) or vertical (down / up).
      *
      * @see https://www.eclipse.org/elk/reference/options/org-eclipse-elk-direction.html
      */
-    'elk.direction': 'DOWN',
+    "elk.direction": "DOWN",
 
     /**
      * Strategy for node layering.
      *
      * @see https://www.eclipse.org/elk/reference/options/org-eclipse-elk-layered-layering-strategy.html
      */
-    'org.eclipse.elk.layered.layering.strategy': 'INTERACTIVE',
+    "org.eclipse.elk.layered.layering.strategy": "INTERACTIVE",
 
     /**
      * What kind of edge routing style should be applied for the content of a parent node.
@@ -68,7 +70,7 @@ const elk = new ELK({
      *
      * @see https://www.eclipse.org/elk/reference/options/org-eclipse-elk-edgeRouting.html
      */
-    'org.eclipse.elk.edgeRouting': 'ORTHOGONAL',
+    "org.eclipse.elk.edgeRouting": "ORTHOGONAL",
 
     /**
      * Adds bend points even if an edge does not change direction.
@@ -78,7 +80,7 @@ const elk = new ELK({
      *
      * @see https://www.eclipse.org/elk/reference/options/org-eclipse-elk-layered-unnecessaryBendpoints.html
      */
-    'elk.layered.unnecessaryBendpoints': 'true',
+    "elk.layered.unnecessaryBendpoints": "true",
 
     /**
      * The spacing to be preserved between nodes and edges that are routed next to the node’s layer.
@@ -86,7 +88,7 @@ const elk = new ELK({
      *
      * @see https://www.eclipse.org/elk/reference/options/org-eclipse-elk-layered-spacing-edgeNodeBetweenLayers.html
      */
-    'elk.layered.spacing.edgeNodeBetweenLayers': '50',
+    "elk.layered.spacing.edgeNodeBetweenLayers": "50",
 
     /**
      * Tells the BK node placer to use a certain alignment (out of its four)
@@ -94,7 +96,7 @@ const elk = new ELK({
      *
      * @see https://www.eclipse.org/elk/reference/options/org-eclipse-elk-layered-nodePlacement-bk-fixedAlignment.html
      */
-    'org.eclipse.elk.layered.nodePlacement.bk.fixedAlignment': 'BALANCED',
+    "org.eclipse.elk.layered.nodePlacement.bk.fixedAlignment": "BALANCED",
 
     /**
      * Strategy for cycle breaking.
@@ -105,7 +107,7 @@ const elk = new ELK({
      *
      * @see https://www.eclipse.org/elk/reference/options/org-eclipse-elk-layered-cycleBreaking-strategy.html
      */
-    'org.eclipse.elk.layered.cycleBreaking.strategy': 'DEPTH_FIRST',
+    "org.eclipse.elk.layered.cycleBreaking.strategy": "DEPTH_FIRST",
 
     /**
      * Whether this node allows to route self loops inside of it instead of around it.
@@ -115,14 +117,14 @@ const elk = new ELK({
      *
      * @see https://www.eclipse.org/elk/reference/options/org-eclipse-elk-insideSelfLoops-activate.html
      */
-    'org.eclipse.elk.insideSelfLoops.activate': 'true',
+    "org.eclipse.elk.insideSelfLoops.activate": "true",
 
     /**
      * Whether each connected component should be processed separately.
      *
      * @see https://www.eclipse.org/elk/reference/options/org-eclipse-elk-separateConnectedComponents.html
      */
-    separateConnectedComponents: 'true',
+    separateConnectedComponents: "true",
 
     /**
      * Spacing to be preserved between pairs of connected components.
@@ -130,7 +132,7 @@ const elk = new ELK({
      *
      * @see https://www.eclipse.org/elk/reference/options/org-eclipse-elk-spacing-componentComponent.html
      */
-    'spacing.componentComponent': '70',
+    "spacing.componentComponent": "70",
 
     /**
      * TODO: Should be spacing.baseValue?
@@ -141,8 +143,7 @@ const elk = new ELK({
      *
      * @see https://www.eclipse.org/elk/reference/groups/org-eclipse-elk-layered-spacing.html
      */
-    spacing: '75',
-
+    spacing: "75",
 
     /**
      * The spacing to be preserved between any pair of nodes of two adjacent layers.
@@ -150,66 +151,82 @@ const elk = new ELK({
      *
      * @see https://www.eclipse.org/elk/reference/options/org-eclipse-elk-layered-spacing-nodeNodeBetweenLayers.html
      */
-    'spacing.nodeNodeBetweenLayers': '125',
+    "spacing.nodeNodeBetweenLayers": "125",
 
-    'elk.spacing.nodeNode': '75',
-    'elk.zoomToFit': 'true',
-  }
-})
+    "elk.spacing.nodeNode": "75",
+    "elk.zoomToFit": "true",
+  },
+});
 
-export const createGraphLayout = async (nodes: Elements, edges: Elements, lrOrientation: boolean): Promise<Elements> => {
+export const createGraphLayout = async (
+  nodes: Elements,
+  edges: Elements,
+  lrOrientation: boolean,
+): Promise<Elements> => {
+  const direction = lrOrientation ? "RIGHT" : "DOWN";
 
-  const direction = lrOrientation ? 'RIGHT' : 'DOWN';
-
-  const elk_nodes: ElkNode[] = []
+  const elk_nodes: ElkNode[] = [];
   nodes.forEach((el) => {
     if (!el.isHidden) {
       elk_nodes.push({
-        id: el.id,        
-        // width: el.__rf?.width ?? DEFAULT_WIDTH,
-        // height: el.__rf?.height ?? DEFAULT_HEIGHT
-        width: +el.style!.width!, 
-        height: +el.style!.height!, 
-      })
+        id: el.id,
+        width: DEFAULT_WIDTH,
+        height: DEFAULT_HEIGHT,
+        //width: +el.style!.width!,
+        //height: +el.style!.height!,
+      });
     }
   });
 
-  const elk_edges: ElkPrimitiveEdge[] = []
+  const elk_edges: ElkPrimitiveEdge[] = [];
   edges.forEach((el) => {
     if (!el.isHidden) {
       const edge: Edge = el as Edge;
       elk_edges.push({
         id: edge.id,
         target: edge.target,
-        source: edge.source
-      })
+        source: edge.source,
+      });
     }
   });
 
-  const isHorizontal = direction === 'RIGHT';
+  const isHorizontal = direction === "RIGHT";
   const newGraph = await elk.layout({
-    id: 'root',
+    id: "root",
     children: elk_nodes,
     edges: elk_edges,
     layoutOptions: {
-      'elk.direction': direction,
-      'elk.spacing.nodeNode': isHorizontal ? '150' : '75',
-    }
-  })
+      "elk.direction": direction,
+      "elk.spacing.nodeNode": isHorizontal ? "150" : "150",
+      "elk.layered.layering.strategy": "NETWORK_SIMPLEX",
+      //'elk.layered.layering.strategy': 'LONGEST_PATH',
+      //'elk.layered.layering.strategy': 'COFFMAN_GRAPH',
+      //'elk.layered.layering.strategy': 'INTERACTIVE',
+      //'elk.layered.layering.strategy': 'STRETCH_WIDTH',
+      //'elk.layered.layering.strategy': 'MIN_WIDTH',
+
+      "org.eclipse.elk.edgeRouting": "POLYLINE",
+
+      //'org.eclipse.elk.alignment': 'CENTER',
+      //'org.eclipse.elk.contentAlignment': 'V_CENTER',
+      //'org.eclipse.elk.layered.nodePlacement.bk.fixedAlignment': "BALANCED",
+      //'org.eclipse.elk.layered.layering.layerConstraint': 'LAST',
+    },
+  });
 
   return nodes.map((el) => {
     const temp = Object.assign({}, el) as Node;
     if (isNode(el)) {
-      const node = newGraph?.children?.find((n) => n.id === el.id)
+      const node = newGraph?.children?.find((n) => n.id === el.id);
       if (node?.x && node?.y && node?.width && node?.height) {
         temp.position = {
-          x: node.x - node.width / 2 + Math.random() / 1000,
-          y: node.y - node.height / 2
-        }
+          x: node.x - ((el.style!.width! as number) - DEFAULT_WIDTH) / 2 + Math.random() / 1000,
+          y: node.y - ((el.style!.height! as number) - DEFAULT_HEIGHT) / 2,
+        };
       }
       temp.targetPosition = isHorizontal ? Position.Left : Position.Top;
       temp.sourcePosition = isHorizontal ? Position.Right : Position.Bottom;
     }
     return temp;
   });
-}
+};

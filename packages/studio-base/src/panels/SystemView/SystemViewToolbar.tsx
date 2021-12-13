@@ -1,3 +1,7 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/
+
 // Copyright 2022 Open Source Robotics Foundation, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -97,7 +101,7 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
 
   const filterNodeList = (nodes: Elements): INodeListItem[] => {
     const elements: INodeListItem[] = nodes.map((node) => { return { key: node.id, name: node.data.label as string, isHidden: node.isHidden as boolean } });
-    const newElements = elements.reduce(function(filtered: INodeListItem[], item: INodeListItem) {
+    const newElements = elements.reduce((filtered: INodeListItem[], item: INodeListItem) => {
       if (item.name.startsWith('_')) {
         if (includeHiddenNodes) {
           filtered.push(item);
@@ -124,7 +128,7 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
         className={styles.buttons}
         selectedTab={selectedTab}
         onSelectTab={(newSelectedTab) => {
-          setSelectedTab(newSelectedTab!)
+          setSelectedTab(newSelectedTab)
         }}
       >
         <ToolGroup name={"Node Grouping"}>
@@ -148,7 +152,7 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
         className={styles.buttons}
         selectedTab={selectedTab2}
         onSelectTab={(newSelectedTab) => {
-          setSelectedTab2(newSelectedTab!)
+          setSelectedTab2(newSelectedTab)
         }}
       >
         <ToolGroup name={"Node List"}>

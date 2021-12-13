@@ -1,4 +1,4 @@
-// Copyright 2022 Open Source Robotics Foundation, Inc.
+// Copyright 2021 Open Source Robotics Foundation, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@ export const initialNodes: Elements = [
   // Nodes
   {
     id: '1',
-    isHidden: false,
     type: 'input',
+    isHidden: false,
     data: { label: 'stereo_camera_controller' },
     position,
     sourcePosition: Position.Bottom,
@@ -30,6 +30,7 @@ export const initialNodes: Elements = [
   },
   {
     id: '2',
+    type: 'default',
     isHidden: false,
     data: { label: 'image_adjuster_left_stereo' },
     position,
@@ -39,6 +40,7 @@ export const initialNodes: Elements = [
   },
   {
     id: '3',
+    type: 'default',
     isHidden: false,
     data: { label: 'image_adjuster_right_stereo' },
     position,
@@ -48,6 +50,7 @@ export const initialNodes: Elements = [
   },
   {
     id: '4',
+    type: 'default',
     isHidden: false,
     data: { label: 'disparity_node' },
     position,
@@ -57,6 +60,7 @@ export const initialNodes: Elements = [
   },
   {
     id: '5',
+    type: 'default',
     isHidden: false,
     data: { label: 'point_cloud_node' },
     position,
@@ -66,6 +70,7 @@ export const initialNodes: Elements = [
   },
   {
     id: '6',
+    type: 'default',
     isHidden: true,
     data: { label: '_a_hidden_node' },
     position,
@@ -82,7 +87,7 @@ export const initialNodes: Elements = [
     position,
     sourcePosition: Position.Bottom,
     targetPosition: Position.Top,
-    style: { width: 125, height: 40 },
+    style: { width: 175, height: 100 },
   },
   {
     id: '102',
@@ -135,146 +140,146 @@ export const initialNodes: Elements = [
 export const initialEdges: Elements = [
   {
     id: 'edge-1-101',
+    type: 'default',
     isHidden: false,
     label: '10Hz',
     labelStyle: { fill: 'white' },
     labelBgStyle: { fill: 'rgba(0,0,0,0)' },
     source: '1',
     target: '101',
-    type: 'default',
     animated: true,
     arrowHeadType: ArrowHeadType.Arrow
   },
   {
     id: 'edge-1-102',
+    type: 'default',
     isHidden: false,
     label: '10Hz',
     labelStyle: { fill: 'white' },
     labelBgStyle: { fill: 'rgba(0,0,0,0)' },
     source: '1',
     target: '102',
-    type: 'default',
     animated: true,
     arrowHeadType: ArrowHeadType.Arrow
   },
 
   {
     id: 'edge-101-2',
+    type: 'default',
     isHidden: false,
     label: '11Hz',
     labelStyle: { fill: 'white' },
     labelBgStyle: { fill: 'rgba(0,0,0,0)' },
     source: '101',
     target: '2',
-    type: 'default',
     animated: true,
     arrowHeadType: ArrowHeadType.Arrow
   },
   {
     id: 'edge-102-3',
+    type: 'default',
     isHidden: false,
     label: '12Hz',
     labelStyle: { fill: 'white' },
     labelBgStyle: { fill: 'rgba(0,0,0,0)' },
     source: '102',
     target: '3',
-    type: 'default',
     animated: true,
     arrowHeadType: ArrowHeadType.Arrow
   },
   {
     id: 'edge-2-103',
+    type: 'default',
     isHidden: false,
     label: '13Hz',
     labelStyle: { fill: 'white' },
     labelBgStyle: { fill: 'rgba(0,0,0,0)' },
     source: '2',
     target: '103',
-    type: 'default',
     animated: true,
     arrowHeadType: ArrowHeadType.Arrow
   },
   {
     id: 'edge-3-104',
+    type: 'default',
     isHidden: false,
     label: '14Hz',
     labelStyle: { fill: 'white' },
     labelBgStyle: { fill: 'rgba(0,0,0,0)' },
     source: '3',
     target: '104',
-    type: 'default',
     animated: true,
     arrowHeadType: ArrowHeadType.Arrow
   },
   {
     id: 'edge-103-4',
+    type: 'default',
     isHidden: false,
     label: '15Hz',
     labelStyle: { fill: 'white' },
     labelBgStyle: { fill: 'rgba(0,0,0,0)' },
     source: '103',
     target: '4',
-    type: 'default',
     animated: true,
     arrowHeadType: ArrowHeadType.Arrow
   },
   {
     id: 'edge-104-4',
+    type: 'default',
     isHidden: false,
     label: '15Hz',
     labelStyle: { fill: 'white' },
     labelBgStyle: { fill: 'rgba(0,0,0,0)' },
     source: '104',
     target: '4',
-    type: 'default',
     animated: true,
     arrowHeadType: ArrowHeadType.Arrow
   },
   {
     id: 'edge-4-105',
+    type: 'default',
     isHidden: false,
     label: '15Hz',
     labelStyle: { fill: 'white' },
     labelBgStyle: { fill: 'rgba(0,0,0,0)' },
     source: '4',
     target: '105',
-    type: 'default',
     animated: true,
     arrowHeadType: ArrowHeadType.Arrow
   },
   {
     id: 'edge-105-5',
+    type: 'default',
     isHidden: false,
     label: '15Hz',
     labelStyle: { fill: 'white' },
     labelBgStyle: { fill: 'rgba(0,0,0,0)' },
     source: '105',
     target: '5',
-    type: 'default',
     animated: true,
     arrowHeadType: ArrowHeadType.Arrow
   },
   {
     id: 'edge-5-106',
+    type: 'default',
     isHidden: false,
     label: '15Hz',
     labelStyle: { fill: 'white' },
     labelBgStyle: { fill: 'rgba(0,0,0,0)' },
     source: '5',
     target: '106',
-    type: 'default',
     animated: true,
     arrowHeadType: ArrowHeadType.Arrow
   },
   {
     id: 'edge-103-5',
+    type: 'default',
     isHidden: false,
     label: '15Hz',
     labelStyle: { fill: 'white' },
     labelBgStyle: { fill: 'rgba(0,0,0,0)' },
     source: '103',
     target: '5',
-    type: 'default',
     animated: true,
     arrowHeadType: ArrowHeadType.Arrow
   },

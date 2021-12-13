@@ -120,7 +120,7 @@ export class NodeList extends React.Component<Props, INodeListState> {
               for (let i = 0; i < this.props.nodes.length; i++) {
                 const key = this.props.nodes[i]!.key;
                 // Avoid updating the graph 'til the last selection change
-                if (i == this.props.nodes.length - 1) {
+                if (i === this.props.nodes.length - 1) {
                   this._selection.setChangeEvents(true, true);
                 }
                 newSelection.setKeySelected(`${key}`, true, false);
@@ -197,7 +197,7 @@ export class NodeList extends React.Component<Props, INodeListState> {
 
     return (
       <div>
-        <MarqueeSelection selection={this._selection}>
+        <MarqueeSelection selection={this._selection} onShouldStartSelection={(ev: MouseEvent) => { return false; }} >
           <DetailsList
             compact={true}
             items={items}
@@ -225,12 +225,7 @@ export class NodeList extends React.Component<Props, INodeListState> {
 
   private _onFilter = (ev: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, text: string | undefined): void => {
     this.setState({
-      items: text ? this.props.nodes.filter(i => i.name.toLowerCase().indexOf(text) > -1) : this.props.nodes,
+      items: text ? this.props.nodes.filter(i => i.name.toLowerCase().includes(text)) : this.props.nodes,
     });
   };
 }
-
-// export function(props: Props) {
-//  const theme = useTheme();
-//  return <NodeList {...props} theme={theme}/>
-//}
