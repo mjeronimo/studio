@@ -1,3 +1,7 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/
+
 // Copyright 2022 Open Source Robotics Foundation, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,27 +16,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
 import { DefaultButton, Checkbox } from "@fluentui/react";
 import { DetailsList, DetailsRow, IDetailsListProps, IDetailsListCheckboxProps, IDetailsRowStyles, IDetailsHeaderProps, Selection, IColumn } from '@fluentui/react/lib/DetailsList';
 import { MarqueeSelection } from '@fluentui/react/lib/MarqueeSelection';
-import { mergeStyles } from '@fluentui/react/lib/Styling';
-import { TextField, ITextFieldStyles } from '@fluentui/react/lib/TextField';
 import { IRenderFunction } from '@fluentui/utilities';
 import SelectAllIcon from "@mdi/svg/svg/format-list-bulleted-square.svg";
 import SelectNoneIcon from "@mdi/svg/svg/format-list-checkbox.svg";
-import { CSSProperties, useEffect, useState } from 'react';
+import SearchIcon from "@mdi/svg/svg/magnify.svg";
+import { CSSProperties, useState } from 'react';
 import * as React from 'react';
 
 import Icon from "@foxglove/studio-base/components/Icon";
-
-const exampleChildClass = mergeStyles({
-  display: 'block',
-  marginBottom: '10px',
-});
-
-const textFieldStyles: Partial<ITextFieldStyles> = { root: { maxWidth: '300px' } };
-const selectNoneStyle: CSSProperties = { paddingLeft: '25px' };
+import { LegacyInput } from "@foxglove/studio-base/components/LegacyStyledComponents";
+import { colors } from "@foxglove/studio-base/util/sharedStyleConstants";
 
 export interface INodeListItem {
   key: string;
@@ -56,15 +52,12 @@ export class NodeList extends React.Component<Props, INodeListState> {
   constructor(props: Props) {
     super(props);
     this._selection = new Selection({
-
       onSelectionChanged: () => {
         const items = this._selection.getItems();
         const selectedItems = this._selection.getSelectedIndices();
-
         const selectedNames: string[] = selectedItems.map((item) => {
           return (items[+item] as INodeListItem).name;
         });
-
         props.onSelectionChange(selectedNames);
       }
     });
@@ -78,7 +71,7 @@ export class NodeList extends React.Component<Props, INodeListState> {
     };
   }
 
-  public override componentDidMount() {
+  public override componentDidMount(): void {
     this._selection.setChangeEvents(false, true);
     for (let i = 0; i < this.props.nodes.length; i++) {
       const key = this.props.nodes[i]!.key;
@@ -88,30 +81,40 @@ export class NodeList extends React.Component<Props, INodeListState> {
     this._selection.setChangeEvents(true, true);
   }
 
-  private onRenderDetailsHeader: IRenderFunction<IDetailsHeaderProps> = (props, defaultRender) => {
+  // <Icon style={{ color: "white", marginLeft: "5px", display: "inline" }} size="medium"
+
+  private onRenderDetailsHeader: IRenderFunction<IDetailsHeaderProps> = (props, _defaultRender) => {
     if (!props) {
-      return null;
+      return ReactNull;
     }
 
-    const [selection, setSelection] = useState(new Selection())
-    useEffect(() => { setSelection(new Selection()) }, [])
+    const selectNoneStyle: CSSProperties = { paddingLeft: '25px' };
+    const [_selection, setSelection] = useState(new Selection())
 
     return (
       <div>
-        <TextField
-          className={exampleChildClass}
-          label="Filter by name:"
-          onChange={this._onFilter}
-          styles={textFieldStyles}
-        />
-        <br />
+        <div style={{ backgroundColor: "#1A191F", width: "288px", padding: "0", height: "35px", borderRadius: "4px", border: "1px solid white", marginTop: "10px", marginBottom: "5px" }}>
+          <Icon size="medium" style={{ marginLeft: "5px", display: "inline" }}>
+            <SearchIcon />
+          </Icon>
+          <LegacyInput
+            type="text"
+            placeholder="Search for nodes..."
+            spellCheck={false}
+            style={{ backgroundColor: "transparent", fontSize: '14px', width: "185px", marginLeft: "0px", marginRight: "0px", padding: "8px 5px" }}
+            onChange={(e) => {
+              const text = e.currentTarget.value;
+              this.setState({
+                items: text ? this.props.nodes.filter(i => i.name.toLowerCase().includes(text)) : this.props.nodes,
+              });
+            }}
+          />
+          <span style={{ color: colors.TEXT_NORMAL, display: "inline", textAlign: "center", marginRight: "5px", marginLeft: "5px" }}>
+            101 of 200
+          </span>
+        </div>
 
-        <DefaultButton text="Select All"
-          styles={{
-            flexContainer: {
-              flexDirection: 'row-reverse'
-            }
-          }}
+        <Icon
           onClick={
             () => {
               const newSelection = this._selection;
@@ -129,33 +132,21 @@ export class NodeList extends React.Component<Props, INodeListState> {
             }
           }
         >
-          <Icon style={{ color: "white" }} size="medium">
-            <SelectAllIcon />
-          </Icon>
-        </DefaultButton>
+          <SelectAllIcon />
+        </Icon>
 
-        <span style={selectNoneStyle}>
-          <DefaultButton text="Select None"
-            styles={{
-              flexContainer: {
-                flexDirection: 'row-reverse',
-              }
-            }}
-            onClick={
-              () => {
-                const newSelection = this._selection;
-                newSelection.setItems(this.props.nodes);
-                setSelection(newSelection);
-              }
+        <Icon
+          onClick={
+            () => {
+              const newSelection = this._selection;
+              newSelection.setItems(this.props.nodes);
+              setSelection(newSelection);
             }
-          >
-            <Icon style={{ color: "white" }} size="medium">
-              <SelectNoneIcon />
-            </Icon>
-          </DefaultButton>
-        </span>
-        <br />
-        <br />
+          }
+        >
+          <SelectNoneIcon />
+        </Icon>
+
       </div>
     );
   }
@@ -176,7 +167,7 @@ export class NodeList extends React.Component<Props, INodeListState> {
 
   private onRenderRow: IDetailsListProps['onRenderRow'] = props => {
     if (!props) {
-      return null;
+      return ReactNull;
     }
 
     const customStyles: Partial<IDetailsRowStyles> = {
@@ -184,9 +175,9 @@ export class NodeList extends React.Component<Props, INodeListState> {
 
     //customStyles.root = { border: '0px solid green', margin: 0, padding: 0 };
     //customStyles.cell = { border: '0px solid white', margin: 0, paddingTop: 14, minHeight: 0, height: rowHeight};
-    customStyles.cell = { border: '0px solid white', paddingTop: 9 };
-    customStyles.checkCell = { border: '0px solid yellow', width: '32px' };
-    customStyles.check = { border: '0px solid orange', width: '32px', maxWidth: '32px' };
+    customStyles.cell = { backgroundColor: "black", opacity: "0.8", border: '0px solid white', paddingTop: 9 };
+    customStyles.checkCell = { backgroundColor: "black", opacity: "0.8", border: '0px solid yellow', width: '32px' };
+    customStyles.check = { backgroundColor: "black", opacity: "0.8", border: '0px solid orange', width: '32px', maxWidth: '32px' };
     //customStyles.fields = { border: '0px solid red', margin: 0, padding: 0 };
 
     return <DetailsRow {...props} styles={customStyles} />;
@@ -197,13 +188,12 @@ export class NodeList extends React.Component<Props, INodeListState> {
 
     return (
       <div>
-        <MarqueeSelection selection={this._selection} onShouldStartSelection={(ev: MouseEvent) => { return false; }} >
+        <MarqueeSelection selection={this._selection} onShouldStartSelection={(_ev: MouseEvent) => { return false; }} >
           <DetailsList
             compact={true}
             items={items}
             columns={this._columns}
             setKey="set"
-            //layoutMode={DetailsListLayoutMode.justified}
             cellStyleProps={{
               cellLeftPadding: 0,
               cellRightPadding: 5,
@@ -222,10 +212,4 @@ export class NodeList extends React.Component<Props, INodeListState> {
       </div>
     );
   }
-
-  private _onFilter = (ev: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, text: string | undefined): void => {
-    this.setState({
-      items: text ? this.props.nodes.filter(i => i.name.toLowerCase().includes(text)) : this.props.nodes,
-    });
-  };
 }

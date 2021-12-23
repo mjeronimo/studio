@@ -119,6 +119,40 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
     <Toolbar>
       <br />
       <ExpandingToolbar
+        tooltip="Select nodes to display"
+        icon={
+          <Icon style={{ color: "white" }}>
+            <SelectionIcon />
+          </Icon>
+        }
+        className={styles.buttons}
+        selectedTab={selectedTab2}
+        onSelectTab={(newSelectedTab) => {
+          setSelectedTab2(newSelectedTab)
+        }}
+      >
+        <ToolGroup name={"Node List"}>
+          <NodeList
+            nodes={filterNodeList(props.nodes)}
+            onSelectionChange={props.onSelectionChange}
+          />
+        </ToolGroup>
+        <ToolGroup name={"Options"}>
+          <>
+            <Checkbox
+              label="Automatically select new nodes"
+              checked={false}
+              onChange={() => console.log("onChange")}
+            />
+            <Checkbox
+              label="Include hidden nodes"
+              checked={includeHiddenNodes}
+              onChange={onCheckboxChange}
+            />
+          </>
+        </ToolGroup>
+      </ExpandingToolbar>
+      <ExpandingToolbar
         tooltip="Group nodes"
         icon={
           <Icon style={{ color: "white" }}>
@@ -142,40 +176,7 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
           </>
         </ToolGroup>
       </ExpandingToolbar>
-      <ExpandingToolbar
-        tooltip="Select nodes to display"
-        icon={
-          <Icon style={{ color: "white" }}>
-            <SelectionIcon />
-          </Icon>
-        }
-        className={styles.buttons}
-        selectedTab={selectedTab2}
-        onSelectTab={(newSelectedTab) => {
-          setSelectedTab2(newSelectedTab)
-        }}
-      >
-        <ToolGroup name={"Node List"}>
-          <NodeList
-            nodes={filterNodeList(props.nodes)}
-            onSelectionChange={props.onSelectionChange}
-          />
-        </ToolGroup>
-        <ToolGroup name={"Options"}>
-          <>
-            <Checkbox
-              label="Automatically display new nodes"
-              checked={false}
-              onChange={() => console.log("onChange")}
-            />
-            <Checkbox
-              label="Include hidden nodes"
-              checked={includeHiddenNodes}
-              onChange={onCheckboxChange}
-            />
-          </>
-        </ToolGroup>
-      </ExpandingToolbar>
+
       <div className={styles.buttons}>
         <Button className={styles.iconButton} tooltip="Change graph orientation" onClick={onToggleOrientation}>
           <Icon style={{ color: "white" }} size="small">

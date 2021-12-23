@@ -1,3 +1,7 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/
+
 // Copyright 2022 Open Source Robotics Foundation, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,9 +17,9 @@
 // limitations under the License.
 
 import { useTheme } from '@fluentui/react';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import ReactFlow, { Node, Edge, Background, OnLoadParams } from 'react-flow-renderer';
-import { useStoreActions, useStoreState } from 'react-flow-renderer';
+import { useStoreActions } from 'react-flow-renderer';
 
 import { SystemViewToolbar } from "./SystemViewToolbar";
 import { initialNodes, initialEdges } from './initial-elements';
@@ -25,17 +29,16 @@ import './layouting.css';
 type Props = {
 }
 
-export const SystemViewer = (props: Props) => {
+export const SystemViewer = (_props: Props) => {
 
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
   const [lrOrientation, setLROrientation] = useState(false);
   const [reactFlowInstance, setReactFlowInstance] = useState<OnLoadParams>();
 
-  // const { zoomIn, zoomOut, fitView } = useZoomPanHelper();
   const setInteractive = useStoreActions((actions) => actions.setInteractive);
-  const isInteractive = useStoreState((s) => s.nodesDraggable && s.nodesConnectable && s.elementsSelectable);
-  //const isInteractive = false; 
+  const isInteractive = false;
+  const [isConnectable, _setIsConnectable] = useState<boolean>(false);
 
   const theme = useTheme();
 
@@ -43,11 +46,12 @@ export const SystemViewer = (props: Props) => {
     createGraphLayout(nodes, edges, lrOrientation)
       .then(els => { setNodes(els); })
       .catch(err => console.error(err))
-  //}, [nodes, edges, lrOrientation])
+    //}, [nodes, edges, lrOrientation])
   }, [])
 
   const onLoad = async (_reactFlowInstance: OnLoadParams) => {
     setReactFlowInstance(_reactFlowInstance);
+    setInteractive(isInteractive);
   }
 
   const selectionChange = async (selectedNames: string[]) => {
@@ -97,8 +101,8 @@ export const SystemViewer = (props: Props) => {
     reactFlowInstance?.fitView();
   }
 
-  const interactiveChange = (isInteractive: boolean) => {
-    setInteractive?.(isInteractive);
+  const interactiveChange = (newInteractive: boolean) => {
+    setInteractive?.(newInteractive);
   }
 
   const toggleOrientation = async (lrOrientation: boolean) => {
@@ -118,6 +122,7 @@ export const SystemViewer = (props: Props) => {
         minZoom={0.2}
         maxZoom={4}
         onLoad={onLoad}
+        nodesConnectable={isConnectable}
       >
         <Background
           color={theme.semanticColors.accentButtonBackground}
