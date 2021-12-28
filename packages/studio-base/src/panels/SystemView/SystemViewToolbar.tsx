@@ -24,7 +24,7 @@ import UnlockIcon from "@mdi/svg/svg/lock-open-variant-outline.svg";
 import LockIcon from "@mdi/svg/svg/lock-outline.svg";
 import MinusIcon from "@mdi/svg/svg/minus.svg";
 import PlusIcon from "@mdi/svg/svg/plus.svg";
-import React, { useState } from "react";
+import React, { CSSProperties, useState } from "react";
 import { Elements } from 'react-flow-renderer';
 
 import Button from "@foxglove/studio-base/components/Button";
@@ -49,6 +49,8 @@ export type Props = {
   onToggleOrientation?: (lrOrientation: boolean) => void
   onSelectionChange: (selectedNodes: string[]) => void
 };
+
+const toolbarStyles: CSSProperties = { width: '325px' };
 
 export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
 
@@ -125,6 +127,7 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
             <SelectionIcon />
           </Icon>
         }
+        style={toolbarStyles}
         className={styles.buttons}
         selectedTab={selectedTab2}
         onSelectTab={(newSelectedTab) => {
@@ -206,6 +209,6 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
           </Icon>
         </Button>
       </div>
-    </Toolbar>
+    </Toolbar >
   );
 };

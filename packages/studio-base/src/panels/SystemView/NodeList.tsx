@@ -16,14 +16,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { DefaultButton, Checkbox } from "@fluentui/react";
+import { Checkbox } from "@fluentui/react";
 import { DetailsList, DetailsRow, IDetailsListProps, IDetailsListCheckboxProps, IDetailsRowStyles, IDetailsHeaderProps, Selection, IColumn } from '@fluentui/react/lib/DetailsList';
 import { MarqueeSelection } from '@fluentui/react/lib/MarqueeSelection';
 import { IRenderFunction } from '@fluentui/utilities';
 import SelectAllIcon from "@mdi/svg/svg/format-list-bulleted-square.svg";
 import SelectNoneIcon from "@mdi/svg/svg/format-list-checkbox.svg";
 import SearchIcon from "@mdi/svg/svg/magnify.svg";
-import { CSSProperties, useState } from 'react';
+import { useState } from 'react';
 import * as React from 'react';
 
 import Icon from "@foxglove/studio-base/components/Icon";
@@ -81,19 +81,16 @@ export class NodeList extends React.Component<Props, INodeListState> {
     this._selection.setChangeEvents(true, true);
   }
 
-  // <Icon style={{ color: "white", marginLeft: "5px", display: "inline" }} size="medium"
-
   private onRenderDetailsHeader: IRenderFunction<IDetailsHeaderProps> = (props, _defaultRender) => {
     if (!props) {
       return ReactNull;
     }
 
-    const selectNoneStyle: CSSProperties = { paddingLeft: '25px' };
     const [_selection, setSelection] = useState(new Selection())
 
     return (
       <div>
-        <div style={{ backgroundColor: "#1A191F", width: "288px", padding: "0", height: "35px", borderRadius: "4px", border: "1px solid white", marginTop: "10px", marginBottom: "5px" }}>
+        <div style={{ backgroundColor: "#1A191F", width: "300px", padding: "0", height: "35px", borderRadius: "4px", border: "1px solid white", marginTop: "10px", marginBottom: "5px" }}>
           <Icon size="medium" style={{ marginLeft: "5px", display: "inline" }}>
             <SearchIcon />
           </Icon>
@@ -101,7 +98,7 @@ export class NodeList extends React.Component<Props, INodeListState> {
             type="text"
             placeholder="Search for nodes..."
             spellCheck={false}
-            style={{ backgroundColor: "transparent", fontSize: '14px', width: "185px", marginLeft: "0px", marginRight: "0px", padding: "8px 5px" }}
+            style={{ backgroundColor: "transparent", fontSize: '14px', width: "195px", marginLeft: "0px", marginRight: "0px", padding: "8px 5px" }}
             onChange={(e) => {
               const text = e.currentTarget.value;
               this.setState({
