@@ -31,16 +31,16 @@ type Props = {
 
 export const SystemViewer = (props: Props) => {
 
+  const theme = useTheme();
+  const isInteractive = false;
+
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
   const [lrOrientation, setLROrientation] = useState(false);
   const [reactFlowInstance, setReactFlowInstance] = useState<OnLoadParams>();
-
-  const setInteractive = useStoreActions((actions) => actions.setInteractive);
-  const isInteractive = false;
   const [isConnectable, _setIsConnectable] = useState<boolean>(false);
 
-  const theme = useTheme();
+  const setInteractive = useStoreActions((actions) => actions.setInteractive);
 
   useEffect(() => {
     createGraphLayout(nodes, edges, lrOrientation)
@@ -83,7 +83,7 @@ export const SystemViewer = (props: Props) => {
 
     const allNodes = newNodes.concat(newTopics);
 
-    const visibleNodes = allNodes.filter(node => { return !(node as Node).isHidden });
+    const visibleNodes = allNodes.filter(node => { return (node as Node).isHidden === false });
     const visibleNodeIds = visibleNodes.map(node => { return node.id })
 
     const newEdges = edges.map(edge => {

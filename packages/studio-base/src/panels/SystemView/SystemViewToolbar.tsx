@@ -51,27 +51,26 @@ export type Props = {
 };
 
 const toolbarStyles: CSSProperties = { width: '325px' };
+const iconStyles: CSSProperties = { color: 'white' };
 
 export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
 
-  const [lrOrientation, setLROrientation] = useState<boolean>(props.lrOrientation);
-  const [isInteractive, setInteractive] = useState<boolean>(props.isInteractive);
-  const [includeHiddenNodes, setIncludeHiddenNotes] = useState<boolean>(false);
-
   let defaultSelectedTab: string | undefined;
-  const [selectedTab, setSelectedTab] = React.useState(defaultSelectedTab);
-
   let defaultSelectedTab2: string | undefined;
-  const [selectedTab2, setSelectedTab2] = React.useState(defaultSelectedTab2);
 
   const GroupingOptions = {
     first: { id: "logical", label: "Logical", },
     second: { id: "physical", label: "Physical", },
     third: { id: "none", label: "None", },
   };
-
-  const [selectedId, setSelectedId] = React.useState(GroupingOptions.third.id);
   const optionArray: Option[] = Object.values(GroupingOptions);
+
+  const [lrOrientation, setLROrientation] = useState<boolean>(props.lrOrientation);
+  const [isInteractive, setInteractive] = useState<boolean>(props.isInteractive);
+  const [includeHiddenNodes, setIncludeHiddenNotes] = useState<boolean>(false);
+  const [selectedTab, setSelectedTab] = React.useState(defaultSelectedTab);
+  const [selectedTab2, setSelectedTab2] = React.useState(defaultSelectedTab2);
+  const [selectedId, setSelectedId] = React.useState(GroupingOptions.third.id);
 
   const onToggleOrientation = () => {
     const newOrientation = !lrOrientation;
@@ -123,7 +122,7 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
       <ExpandingToolbar
         tooltip="Select nodes to display"
         icon={
-          <Icon style={{ color: "white" }}>
+          <Icon style={iconStyles}>
             <SelectionIcon />
           </Icon>
         }
@@ -158,7 +157,7 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
       <ExpandingToolbar
         tooltip="Group nodes"
         icon={
-          <Icon style={{ color: "white" }}>
+          <Icon style={iconStyles}>
             <GroupIcon />
           </Icon>
         }
@@ -179,32 +178,31 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
           </>
         </ToolGroup>
       </ExpandingToolbar>
-
       <div className={styles.buttons}>
         <Button className={styles.iconButton} tooltip="Change graph orientation" onClick={onToggleOrientation}>
-          <Icon style={{ color: "white" }} size="small">
+          <Icon style={iconStyles} size="small">
             {lrOrientation ? <ArrowUpDownIcon /> : <ArrowLeftRightIcon />}
           </Icon>
         </Button>
       </div>
       <div className={styles.buttons}>
         <Button className={styles.iconButton} tooltip="Zoom in graph" onClick={onZoomInHandler}>
-          <Icon style={{ color: "white" }} size="small">
+          <Icon style={iconStyles} size="small">
             <PlusIcon />
           </Icon>
         </Button>
         <Button className={styles.iconButton} tooltip="Zoom out graph" onClick={onZoomOutHandler}>
-          <Icon style={{ color: "white" }} size="small">
+          <Icon style={iconStyles} size="small">
             <MinusIcon />
           </Icon>
         </Button>
         <Button className={styles.iconButton} tooltip="Fit graph to window" onClick={onFitViewHandler}>
-          <Icon style={{ color: "white" }} size="small">
+          <Icon style={iconStyles} size="small">
             <FitviewIcon />
           </Icon>
         </Button>
         <Button className={styles.iconButton} tooltip="Lock/unlock the node positions" onClick={onInteractiveChangeHandler}>
-          <Icon style={{ color: "white" }} size="small">
+          <Icon style={iconStyles} size="small">
             {isInteractive ? <UnlockIcon /> : <LockIcon />}
           </Icon>
         </Button>
