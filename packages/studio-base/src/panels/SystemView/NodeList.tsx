@@ -69,12 +69,16 @@ export class NodeList extends React.Component<Props, INodeListState> {
     };
   }
 
-  public override componentDidMount(): void {
+  private setNodeVisibility(shouldDisplayFn: (node: INodeListItem) => boolean): void {
     this._selection.setChangeEvents(false);
     this.props.nodes.forEach(node => {
-      this._selection.setKeySelected(`${node.key}`, !node.isHidden, false);
+      this._selection.setKeySelected(`${node.key}`, shouldDisplayFn(node), false);
     });
     this._selection.setChangeEvents(true);
+  }
+
+  public override componentDidMount(): void {
+    this.setNodeVisibility((node: INodeListItem): boolean => { return !node.isHidden });
   }
 
   private onRenderDetailsHeader: IRenderFunction<IDetailsHeaderProps> = (props, _defaultRender) => {
@@ -91,7 +95,6 @@ export class NodeList extends React.Component<Props, INodeListState> {
           <LegacyInput
             type="text"
             placeholder="Filter nodes..."
-            //value={this.state["filterText"]}
             spellCheck={false}
             style={{ backgroundColor: "transparent", fontSize: '14px', width: "195px", marginLeft: "0px", marginRight: "0px", padding: "8px 5px" }}
             onChange={(e) => {
@@ -104,32 +107,10 @@ export class NodeList extends React.Component<Props, INodeListState> {
             {this.state["items"].length} of {this.props.nodes.length}
           </span>
         </div>
-
-        <Icon
-          onClick={
-            () => {
-              this._selection.setChangeEvents(false);
-              this.state["items"].forEach((item) => {
-                this._selection.setKeySelected(item.key, true, false);
-              });
-              this._selection.setChangeEvents(true);
-            }
-          }
-        >
+        <Icon onClick={() => { this.setNodeVisibility((_: INodeListItem): boolean => { return true }) }}>
           <SelectAllIcon />
         </Icon>
-
-        <Icon
-          onClick={
-            () => {
-              this._selection.setChangeEvents(false);
-              this.state["items"].forEach((item) => {
-                this._selection.setKeySelected(item.key, false, false);
-              });
-              this._selection.setChangeEvents(true);
-            }
-          }
-        >
+        <Icon onClick={() => { this.setNodeVisibility((_: INodeListItem): boolean => { return false }) }}>
           <SelectNoneIcon />
         </Icon>
       </div>
@@ -155,19 +136,33 @@ export class NodeList extends React.Component<Props, INodeListState> {
       return ReactNull;
     }
 
-    const customStyles: Partial<IDetailsRowStyles> = {
-    };
+    const customStyles: Partial<IDetailsRowStyles> = {};
 
-    customStyles.cell = { backgroundColor: "black", opacity: "0.8", border: '0px solid white', paddingTop: 9 };
-    customStyles.checkCell = { backgroundColor: "black", opacity: "0.8", border: '0px solid yellow', width: '32px' };
-    customStyles.check = { backgroundColor: "black", opacity: "0.8", border: '0px solid orange', width: '32px', maxWidth: '32px' };
+    customStyles.cell = {
+      backgroundColor: "black",
+      opacity: "0.8",
+      border: '0px solid white',
+      paddingTop: 9
+    };
+    customStyles.checkCell = {
+      backgroundColor: "black",
+      opacity: "0.8",
+      border: '0px solid yellow',
+      width: '32px'
+    };
+    customStyles.check = {
+      backgroundColor: "black",
+      opacity: "0.8",
+      border: '0px solid orange',
+      width: '32px',
+      maxWidth: '32px'
+    };
 
     return <DetailsRow {...props} styles={customStyles} />;
   };
 
   public override render(): JSX.Element {
     const { items } = this.state;
-
     return (
       <div>
         <DetailsList
@@ -175,11 +170,7 @@ export class NodeList extends React.Component<Props, INodeListState> {
           items={items}
           columns={this._columns}
           setKey="set"
-          cellStyleProps={{
-            cellLeftPadding: 0,
-            cellRightPadding: 5,
-            cellExtraRightPadding: 0,
-          }}
+          cellStyleProps={{ cellLeftPadding: 0, cellRightPadding: 5, cellExtraRightPadding: 0, }}
           selection={this._selection}
           selectionPreservedOnEmptyClick={true}
           onRenderDetailsHeader={this.onRenderDetailsHeader}
