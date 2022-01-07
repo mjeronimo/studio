@@ -22,14 +22,14 @@ import ReactFlow, { Node, Edge, Background, OnLoadParams } from 'react-flow-rend
 import { useStoreActions } from 'react-flow-renderer';
 
 import { SystemViewToolbar } from "./SystemViewToolbar";
-import { initialNodes, initialEdges } from './initial-elements';
+import { initialNodes, initialEdges, is_ros_node, is_ros_topic } from './initial-elements';
 import { createGraphLayout } from "./layout";
 import './layouting.css';
 
 type Props = {
 }
 
-export const SystemViewer = (_props: Props) => {
+export const SystemViewer = (props: Props) => {
 
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
@@ -55,7 +55,13 @@ export const SystemViewer = (_props: Props) => {
   }
 
   const selectionChange = async (selectedNames: string[]) => {
-    const newNodes = nodes.map(node => {
+    const ros_nodes = nodes.filter(node => is_ros_node(node));
+    const ros_topics = nodes.filter(node => is_ros_topic(node));
+
+    console.log(ros_nodes);
+    console.log(ros_topics);
+
+    const newNodes = ros_nodes.map(node => {
       if (node.data && node.data.label && selectedNames.includes(node.data.label)) {
         return {
           ...node,
@@ -68,11 +74,20 @@ export const SystemViewer = (_props: Props) => {
       }
     });
 
-    const selectedNodes = newNodes.filter(node => { return !(node as Node).isHidden });
-    const selectedIds = selectedNodes.map(node => { return node.id })
+    const newTopics = ros_topics.map(node => {
+      return {
+        ...node,
+        isHidden: false
+      }
+    });
+
+    const allNodes = newNodes.concat(newTopics);
+
+    const visibleNodes = allNodes.filter(node => { return !(node as Node).isHidden });
+    const visibleNodeIds = visibleNodes.map(node => { return node.id })
 
     const newEdges = edges.map(edge => {
-      if (selectedIds.includes((edge as Edge<any>).source) && selectedIds.includes((edge as Edge<any>).target)) {
+      if (visibleNodeIds.includes((edge as Edge<any>).source) && visibleNodeIds.includes((edge as Edge<any>).target)) {
         return {
           ...edge,
           isHidden: false
@@ -84,7 +99,7 @@ export const SystemViewer = (_props: Props) => {
       }
     });
 
-    createGraphLayout(newNodes, newEdges, lrOrientation)
+    createGraphLayout(allNodes, newEdges, lrOrientation)
       .then(els => { setNodes(els); setEdges(newEdges); })
       .catch(err => console.error(err))
   }
@@ -130,7 +145,7 @@ export const SystemViewer = (_props: Props) => {
         />
       </ReactFlow>
       <SystemViewToolbar
-        nodes={nodes}
+        nodes={nodes.filter(node => is_ros_node(node))}
         lrOrientation={lrOrientation}
         isInteractive={isInteractive}
         onZoomIn={zoomIn}

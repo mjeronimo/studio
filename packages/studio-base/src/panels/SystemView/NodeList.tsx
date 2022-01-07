@@ -18,12 +18,10 @@
 
 import { Checkbox } from "@fluentui/react";
 import { DetailsList, DetailsRow, IDetailsListProps, IDetailsListCheckboxProps, IDetailsRowStyles, IDetailsHeaderProps, Selection, IColumn } from '@fluentui/react/lib/DetailsList';
-import { MarqueeSelection } from '@fluentui/react/lib/MarqueeSelection';
 import { IRenderFunction } from '@fluentui/utilities';
 import SelectAllIcon from "@mdi/svg/svg/format-list-bulleted-square.svg";
 import SelectNoneIcon from "@mdi/svg/svg/format-list-checkbox.svg";
 import SearchIcon from "@mdi/svg/svg/magnify.svg";
-import { useState } from 'react';
 import * as React from 'react';
 
 import Icon from "@foxglove/studio-base/components/Icon";
@@ -72,21 +70,17 @@ export class NodeList extends React.Component<Props, INodeListState> {
   }
 
   public override componentDidMount(): void {
-    this._selection.setChangeEvents(false, true);
-    for (let i = 0; i < this.props.nodes.length; i++) {
-      const key = this.props.nodes[i]!.key;
-      const isHidden = this.props.nodes[i]!.isHidden;
-      this._selection.setKeySelected(`${key}`, !isHidden, false);
-    }
-    this._selection.setChangeEvents(true, true);
+    this._selection.setChangeEvents(false);
+    this.props.nodes.forEach(node => {
+      this._selection.setKeySelected(`${node.key}`, !node.isHidden, false);
+    });
+    this._selection.setChangeEvents(true);
   }
 
   private onRenderDetailsHeader: IRenderFunction<IDetailsHeaderProps> = (props, _defaultRender) => {
     if (!props) {
       return ReactNull;
     }
-
-    const [_selection, setSelection] = useState(new Selection())
 
     return (
       <div>
@@ -96,36 +90,29 @@ export class NodeList extends React.Component<Props, INodeListState> {
           </Icon>
           <LegacyInput
             type="text"
-            placeholder="Search for nodes..."
+            placeholder="Filter nodes..."
+            //value={this.state["filterText"]}
             spellCheck={false}
             style={{ backgroundColor: "transparent", fontSize: '14px', width: "195px", marginLeft: "0px", marginRight: "0px", padding: "8px 5px" }}
             onChange={(e) => {
               const text = e.currentTarget.value;
-              this.setState({
-                items: text ? this.props.nodes.filter(i => i.name.toLowerCase().includes(text)) : this.props.nodes,
-              });
+              const filteredNodes = text ? this.props.nodes.filter(node => node.name.toLowerCase().includes(text)) : this.props.nodes;
+              this.setState({ items: filteredNodes });
             }}
           />
           <span style={{ color: colors.TEXT_NORMAL, display: "inline", textAlign: "center", marginRight: "5px", marginLeft: "5px" }}>
-            101 of 200
+            {this.state["items"].length} of {this.props.nodes.length}
           </span>
         </div>
 
         <Icon
           onClick={
             () => {
-              const newSelection = this._selection;
-              newSelection.setItems(this.props.nodes);
-              this._selection.setChangeEvents(false, true);
-              for (let i = 0; i < this.props.nodes.length; i++) {
-                const key = this.props.nodes[i]!.key;
-                // Avoid updating the graph 'til the last selection change
-                if (i === this.props.nodes.length - 1) {
-                  this._selection.setChangeEvents(true, true);
-                }
-                newSelection.setKeySelected(`${key}`, true, false);
-              }
-              setSelection(newSelection);
+              this._selection.setChangeEvents(false);
+              this.state["items"].forEach((item) => {
+                this._selection.setKeySelected(item.key, true, false);
+              });
+              this._selection.setChangeEvents(true);
             }
           }
         >
@@ -135,20 +122,21 @@ export class NodeList extends React.Component<Props, INodeListState> {
         <Icon
           onClick={
             () => {
-              const newSelection = this._selection;
-              newSelection.setItems(this.props.nodes);
-              setSelection(newSelection);
+              this._selection.setChangeEvents(false);
+              this.state["items"].forEach((item) => {
+                this._selection.setKeySelected(item.key, false, false);
+              });
+              this._selection.setChangeEvents(true);
             }
           }
         >
           <SelectNoneIcon />
         </Icon>
-
       </div>
     );
   }
 
-  private onRenderCheckbox(props: IDetailsListCheckboxProps | undefined) {
+  private onRenderCheckbox: IRenderFunction<IDetailsListCheckboxProps> = (props) => {
     const styles = {
       checkbox: {
         width: '15px',
@@ -170,12 +158,9 @@ export class NodeList extends React.Component<Props, INodeListState> {
     const customStyles: Partial<IDetailsRowStyles> = {
     };
 
-    //customStyles.root = { border: '0px solid green', margin: 0, padding: 0 };
-    //customStyles.cell = { border: '0px solid white', margin: 0, paddingTop: 14, minHeight: 0, height: rowHeight};
     customStyles.cell = { backgroundColor: "black", opacity: "0.8", border: '0px solid white', paddingTop: 9 };
     customStyles.checkCell = { backgroundColor: "black", opacity: "0.8", border: '0px solid yellow', width: '32px' };
     customStyles.check = { backgroundColor: "black", opacity: "0.8", border: '0px solid orange', width: '32px', maxWidth: '32px' };
-    //customStyles.fields = { border: '0px solid red', margin: 0, padding: 0 };
 
     return <DetailsRow {...props} styles={customStyles} />;
   };
@@ -185,27 +170,25 @@ export class NodeList extends React.Component<Props, INodeListState> {
 
     return (
       <div>
-        <MarqueeSelection selection={this._selection} onShouldStartSelection={(_ev: MouseEvent) => { return false; }} >
-          <DetailsList
-            compact={true}
-            items={items}
-            columns={this._columns}
-            setKey="set"
-            cellStyleProps={{
-              cellLeftPadding: 0,
-              cellRightPadding: 5,
-              cellExtraRightPadding: 0,
-            }}
-            selection={this._selection}
-            selectionPreservedOnEmptyClick={true}
-            onRenderDetailsHeader={this.onRenderDetailsHeader}
-            onRenderRow={this.onRenderRow}
-            onRenderCheckbox={this.onRenderCheckbox}
-            ariaLabelForSelectionColumn="Toggle selection"
-            ariaLabelForSelectAllCheckbox="Toggle selection for all items"
-            checkButtonAriaLabel="select row"
-          />
-        </MarqueeSelection>
+        <DetailsList
+          compact={true}
+          items={items}
+          columns={this._columns}
+          setKey="set"
+          cellStyleProps={{
+            cellLeftPadding: 0,
+            cellRightPadding: 5,
+            cellExtraRightPadding: 0,
+          }}
+          selection={this._selection}
+          selectionPreservedOnEmptyClick={true}
+          onRenderDetailsHeader={this.onRenderDetailsHeader}
+          onRenderRow={this.onRenderRow}
+          onRenderCheckbox={this.onRenderCheckbox}
+          ariaLabelForSelectionColumn="Toggle selection"
+          ariaLabelForSelectAllCheckbox="Toggle selection for all items"
+          checkButtonAriaLabel="select row"
+        />
       </div>
     );
   }
