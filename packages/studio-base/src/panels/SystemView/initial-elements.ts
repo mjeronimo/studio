@@ -16,7 +16,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { FlowElement, Elements, Position, XYPosition, ArrowHeadType } from "react-flow-renderer";
+import {
+  FlowElement,
+  Elements,
+  Edge,
+  Position,
+  XYPosition,
+  ArrowHeadType,
+} from "react-flow-renderer";
 
 const position: XYPosition = { x: 0, y: 0 };
 
@@ -26,6 +33,18 @@ export const is_ros_node = (node: FlowElement): boolean => {
 
 export const is_ros_topic = (node: FlowElement): boolean => {
   return node.data.label.startsWith("T:");
+};
+
+export const get_peer_node_ids = (node: FlowElement, edges: Edge[]): string[] => {
+  const connected_edges = edges.filter((edge) => {
+    return edge.source === node.id || edge.target === node.id;
+  });
+
+  const peer_nodes_ids = connected_edges.map((edge) => {
+    return edge.source === node.id ? edge.target : edge.source;
+  });
+
+  return peer_nodes_ids;
 };
 
 export const initialNodes: Elements = [

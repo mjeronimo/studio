@@ -22,7 +22,7 @@ import ReactFlow, { Node, Edge, Background, OnLoadParams } from 'react-flow-rend
 import { useStoreActions } from 'react-flow-renderer';
 
 import { SystemViewToolbar } from "./SystemViewToolbar";
-import { initialNodes, initialEdges, is_ros_node, is_ros_topic } from './initial-elements';
+import { initialNodes, initialEdges, get_peer_node_ids, is_ros_node, is_ros_topic } from './initial-elements';
 import { createGraphLayout } from "./layout";
 import './layouting.css';
 
@@ -75,14 +75,22 @@ export const SystemViewer = (props: Props) => {
     });
 
     const newTopics = ros_topics.map(node => {
+      const peer_node_ids = get_peer_node_ids(node, edges as Edge[]);
+      let shouldHide = true;
+      peer_node_ids.forEach(peer_node_id => {
+        const peer_node = newNodes.find((n) => n.id === peer_node_id);
+        if (!peer_node!.isHidden) {
+          shouldHide = false;
+        }
+      })
+
       return {
         ...node,
-        isHidden: false
+        isHidden: shouldHide
       }
     });
 
     const allNodes = newNodes.concat(newTopics);
-
     const visibleNodes = allNodes.filter(node => { return (node as Node).isHidden === false });
     const visibleNodeIds = visibleNodes.map(node => { return node.id })
 
