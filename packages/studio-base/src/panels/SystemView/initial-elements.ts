@@ -28,11 +28,11 @@ import {
 const position: XYPosition = { x: 0, y: 0 };
 
 export const is_ros_node = (node: FlowElement): boolean => {
-  return node.data.label.startsWith("T:") === false;
+  return node.type === "rosNode";
 };
 
 export const is_ros_topic = (node: FlowElement): boolean => {
-  return node.data.label.startsWith("T:");
+  return node.type === "rosTopic";
 };
 
 export const get_peer_node_ids = (node: FlowElement, edges: Edge[]): string[] => {
@@ -51,125 +51,149 @@ export const initialNodes: Elements = [
   // Nodes
   {
     id: "1",
-    type: "input",
+    type: "rosNode",
     isHidden: false,
-    data: { label: "stereo_camera_controller" },
+    data: { 
+      label: "stereo_camera_controller",
+      sourcePosition: Position.Bottom,
+      targetPosition: Position.Top,
+    },
     position,
-    sourcePosition: Position.Bottom,
-    targetPosition: Position.Top,
     style: { width: 175, height: 40 },
   },
   {
     id: "2",
-    type: "default",
+    type: "rosNode",
     isHidden: false,
-    data: { label: "image_adjuster_left_stereo" },
+    data: { 
+      label: "image_adjuster_left_stereo/here-is-a-very-long-name-to-find-out-what-happens",
+      sourcePosition: Position.Bottom,
+      targetPosition: Position.Top,
+    },
     position,
-    sourcePosition: Position.Bottom,
-    targetPosition: Position.Top,
     style: { width: 175, height: 40 },
   },
   {
     id: "3",
-    type: "default",
+    type: "rosNode",
     isHidden: false,
-    data: { label: "image_adjuster_right_stereo" },
+    data: { 
+      label: "image_adjuster_right_stereo",
+      sourcePosition: Position.Bottom,
+      targetPosition: Position.Top,
+    },
     position,
-    sourcePosition: Position.Bottom,
-    targetPosition: Position.Top,
     style: { width: 175, height: 40 },
   },
   {
     id: "4",
-    type: "default",
+    type: "rosNode",
     isHidden: false,
-    data: { label: "disparity_node" },
+    data: { 
+      label: "disparity_node",
+      sourcePosition: Position.Bottom,
+      targetPosition: Position.Top,
+    },
     position,
-    sourcePosition: Position.Bottom,
-    targetPosition: Position.Top,
     style: { width: 175, height: 40 },
   },
   {
     id: "5",
-    type: "default",
+    type: "rosNode",
     isHidden: false,
-    data: { label: "point_cloud_node" },
+    data: { 
+      label: "point_cloud_node",
+      sourcePosition: Position.Bottom,
+      targetPosition: Position.Top,
+    },
     position,
-    sourcePosition: Position.Bottom,
-    targetPosition: Position.Top,
     style: { width: 175, height: 40 },
   },
   {
     id: "6",
-    type: "default",
+    type: "rosNode",
     isHidden: true,
-    data: { label: "_a_hidden_node" },
+    data: { 
+      label: "_a_hidden_node",
+      sourcePosition: Position.Bottom,
+      targetPosition: Position.Top,
+    },
     position,
-    sourcePosition: Position.Bottom,
-    targetPosition: Position.Top,
     style: { width: 175, height: 40 },
   },
 
   // Topics
   {
     id: "101",
-    type: "default",
+    type: "rosTopic",
     isHidden: false,
-    data: { label: "T: /viper/NavCamStereo/left/image_raw" },
+    data: {
+      label: "/viper/NavCamStereo/left/image_raw",
+      sourcePosition: Position.Bottom,
+      targetPosition: Position.Top,
+    },
     position,
-    sourcePosition: Position.Bottom,
-    targetPosition: Position.Top,
-    style: { width: 175, height: 100 },
+    style: { width: 125, height: 40 },
   },
   {
     id: "102",
-    type: "default",
+    type: "rosTopic",
     isHidden: false,
-    data: { label: "T: /viper/NavCamStereo/right/image_raw" },
+    data: {
+      label: "/viper/NavCamStereo/right/image_raw",
+      sourcePosition: Position.Bottom,
+      targetPosition: Position.Top,
+    },
     position,
-    sourcePosition: Position.Bottom,
-    targetPosition: Position.Top,
     style: { width: 125, height: 40 },
   },
   {
     id: "103",
-    type: "default",
+    type: "rosTopic",
     isHidden: false,
-    data: { label: "T: /viper/NavCamStereo/left/image_raw/adjusted_stereo" },
+    data: {
+      label: "/viper/NavCamStereo/left/image_raw/adjusted_stereo/very-long-name-here-it-is",
+      sourcePosition: Position.Bottom,
+      targetPosition: Position.Top,
+    },
     position,
-    sourcePosition: Position.Bottom,
-    targetPosition: Position.Top,
     style: { width: 125, height: 40 },
   },
   {
     id: "104",
-    type: "default",
+    type: "rosTopic",
     isHidden: false,
-    data: { label: "T: /viper/NavCamStereo/right/image_raw/adjusted_stereo" },
+    data: {
+      label: "/viper/NavCamStereo/right/image_raw/adjusted_stereo",
+      sourcePosition: Position.Bottom,
+      targetPosition: Position.Top,
+    },
     position,
-    sourcePosition: Position.Bottom,
-    targetPosition: Position.Top,
     style: { width: 125, height: 40 },
   },
 
   {
     id: "105",
-    type: "default",
+    type: "rosTopic",
     isHidden: false,
-    data: { label: "T: /viper/NavCamStereo/disparity" },
+    data: {
+      label: "/viper/NavCamStereo/disparity",
+      sourcePosition: Position.Bottom,
+      targetPosition: Position.Top,
+    },
     position,
-    sourcePosition: Position.Bottom,
-    targetPosition: Position.Top,
     style: { width: 125, height: 40 },
   },
   {
     id: "106",
-    type: "default",
+    type: "rosTopic",
     isHidden: false,
-    data: { label: "T: /viper/NavCamStereo/points2" },
+    data: {
+      label: "/viper/NavCamStereo/points2",
+      sourcePosition: Position.Bottom,
+      targetPosition: Position.Top,
+    },
     position,
-    sourcePosition: Position.Bottom,
-    targetPosition: Position.Top,
     style: { width: 125, height: 40 },
   },
 ];

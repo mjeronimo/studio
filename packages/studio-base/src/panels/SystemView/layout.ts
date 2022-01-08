@@ -224,8 +224,14 @@ export const createGraphLayout = async (
           y: node.y - ((el.style!.height! as number) - DEFAULT_HEIGHT) / 2,
         };
       }
+      // TODO: Resolve this duplication:
       temp.targetPosition = isHorizontal ? Position.Left : Position.Top;
       temp.sourcePosition = isHorizontal ? Position.Right : Position.Bottom;
+      temp.data.targetPosition = isHorizontal ? Position.Left : Position.Top;
+      temp.data.sourcePosition = isHorizontal ? Position.Right : Position.Bottom;
+
+      // Try:
+      // temp.targetPosition = temp.data.targetPosition;
     }
     return temp;
   });

@@ -24,9 +24,16 @@ import { useStoreActions } from 'react-flow-renderer';
 import { SystemViewToolbar } from "./SystemViewToolbar";
 import { initialNodes, initialEdges, get_peer_node_ids, is_ros_node, is_ros_topic } from './initial-elements';
 import { createGraphLayout } from "./layout";
+import RosNode from "./RosNode";
+import RosTopic from "./RosTopic";
 import './layouting.css';
 
 type Props = {
+}
+
+const nodeTypes = {
+  rosNode: RosNode,
+  rosTopic: RosTopic,
 }
 
 export const SystemViewer = (props: Props) => {
@@ -146,6 +153,7 @@ export const SystemViewer = (props: Props) => {
         maxZoom={4}
         onLoad={onLoad}
         nodesConnectable={isConnectable}
+        nodeTypes={nodeTypes}
       >
         <Background
           color={theme.semanticColors.accentButtonBackground}
