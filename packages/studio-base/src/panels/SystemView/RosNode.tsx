@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import { useTheme } from "@fluentui/react";
+import ChevronRightIcon from "@mdi/svg/svg/chevron-right.svg";
 import CloseIcon from "@mdi/svg/svg/close.svg";
 import { memo, FC, CSSProperties } from 'react';
 import { Handle, NodeProps } from 'react-flow-renderer';
@@ -29,8 +30,12 @@ const RosNode: FC<NodeProps> = ({ data }) => {
     boxSizing: "border-box",
     margin: "0px",
     minWidth: "0px",
-    padding: "0px",
-    backgroundColor: 'rgb(34, 33, 56)',
+
+    //padding: "0px",
+    //backgroundColor: 'rgb(34, 33, 56)',
+    padding: "2px",
+    backgroundColor: "black",
+
     border: '2px solid rgb(51, 49, 84)',
     color: "rgb(255,255,255)",
     position: "relative",
@@ -43,6 +48,8 @@ const RosNode: FC<NodeProps> = ({ data }) => {
   };
 
   const headerStyle: CSSProperties = {
+    backgroundColor: 'rgb(34, 33, 56)',
+
     border: '0px solid green',
     padding: "8px",
     display: "flex",
@@ -64,6 +71,9 @@ const RosNode: FC<NodeProps> = ({ data }) => {
   };
 
   const bodyStyle: CSSProperties = {
+    backgroundColor: 'rgb(34, 33, 56)',
+    color: "rgb(255,255,255,0.5)",
+
     border: '0px solid red',
     padding: "8px",
   };
@@ -88,7 +98,10 @@ const RosNode: FC<NodeProps> = ({ data }) => {
         </div>
       </div>
       <div style={bodyStyle}>
-        This is the content
+        <Icon size="xsmall">
+          <ChevronRightIcon />
+        </Icon>
+        Parameters
       </div>
       <Handle type="target" position={data.targetPosition} />
       <Handle type="source" position={data.sourcePosition} />

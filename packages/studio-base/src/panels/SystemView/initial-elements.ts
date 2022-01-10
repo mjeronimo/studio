@@ -23,24 +23,22 @@ import {
 
 const position: XYPosition = { x: 0, y: 0 };
 
-export const is_ros_node = (node: FlowElement): boolean => {
+export const isRosNode = (node: FlowElement): boolean => {
   return node.type === "rosNode";
 };
 
-export const is_ros_topic = (node: FlowElement): boolean => {
+export const isRosTopic = (node: FlowElement): boolean => {
   return node.type === "rosTopic";
 };
 
-export const get_peer_node_ids = (node: FlowElement, edges: Edge[]): string[] => {
+export const getPeerNodeIds = (node: FlowElement, edges: Edge[]): string[] => {
   const connected_edges = edges.filter((edge) => {
     return edge.source === node.id || edge.target === node.id;
   });
 
-  const peer_nodes_ids = connected_edges.map((edge) => {
+  return connected_edges.map((edge) => {
     return edge.source === node.id ? edge.target : edge.source;
   });
-
-  return peer_nodes_ids;
 };
 
 export const initialNodes: Elements = [
@@ -50,72 +48,78 @@ export const initialNodes: Elements = [
     type: "rosNode",
     isHidden: false,
     data: {
+      namespace: "/viper/NavCamStereo",
       label: "stereo_camera_controller",
       sourcePosition: Position.Bottom,
       targetPosition: Position.Top,
     },
     position,
-    style: { width: 250, height: 72 },
+    style: { width: 275, height: 79 },
   },
   {
     id: "2",
     type: "rosNode",
     isHidden: false,
     data: {
+      namespace: "/viper/NavCamStereo",
       label: "image_adjuster_left_stereo",
       sourcePosition: Position.Bottom,
       targetPosition: Position.Top,
     },
     position,
-    style: { width: 250, height: 72 },
+    style: { width: 275, height: 79 },
   },
   {
     id: "3",
     type: "rosNode",
     isHidden: false,
     data: {
+      namespace: "/viper/NavCamStereo",
       label: "image_adjuster_right_stereo",
       sourcePosition: Position.Bottom,
       targetPosition: Position.Top,
     },
     position,
-    style: { width: 250, height: 72 },
+    style: { width: 275, height: 79 },
   },
   {
     id: "4",
     type: "rosNode",
     isHidden: false,
     data: {
+      namespace: "/viper/NavCamStereo",
       label: "disparity_node",
       sourcePosition: Position.Bottom,
       targetPosition: Position.Top,
     },
     position,
-    style: { width: 250, height: 72 },
+    style: { width: 275, height: 79 },
   },
   {
     id: "5",
     type: "rosNode",
     isHidden: false,
     data: {
+      namespace: "/viper/NavCamStereo",
       label: "point_cloud_node",
       sourcePosition: Position.Bottom,
       targetPosition: Position.Top,
     },
     position,
-    style: { width: 250, height: 72 },
+    style: { width: 275, height: 79 },
   },
   {
     id: "6",
     type: "rosNode",
     isHidden: true,
     data: {
+      namespace: "/viper/NavCamStereo",
       label: "_a_hidden_node",
       sourcePosition: Position.Bottom,
       targetPosition: Position.Top,
     },
     position,
-    style: { width: 250, height: 72 },
+    style: { width: 275, height: 79 },
   },
 
   // Topics

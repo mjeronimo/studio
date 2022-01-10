@@ -1,7 +1,3 @@
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/
-
 // Copyright 2022 Open Source Robotics Foundation, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,19 +17,19 @@ import { useState, useEffect } from 'react';
 import ReactFlow, { Node, Edge, Background, OnLoadParams } from 'react-flow-renderer';
 import { useStoreActions } from 'react-flow-renderer';
 
-import { SystemViewToolbar } from "./SystemViewToolbar";
-import { initialNodes, initialEdges, get_peer_node_ids, is_ros_node, is_ros_topic } from './initial-elements';
-import { createGraphLayout } from "./layout";
 import RosNode from "./RosNode";
 import RosTopic from "./RosTopic";
+import { SystemViewToolbar } from "./SystemViewToolbar";
+import { initialNodes, initialEdges, getPeerNodeIds, isRosNode, isRosTopic } from './initial-elements';
+import { createGraphLayout } from "./layout";
 import './layouting.css';
-
-type Props = {
-}
 
 const nodeTypes = {
   rosNode: RosNode,
   rosTopic: RosTopic,
+}
+
+type Props = {
 }
 
 export const SystemViewer = (props: Props) => {
@@ -50,11 +46,13 @@ export const SystemViewer = (props: Props) => {
   const setInteractive = useStoreActions((actions) => actions.setInteractive);
 
   useEffect(() => {
+    // TODO: Will this cause a render? Could do first render off-screen and update dimensions
+    setNodes(nodes);
+
     createGraphLayout(nodes, edges, lrOrientation, theme)
-      .then(els => { setNodes(els); })
+      .then(els => { setNodes(els); setEdges(edges); })
       .catch(err => console.error(err))
-    //}, [nodes, edges, lrOrientation])
-  }, [])
+  }, []);
 
   const onLoad = async (_reactFlowInstance: OnLoadParams) => {
     setReactFlowInstance(_reactFlowInstance);
@@ -62,11 +60,10 @@ export const SystemViewer = (props: Props) => {
   }
 
   const selectionChange = async (selectedNames: string[]) => {
-    const ros_nodes = nodes.filter(node => is_ros_node(node));
-    const ros_topics = nodes.filter(node => is_ros_topic(node));
+    const ros_nodes = nodes.filter(node => isRosNode(node));
+    const ros_topics = nodes.filter(node => isRosTopic(node));
 
-    console.log(ros_nodes);
-    console.log(ros_topics);
+    console.log("selectionChange");
 
     const newNodes = ros_nodes.map(node => {
       if (node.data && node.data.label && selectedNames.includes(node.data.label)) {
@@ -82,7 +79,7 @@ export const SystemViewer = (props: Props) => {
     });
 
     const newTopics = ros_topics.map(node => {
-      const peer_node_ids = get_peer_node_ids(node, edges as Edge[]);
+      const peer_node_ids = getPeerNodeIds(node, edges as Edge[]);
       let shouldHide = true;
       peer_node_ids.forEach(peer_node_id => {
         const peer_node = newNodes.find((n) => n.id === peer_node_id);
@@ -101,6 +98,8 @@ export const SystemViewer = (props: Props) => {
     const visibleNodes = allNodes.filter(node => { return (node as Node).isHidden === false });
     const visibleNodeIds = visibleNodes.map(node => { return node.id })
 
+    console.log("edges", edges);
+
     const newEdges = edges.map(edge => {
       if (visibleNodeIds.includes((edge as Edge<any>).source) && visibleNodeIds.includes((edge as Edge<any>).target)) {
         return {
@@ -114,8 +113,10 @@ export const SystemViewer = (props: Props) => {
       }
     });
 
+    console.log("newEdges", newEdges);
+
     createGraphLayout(allNodes, newEdges, lrOrientation, theme)
-      .then(els => { setNodes(els); setEdges(newEdges); })
+      .then(els => { setEdges(newEdges), setNodes(els); })
       .catch(err => console.error(err))
   }
 
@@ -161,7 +162,7 @@ export const SystemViewer = (props: Props) => {
         />
       </ReactFlow>
       <SystemViewToolbar
-        nodes={nodes.filter(node => is_ros_node(node))}
+        nodes={nodes.filter(node => isRosNode(node))}
         lrOrientation={lrOrientation}
         isInteractive={isInteractive}
         onZoomIn={zoomIn}
