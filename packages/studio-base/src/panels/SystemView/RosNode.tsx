@@ -12,19 +12,60 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { memo, FC, CSSProperties } from 'react';
 import { useTheme } from "@fluentui/react";
+import CloseIcon from "@mdi/svg/svg/close.svg";
+import { memo, FC, CSSProperties } from 'react';
 import { Handle, NodeProps } from 'react-flow-renderer';
+
 import Icon from "@foxglove/studio-base/components/Icon";
-import NodeIcon from "./assets/icons/fitview.svg";
+
+import NodeIcon from "./assets/icons/ros_logo.svg";
 
 const RosNode: FC<NodeProps> = ({ data }) => {
   const theme = useTheme();
+  //background: theme.palette.themeLighter,
 
-  const nodeStyle: CSSProperties = { 
-    background: theme.palette.themeLighter, 
-    border: '1px solid #AAA',
-    height: '100%'
+  const nodeStyle: CSSProperties = {
+    boxSizing: "border-box",
+    margin: "0px",
+    minWidth: "0px",
+    padding: "0px",
+    backgroundColor: 'rgb(34, 33, 56)',
+    border: '2px solid rgb(51, 49, 84)',
+    color: "rgb(255,255,255)",
+    position: "relative",
+    boxShadow: "non !important",
+    width: '100%',
+    height: '100%',
+    fontFamily: theme.fonts.medium.fontFamily,
+    fontSize: theme.fonts.medium.fontSize,
+    fontWeight: theme.fonts.medium.fontWeight as number,
+  };
+
+  const headerStyle: CSSProperties = {
+    border: '0px solid green',
+    padding: "8px",
+    display: "flex",
+    borderBottom: '1px solid rgb(51, 49, 84)',
+    alignItems: "center",
+    justifyContent: "space-between",
+  };
+
+  const titleStyle: CSSProperties = {
+    border: '0px solid red',
+    display: "flex",
+  };
+
+  const closeStyle: CSSProperties = {
+    border: '0px solid red',
+    cursor: "pointer",
+    pointerEvents: "all",
+    opacity: "0.25",
+  };
+
+  const bodyStyle: CSSProperties = {
+    border: '0px solid red',
+    padding: "8px",
   };
 
   const targetHandleStyle: CSSProperties = { background: '#555' };
@@ -33,11 +74,21 @@ const RosNode: FC<NodeProps> = ({ data }) => {
 
   return (
     <div style={nodeStyle} >
-      <div>
-        <Icon style={{ color: "white" }} size="medium">
-          <NodeIcon />
-        </Icon>
-        <strong>{data.label}</strong>
+      <div style={headerStyle}>
+        <div style={titleStyle}>
+          <Icon style={{ color: "white", marginRight: "8px" }} size="xsmall">
+            <NodeIcon />
+          </Icon>
+          {data.label}
+        </div>
+        <div style={closeStyle}>
+          <Icon style={{ color: "white" }} size="xsmall">
+            <CloseIcon />
+          </Icon>
+        </div>
+      </div>
+      <div style={bodyStyle}>
+        This is the content
       </div>
       <Handle type="target" position={data.targetPosition} />
       <Handle type="source" position={data.sourcePosition} />

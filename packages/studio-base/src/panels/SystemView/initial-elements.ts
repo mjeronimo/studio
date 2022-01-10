@@ -1,7 +1,3 @@
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/
-
 // Copyright 2021 Open Source Robotics Foundation, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -53,73 +49,73 @@ export const initialNodes: Elements = [
     id: "1",
     type: "rosNode",
     isHidden: false,
-    data: { 
+    data: {
       label: "stereo_camera_controller",
       sourcePosition: Position.Bottom,
       targetPosition: Position.Top,
     },
     position,
-    style: { width: 175, height: 40 },
+    style: { width: 250, height: 72 },
   },
   {
     id: "2",
     type: "rosNode",
     isHidden: false,
-    data: { 
+    data: {
       label: "image_adjuster_left_stereo",
       sourcePosition: Position.Bottom,
       targetPosition: Position.Top,
     },
     position,
-    style: { width: 175, height: 40 },
+    style: { width: 250, height: 72 },
   },
   {
     id: "3",
     type: "rosNode",
     isHidden: false,
-    data: { 
+    data: {
       label: "image_adjuster_right_stereo",
       sourcePosition: Position.Bottom,
       targetPosition: Position.Top,
     },
     position,
-    style: { width: 175, height: 40 },
+    style: { width: 250, height: 72 },
   },
   {
     id: "4",
     type: "rosNode",
     isHidden: false,
-    data: { 
+    data: {
       label: "disparity_node",
       sourcePosition: Position.Bottom,
       targetPosition: Position.Top,
     },
     position,
-    style: { width: 175, height: 40 },
+    style: { width: 250, height: 72 },
   },
   {
     id: "5",
     type: "rosNode",
     isHidden: false,
-    data: { 
+    data: {
       label: "point_cloud_node",
       sourcePosition: Position.Bottom,
       targetPosition: Position.Top,
     },
     position,
-    style: { width: 175, height: 40 },
+    style: { width: 250, height: 72 },
   },
   {
     id: "6",
     type: "rosNode",
     isHidden: true,
-    data: { 
+    data: {
       label: "_a_hidden_node",
       sourcePosition: Position.Bottom,
       targetPosition: Position.Top,
     },
     position,
-    style: { width: 175, height: 40 },
+    style: { width: 250, height: 72 },
   },
 
   // Topics

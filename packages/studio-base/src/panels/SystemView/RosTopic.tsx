@@ -12,14 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { useTheme } from "@fluentui/react";
 import { memo, FC, CSSProperties } from 'react';
 import { Handle, NodeProps } from 'react-flow-renderer';
-import { useTheme } from "@fluentui/react";
 
 const RosTopic: FC<NodeProps> = ({ data }) => {
   const theme = useTheme();
 
-  const nodeStyle: CSSProperties = { 
+  const nodeStyle: CSSProperties = {
     border: '0px solid red',
     height: '100%',
     width: '100%',
@@ -28,19 +28,19 @@ const RosTopic: FC<NodeProps> = ({ data }) => {
     fontWeight: theme.fonts.medium.fontWeight as number,
   };
 
-  const handleStyle: CSSProperties = { 
-    backgroundColor: 'transparent', 
-    border: '0px solid red' ,
-    height: '1px', 
-    width: '1px', 
+  const handleStyle: CSSProperties = {
+    backgroundColor: 'transparent',
+    border: '0px solid red',
+    height: '1px',
+    width: '1px',
   };
 
   return (
-      <div style={nodeStyle}>
-        <div>{data.label}</div>
-        <Handle type="target" style={handleStyle} position={data.targetPosition} />
-        <Handle type="source" style={handleStyle} position={data.sourcePosition} />
-      </div>
+    <div style={nodeStyle}>
+      <div>{data.label}</div>
+      <Handle type="target" style={handleStyle} position={data.targetPosition} />
+      <Handle type="source" style={handleStyle} position={data.sourcePosition} />
+    </div>
   );
 };
 
