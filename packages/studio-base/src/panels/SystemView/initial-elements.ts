@@ -66,7 +66,7 @@ export const initialNodes: Elements = [
     type: "rosNode",
     isHidden: false,
     data: { 
-      label: "image_adjuster_left_stereo/here-is-a-very-long-name-to-find-out-what-happens",
+      label: "image_adjuster_left_stereo",
       sourcePosition: Position.Bottom,
       targetPosition: Position.Top,
     },
@@ -128,7 +128,8 @@ export const initialNodes: Elements = [
     type: "rosTopic",
     isHidden: false,
     data: {
-      label: "/viper/NavCamStereo/left/image_raw",
+      namespace: "/viper/NavCamStereo",
+      label: "/left/image_raw",
       sourcePosition: Position.Bottom,
       targetPosition: Position.Top,
     },
@@ -140,7 +141,8 @@ export const initialNodes: Elements = [
     type: "rosTopic",
     isHidden: false,
     data: {
-      label: "/viper/NavCamStereo/right/image_raw",
+      namespace: "/viper/NavCamStereo",
+      label: "/right/image_raw",
       sourcePosition: Position.Bottom,
       targetPosition: Position.Top,
     },
@@ -152,7 +154,8 @@ export const initialNodes: Elements = [
     type: "rosTopic",
     isHidden: false,
     data: {
-      label: "/viper/NavCamStereo/left/image_raw/adjusted_stereo/very-long-name-here-it-is",
+      namespace: "/viper/NavCamStereo",
+      label: "/image_raw/adjusted_stereo",
       sourcePosition: Position.Bottom,
       targetPosition: Position.Top,
     },
@@ -164,7 +167,8 @@ export const initialNodes: Elements = [
     type: "rosTopic",
     isHidden: false,
     data: {
-      label: "/viper/NavCamStereo/right/image_raw/adjusted_stereo",
+      namespace: "/viper/NavCamStereo",
+      label: "/right/image_raw/adjusted_stereo",
       sourcePosition: Position.Bottom,
       targetPosition: Position.Top,
     },
@@ -177,7 +181,8 @@ export const initialNodes: Elements = [
     type: "rosTopic",
     isHidden: false,
     data: {
-      label: "/viper/NavCamStereo/disparity",
+      namespace: "/viper/NavCamStereo",
+      label: "/disparity",
       sourcePosition: Position.Bottom,
       targetPosition: Position.Top,
     },
@@ -189,7 +194,8 @@ export const initialNodes: Elements = [
     type: "rosTopic",
     isHidden: false,
     data: {
-      label: "/viper/NavCamStereo/points2",
+      namespace: "/viper/NavCamStereo",
+      label: "/points2",
       sourcePosition: Position.Bottom,
       targetPosition: Position.Top,
     },
@@ -209,7 +215,7 @@ export const initialEdges: Elements = [
     source: "1",
     target: "101",
     animated: true,
-    arrowHeadType: ArrowHeadType.Arrow,
+    arrowHeadType: ArrowHeadType.ArrowClosed,
   },
   {
     id: "edge-1-102",
@@ -221,7 +227,7 @@ export const initialEdges: Elements = [
     source: "1",
     target: "102",
     animated: true,
-    arrowHeadType: ArrowHeadType.Arrow,
+    arrowHeadType: ArrowHeadType.ArrowClosed,
   },
 
   {
@@ -234,7 +240,7 @@ export const initialEdges: Elements = [
     source: "101",
     target: "2",
     animated: true,
-    arrowHeadType: ArrowHeadType.Arrow,
+    arrowHeadType: ArrowHeadType.ArrowClosed,
   },
   {
     id: "edge-102-3",
@@ -246,7 +252,7 @@ export const initialEdges: Elements = [
     source: "102",
     target: "3",
     animated: true,
-    arrowHeadType: ArrowHeadType.Arrow,
+    arrowHeadType: ArrowHeadType.ArrowClosed,
   },
   {
     id: "edge-2-103",
@@ -258,7 +264,7 @@ export const initialEdges: Elements = [
     source: "2",
     target: "103",
     animated: true,
-    arrowHeadType: ArrowHeadType.Arrow,
+    arrowHeadType: ArrowHeadType.ArrowClosed,
   },
   {
     id: "edge-3-104",
@@ -270,7 +276,7 @@ export const initialEdges: Elements = [
     source: "3",
     target: "104",
     animated: true,
-    arrowHeadType: ArrowHeadType.Arrow,
+    arrowHeadType: ArrowHeadType.ArrowClosed,
   },
   {
     id: "edge-103-4",
@@ -282,7 +288,7 @@ export const initialEdges: Elements = [
     source: "103",
     target: "4",
     animated: true,
-    arrowHeadType: ArrowHeadType.Arrow,
+    arrowHeadType: ArrowHeadType.ArrowClosed,
   },
   {
     id: "edge-104-4",
@@ -294,7 +300,7 @@ export const initialEdges: Elements = [
     source: "104",
     target: "4",
     animated: true,
-    arrowHeadType: ArrowHeadType.Arrow,
+    arrowHeadType: ArrowHeadType.ArrowClosed,
   },
   {
     id: "edge-4-105",
@@ -306,7 +312,7 @@ export const initialEdges: Elements = [
     source: "4",
     target: "105",
     animated: true,
-    arrowHeadType: ArrowHeadType.Arrow,
+    arrowHeadType: ArrowHeadType.ArrowClosed,
   },
   {
     id: "edge-105-5",
@@ -318,7 +324,7 @@ export const initialEdges: Elements = [
     source: "105",
     target: "5",
     animated: true,
-    arrowHeadType: ArrowHeadType.Arrow,
+    arrowHeadType: ArrowHeadType.ArrowClosed,
   },
   {
     id: "edge-5-106",
@@ -330,7 +336,7 @@ export const initialEdges: Elements = [
     source: "5",
     target: "106",
     animated: true,
-    arrowHeadType: ArrowHeadType.Arrow,
+    arrowHeadType: ArrowHeadType.ArrowClosed,
   },
   {
     id: "edge-103-5",
@@ -342,6 +348,6 @@ export const initialEdges: Elements = [
     source: "103",
     target: "5",
     animated: true,
-    arrowHeadType: ArrowHeadType.Arrow,
+    arrowHeadType: ArrowHeadType.ArrowClosed,
   },
 ];

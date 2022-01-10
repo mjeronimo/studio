@@ -50,7 +50,7 @@ export const SystemViewer = (props: Props) => {
   const setInteractive = useStoreActions((actions) => actions.setInteractive);
 
   useEffect(() => {
-    createGraphLayout(nodes, edges, lrOrientation)
+    createGraphLayout(nodes, edges, lrOrientation, theme)
       .then(els => { setNodes(els); })
       .catch(err => console.error(err))
     //}, [nodes, edges, lrOrientation])
@@ -114,7 +114,7 @@ export const SystemViewer = (props: Props) => {
       }
     });
 
-    createGraphLayout(allNodes, newEdges, lrOrientation)
+    createGraphLayout(allNodes, newEdges, lrOrientation, theme)
       .then(els => { setNodes(els); setEdges(newEdges); })
       .catch(err => console.error(err))
   }
@@ -137,7 +137,7 @@ export const SystemViewer = (props: Props) => {
 
   const toggleOrientation = async (lrOrientation: boolean) => {
     setLROrientation(lrOrientation);
-    createGraphLayout(nodes, edges, lrOrientation)
+    createGraphLayout(nodes, edges, lrOrientation, theme)
       .then(els => { setNodes(els); reactFlowInstance!.zoomTo(1.0); reactFlowInstance!.fitView(); })
       .catch(err => console.error(err))
   }

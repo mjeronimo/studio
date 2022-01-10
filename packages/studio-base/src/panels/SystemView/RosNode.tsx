@@ -21,7 +21,12 @@ import NodeIcon from "./assets/icons/fitview.svg";
 const RosNode: FC<NodeProps> = ({ data }) => {
   const theme = useTheme();
 
-  const nodeStyle: CSSProperties = { background: theme.palette.themeLighter, border: '1px solid #AAA' };
+  const nodeStyle: CSSProperties = { 
+    background: theme.palette.themeLighter, 
+    border: '1px solid #AAA',
+    height: '100%'
+  };
+
   const targetHandleStyle: CSSProperties = { background: '#555' };
   const sourceHandleStyleA: CSSProperties = { ...targetHandleStyle, top: 10 };
   const sourceHandleStyleB: CSSProperties = { ...targetHandleStyle, bottom: 10, top: 'auto' };

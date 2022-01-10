@@ -2,8 +2,11 @@
 // License, v2.0. If a copy of the MPL was not distributed with this
 // file, You can obtain one at http://mozilla.org/MPL/2.0/
 
+import type { Theme } from '@fluentui/theme';
 import ELK, { ElkNode, ElkPrimitiveEdge } from "elkjs/lib/elk.bundled";
 import { isNode, Position, Node, Edge, Elements } from "react-flow-renderer";
+import calculateSize from 'calculate-size';
+import { is_ros_topic } from "./initial-elements";
 
 const DEFAULT_WIDTH = 200;
 const DEFAULT_HEIGHT = 50;
@@ -158,10 +161,23 @@ const elk = new ELK({
   },
 });
 
+export function measureText(text: string, theme: Theme) {
+  let result = { height: 0, width: 0 };
+  if (text) {
+    result = calculateSize(text, {
+      font: theme.fonts.medium.fontFamily,
+      fontSize: theme.fonts.medium.fontSize as string,
+      fontWeight: theme.fonts.medium.fontWeight as string,
+    });
+  }
+  return result;
+}
+
 export const createGraphLayout = async (
   nodes: Elements,
   edges: Elements,
   lrOrientation: boolean,
+  theme: Theme,
 ): Promise<Elements> => {
   const direction = lrOrientation ? "RIGHT" : "DOWN";
 
@@ -218,20 +234,34 @@ export const createGraphLayout = async (
     const temp = Object.assign({}, el) as Node;
     if (isNode(el)) {
       const node = newGraph?.children?.find((n) => n.id === el.id);
+
+      // The layout was done with a single standard size in order to get the nodes
+      // to align properly. Adjust the position now based on the actual size.
       if (node?.x && node?.y && node?.width && node?.height) {
         temp.position = {
           x: node.x - ((el.style!.width! as number) - DEFAULT_WIDTH) / 2 + Math.random() / 1000,
           y: node.y - ((el.style!.height! as number) - DEFAULT_HEIGHT) / 2,
         };
       }
+
+      // Initialize the location of the connection points (top/bottom or left/right)
       // TODO: Resolve this duplication:
       temp.targetPosition = isHorizontal ? Position.Left : Position.Top;
       temp.sourcePosition = isHorizontal ? Position.Right : Position.Bottom;
       temp.data.targetPosition = isHorizontal ? Position.Left : Position.Top;
       temp.data.sourcePosition = isHorizontal ? Position.Right : Position.Bottom;
 
-      // Try:
-      // temp.targetPosition = temp.data.targetPosition;
+      // Resize and reposition the topics based on the topic name
+      if (is_ros_topic(el)) {
+        const result = measureText(el.data.label, theme);
+        const current = el.style!.width as number;
+        const actual = result.width;
+        const half_diff = (actual - current) / 2;
+
+        temp.style!.width = result.width;
+        temp.style!.height = result.height;
+        temp.position.x = temp.position.x - half_diff;
+      }
     }
     return temp;
   });
