@@ -20,14 +20,12 @@ const RosTopic: FC<NodeProps> = (props: NodeProps) => {
   const theme = useTheme();
 
   const nodeStyle: CSSProperties = {
-    //border: '1px solid rgb(104, 102, 172)',
-    //borderColor: theme.palette.magentaLight,
-    //padding: '8px',
-    height: '100%',
-    width: '100%',
+    border: props.selected? '1px solid red' : '0px solid red',
     fontFamily: theme.fonts.medium.fontFamily,
     fontSize: theme.fonts.medium.fontSize,
     fontWeight: theme.fonts.medium.fontWeight as number,
+    height: '100%',
+    width: '100%',
   };
 
   const handleStyle: CSSProperties = {

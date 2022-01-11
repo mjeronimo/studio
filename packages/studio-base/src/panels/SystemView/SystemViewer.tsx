@@ -14,7 +14,7 @@
 
 import { useTheme } from '@fluentui/react';
 import { useState, useEffect } from 'react';
-import ReactFlow, { Node, Edge, Background, OnLoadParams } from 'react-flow-renderer';
+import ReactFlow, { Node, Edge, Elements, Background, OnLoadParams } from 'react-flow-renderer';
 import { useStoreActions } from 'react-flow-renderer';
 
 import RosNode from "./RosNode";
@@ -30,6 +30,13 @@ const nodeTypes = {
 }
 
 type Props = {
+}
+
+const onSelectionChange = (elements: Elements | null) => {
+  console.log('selection change', elements);
+  elements && elements.forEach((element) => {
+    console.log(element);
+  });
 }
 
 export const SystemViewer = (props: Props) => {
@@ -54,8 +61,8 @@ export const SystemViewer = (props: Props) => {
       .catch(err => console.error(err))
   }, []);
 
-  const onLoad = async (_reactFlowInstance: OnLoadParams) => {
-    setReactFlowInstance(_reactFlowInstance);
+  const onLoad = async (reactFlowInstance: OnLoadParams) => {
+    setReactFlowInstance(reactFlowInstance);
     setInteractive(isInteractive);
   }
 
@@ -115,9 +122,11 @@ export const SystemViewer = (props: Props) => {
 
     console.log("newEdges", newEdges);
 
-    createGraphLayout(allNodes, newEdges, lrOrientation, theme)
-      .then(els => { setEdges(newEdges), setNodes(els); })
-      .catch(err => console.error(err))
+    setEdges(newEdges), 
+    setNodes(allNodes); 
+    //createGraphLayout(allNodes, newEdges, lrOrientation, theme)
+    //  .then(els => { setEdges(newEdges), setNodes(els); })
+    //  .catch(err => console.error(err))
   }
 
   const zoomIn = () => {
@@ -155,6 +164,7 @@ export const SystemViewer = (props: Props) => {
         onLoad={onLoad}
         nodesConnectable={isConnectable}
         nodeTypes={nodeTypes}
+        onSelectionChange={onSelectionChange}
       >
         <Background
           color={theme.semanticColors.accentButtonBackground}

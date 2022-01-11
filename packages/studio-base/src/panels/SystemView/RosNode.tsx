@@ -19,44 +19,40 @@ import { memo, FC, CSSProperties, useState } from 'react';
 import { Handle, NodeProps } from 'react-flow-renderer';
 
 import Icon from "@foxglove/studio-base/components/Icon";
-
 import NodeIcon from "./assets/icons/ros_logo.svg";
 
-const RosNode: FC<NodeProps> = (props: NodeProps ) => {
+const normalOpacity = 0.25;
+const highlightOpacity = 1.0;
+
+const RosNode: FC<NodeProps> = (props: NodeProps) => {
   const theme = useTheme();
-  const initialOpacity = 0.25;
-  const [opacity, setOpacity] = useState(initialOpacity);
+  const [opacity, setOpacity] = useState(normalOpacity);
 
   const nodeStyle: CSSProperties = {
-    boxSizing: "border-box",
-    margin: "0px",
-    minWidth: "0px",
-
-    //padding: "0px",
-    //backgroundColor: 'rgb(34, 33, 56)',
-    padding: "2px",
     backgroundColor: "black",
-
-    border: '2px solid rgb(51, 49, 84)',
-    color: "rgb(255,255,255)",
-    position: "relative",
+    border: props.selected? '2px solid red' : '2px solid rgb(51, 49, 84)',
     boxShadow: "non !important",
-    width: '100%',
-    height: '100%',
+    boxSizing: "border-box",
+    color: "rgb(255,255,255)",
     fontFamily: theme.fonts.medium.fontFamily,
     fontSize: theme.fonts.medium.fontSize,
     fontWeight: theme.fonts.medium.fontWeight as number,
+    height: '100%',
+    margin: "0px",
+    minWidth: "0px",
+    padding: "2px",
+    position: "relative",
+    width: '100%',
   };
 
   const headerStyle: CSSProperties = {
-    backgroundColor: 'rgb(34, 33, 56)',
-
-    border: '0px solid green',
-    padding: "8px",
-    display: "flex",
-    borderBottom: '1px solid rgb(51, 49, 84)',
     alignItems: "center",
+    backgroundColor: 'rgb(34, 33, 56)',
+    border: '0px solid green',
+    borderBottom: '1px solid rgb(51, 49, 84)',
+    display: "flex",
     justifyContent: "space-between",
+    padding: "8px",
   };
 
   const titleStyle: CSSProperties = {
@@ -67,21 +63,31 @@ const RosNode: FC<NodeProps> = (props: NodeProps ) => {
   const closeStyle: CSSProperties = {
     border: '0px solid red',
     cursor: "pointer",
-    pointerEvents: "all",
     opacity: opacity,
+    pointerEvents: "all",
   };
 
   const bodyStyle: CSSProperties = {
     backgroundColor: 'rgb(34, 33, 56)',
-    color: "rgb(255,255,255,0.5)",
-
     border: '0px solid red',
+    color: "rgb(255,255,255,0.5)",
     padding: "8px",
   };
 
-  const targetHandleStyle: CSSProperties = { background: '#555' };
-  const sourceHandleStyleA: CSSProperties = { ...targetHandleStyle, top: 10 };
-  const sourceHandleStyleB: CSSProperties = { ...targetHandleStyle, bottom: 10, top: 'auto' };
+  const targetHandleStyle: CSSProperties = {
+    background: '#555'
+  };
+
+  const sourceHandleStyleA: CSSProperties = {
+    ...targetHandleStyle,
+    top: 10
+  };
+
+  const sourceHandleStyleB: CSSProperties = {
+    ...targetHandleStyle,
+    bottom: 10,
+    top: 'auto'
+  };
 
   return (
     <div style={nodeStyle} >
@@ -92,13 +98,13 @@ const RosNode: FC<NodeProps> = (props: NodeProps ) => {
           </Icon>
           {props.data.label}
         </div>
-        <div 
+        <div
           style={closeStyle}
-          onMouseEnter={()=>{setOpacity(1.0); }}
-          onMouseLeave={()=>{setOpacity(initialOpacity); }}
+          onMouseEnter={()=>{setOpacity(highlightOpacity); }}
+          onMouseLeave={()=>{setOpacity(normalOpacity); }}
         >
-          <Icon 
-            style={{ color: "white" }} 
+          <Icon
+            style={{ color: "white" }}
             size="xsmall"
             clickable={true}
             onClick={()=> { console.log("clicked"); }}
