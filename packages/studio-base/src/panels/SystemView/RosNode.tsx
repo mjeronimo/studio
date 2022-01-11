@@ -22,7 +22,7 @@ import Icon from "@foxglove/studio-base/components/Icon";
 
 import NodeIcon from "./assets/icons/ros_logo.svg";
 
-const RosNode: FC<NodeProps> = ({ data }) => {
+const RosNode: FC<NodeProps> = (props: NodeProps ) => {
   const theme = useTheme();
   const initialOpacity = 0.25;
   const [opacity, setOpacity] = useState(initialOpacity);
@@ -90,7 +90,7 @@ const RosNode: FC<NodeProps> = ({ data }) => {
           <Icon style={{ color: "white", marginRight: "8px" }} size="xsmall">
             <NodeIcon />
           </Icon>
-          {data.label}
+          {props.data.label}
         </div>
         <div 
           style={closeStyle}
@@ -113,8 +113,8 @@ const RosNode: FC<NodeProps> = ({ data }) => {
         </Icon>
         Parameters
       </div>
-      <Handle type="target" position={data.targetPosition} />
-      <Handle type="source" position={data.sourcePosition} />
+      <Handle type="target" position={props.targetPosition!} />
+      <Handle type="source" position={props.sourcePosition!} />
     </div>
   );
 };

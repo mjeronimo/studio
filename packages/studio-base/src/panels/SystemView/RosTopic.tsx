@@ -16,7 +16,7 @@ import { useTheme } from "@fluentui/react";
 import { memo, FC, CSSProperties } from 'react';
 import { Handle, NodeProps } from 'react-flow-renderer';
 
-const RosTopic: FC<NodeProps> = ({ data }) => {
+const RosTopic: FC<NodeProps> = (props: NodeProps) => {
   const theme = useTheme();
 
   const nodeStyle: CSSProperties = {
@@ -39,9 +39,9 @@ const RosTopic: FC<NodeProps> = ({ data }) => {
 
   return (
     <div style={nodeStyle}>
-      <div>{data.label}</div>
-      <Handle type="target" style={handleStyle} position={data.targetPosition} />
-      <Handle type="source" style={handleStyle} position={data.sourcePosition} />
+      <div>{props.data.label}</div>
+      <Handle type="target" style={handleStyle} position={props.targetPosition!} />
+      <Handle type="source" style={handleStyle} position={props.sourcePosition!} />
     </div>
   );
 };

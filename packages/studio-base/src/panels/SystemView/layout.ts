@@ -130,11 +130,8 @@ export const createGraphLayout = async (
       }
 
       // Initialize the location of the connection points (top/bottom or left/right)
-      // TODO: Resolve this duplication:
       temp.targetPosition = isHorizontal ? Position.Left : Position.Top;
       temp.sourcePosition = isHorizontal ? Position.Right : Position.Bottom;
-      temp.data.targetPosition = isHorizontal ? Position.Left : Position.Top;
-      temp.data.sourcePosition = isHorizontal ? Position.Right : Position.Bottom;
 
       // Resize and reposition the topics based on the topic name
       //if (isRosTopic(el)) {

@@ -50,8 +50,6 @@ export const initialNodes: Elements = [
     data: {
       namespace: "/viper/NavCamStereo",
       label: "stereo_camera_controller",
-      sourcePosition: Position.Bottom,
-      targetPosition: Position.Top,
     },
     position,
     style: { width: 275, height: 79 },
@@ -63,8 +61,6 @@ export const initialNodes: Elements = [
     data: {
       namespace: "/viper/NavCamStereo",
       label: "image_adjuster_left_stereo",
-      sourcePosition: Position.Bottom,
-      targetPosition: Position.Top,
     },
     position,
     style: { width: 275, height: 79 },
@@ -76,8 +72,6 @@ export const initialNodes: Elements = [
     data: {
       namespace: "/viper/NavCamStereo",
       label: "image_adjuster_right_stereo",
-      sourcePosition: Position.Bottom,
-      targetPosition: Position.Top,
     },
     position,
     style: { width: 275, height: 79 },
@@ -89,8 +83,6 @@ export const initialNodes: Elements = [
     data: {
       namespace: "/viper/NavCamStereo",
       label: "disparity_node",
-      sourcePosition: Position.Bottom,
-      targetPosition: Position.Top,
     },
     position,
     style: { width: 275, height: 79 },
@@ -102,8 +94,6 @@ export const initialNodes: Elements = [
     data: {
       namespace: "/viper/NavCamStereo",
       label: "point_cloud_node",
-      sourcePosition: Position.Bottom,
-      targetPosition: Position.Top,
     },
     position,
     style: { width: 275, height: 79 },
@@ -115,8 +105,6 @@ export const initialNodes: Elements = [
     data: {
       namespace: "/viper/NavCamStereo",
       label: "_a_hidden_node",
-      sourcePosition: Position.Bottom,
-      targetPosition: Position.Top,
     },
     position,
     style: { width: 275, height: 79 },
@@ -130,8 +118,6 @@ export const initialNodes: Elements = [
     data: {
       namespace: "/viper/NavCamStereo",
       label: "/left/image_raw",
-      sourcePosition: Position.Bottom,
-      targetPosition: Position.Top,
     },
     position,
     style: { width: 125, height: 40 },
@@ -143,8 +129,6 @@ export const initialNodes: Elements = [
     data: {
       namespace: "/viper/NavCamStereo",
       label: "/right/image_raw",
-      sourcePosition: Position.Bottom,
-      targetPosition: Position.Top,
     },
     position,
     style: { width: 125, height: 40 },
@@ -156,8 +140,6 @@ export const initialNodes: Elements = [
     data: {
       namespace: "/viper/NavCamStereo",
       label: "/image_raw/adjusted_stereo",
-      sourcePosition: Position.Bottom,
-      targetPosition: Position.Top,
     },
     position,
     style: { width: 125, height: 40 },
@@ -169,8 +151,6 @@ export const initialNodes: Elements = [
     data: {
       namespace: "/viper/NavCamStereo",
       label: "/right/image_raw/adjusted_stereo",
-      sourcePosition: Position.Bottom,
-      targetPosition: Position.Top,
     },
     position,
     style: { width: 125, height: 40 },
@@ -183,8 +163,6 @@ export const initialNodes: Elements = [
     data: {
       namespace: "/viper/NavCamStereo",
       label: "/disparity",
-      sourcePosition: Position.Bottom,
-      targetPosition: Position.Top,
     },
     position,
     style: { width: 125, height: 40 },
@@ -196,8 +174,6 @@ export const initialNodes: Elements = [
     data: {
       namespace: "/viper/NavCamStereo",
       label: "/points2",
-      sourcePosition: Position.Bottom,
-      targetPosition: Position.Top,
     },
     position,
     style: { width: 125, height: 40 },
