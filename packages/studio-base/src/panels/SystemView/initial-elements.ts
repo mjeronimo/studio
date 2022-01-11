@@ -49,7 +49,7 @@ export const initialNodes: Elements = [
     isHidden: false,
     data: {
       namespace: "/viper/NavCamStereo",
-      label: "stereo_camera_controller",
+      label: "stereo_camera_controller_really_long_name_to_truncate",
     },
     position,
     style: { width: 275, height: 79 },

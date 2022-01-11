@@ -16,7 +16,7 @@ import { useTheme } from "@fluentui/react";
 import ChevronRightIcon from "@mdi/svg/svg/chevron-right.svg";
 import CloseIcon from "@mdi/svg/svg/close.svg";
 import { memo, FC, CSSProperties, useState } from 'react';
-import { Handle, NodeProps } from 'react-flow-renderer';
+import { Handle, NodeProps, Position } from 'react-flow-renderer';
 
 import Icon from "@foxglove/studio-base/components/Icon";
 import NodeIcon from "./assets/icons/ros_logo.svg";
@@ -57,7 +57,9 @@ const RosNode: FC<NodeProps> = (props: NodeProps) => {
 
   const titleStyle: CSSProperties = {
     border: '0px solid red',
-    display: "flex",
+    whiteSpace: "nowrap",
+    overflow: "hidden",
+    textOverflow: "ellipsis",
   };
 
   const closeStyle: CSSProperties = {
@@ -75,18 +77,19 @@ const RosNode: FC<NodeProps> = (props: NodeProps) => {
   };
 
   const targetHandleStyle: CSSProperties = {
-    background: '#555'
+    //background: '#555'
+    //top: (props.targetPosition === Position.Top) ? -8 : 'auto',
+    //left: 'auto',
+    //left: -8,
+    //right: -8,
+    //bottom: -8,
   };
 
-  const sourceHandleStyleA: CSSProperties = {
-    ...targetHandleStyle,
-    top: 10
-  };
-
-  const sourceHandleStyleB: CSSProperties = {
-    ...targetHandleStyle,
-    bottom: 10,
-    top: 'auto'
+  const sourceHandleStyle: CSSProperties = {
+    //top: -8,
+    //left: -8,
+    //right: -8,
+    //bottom: -8,
   };
 
   return (
@@ -104,7 +107,7 @@ const RosNode: FC<NodeProps> = (props: NodeProps) => {
           onMouseLeave={()=>{setOpacity(normalOpacity); }}
         >
           <Icon
-            style={{ color: "white" }}
+            style={{ color: "white", marginLeft: "8px" }}
             size="xsmall"
             clickable={true}
             onClick={()=> { console.log("clicked"); }}
@@ -119,8 +122,8 @@ const RosNode: FC<NodeProps> = (props: NodeProps) => {
         </Icon>
         Parameters
       </div>
-      <Handle type="target" position={props.targetPosition!} />
-      <Handle type="source" position={props.sourcePosition!} />
+      <Handle type="target" position={props.targetPosition!} style={targetHandleStyle}/>
+      <Handle type="source" position={props.sourcePosition!} style={sourceHandleStyle}/>
     </div>
   );
 };
