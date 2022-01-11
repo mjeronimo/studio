@@ -58,19 +58,6 @@ export const createGraphLayout = async (
   const elk_nodes: ElkNode[] = [];
 
   nodes.forEach((el) => {
-    const myprops: NodeProps = {
-      id: el.id,
-      type: el.type!,
-      data: el.data,
-      selected: false,
-      isConnectable: true,
-      xPos: 0,
-      yPos: 0,
-    };
-    const foobar = React.createElement(RosNode, myprops);    
-    console.log(foobar);
-    //ReactDOM.render(foobar, document.getElementById("root"));                   
-
     if (!el.isHidden) {
       if (isRosTopic(el)) {
         // Resize and reposition the topics based on the topic name

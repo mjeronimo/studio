@@ -26,7 +26,7 @@ const NodeListWrapper = (props: any) => (
   <div style={containerStyle}>
     <MockPanelContextProvider>
       <NodeList
-        nodes={initialNodes.map((node) => { return { key: node.id, name: node.data.label as string, isHidden: node.isHidden as boolean } })} 
+        nodes={initialNodes.map((node) => { return { key: node.id, name: node.data.label as string, isHidden: node.isHidden as boolean } })}
         lrOrientation={true}
       />
     </MockPanelContextProvider>

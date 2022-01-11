@@ -18,7 +18,7 @@ import { IRenderFunction } from '@fluentui/utilities';
 import SelectAllIcon from "@mdi/svg/svg/format-list-bulleted-square.svg";
 import SelectNoneIcon from "@mdi/svg/svg/format-list-checkbox.svg";
 import SearchIcon from "@mdi/svg/svg/magnify.svg";
-import * as React from 'react';
+import React, { CSSProperties } from 'react';
 
 import Icon from "@foxglove/studio-base/components/Icon";
 import { LegacyInput } from "@foxglove/studio-base/components/LegacyStyledComponents";
@@ -40,15 +40,15 @@ interface Props {
 }
 
 export class NodeList extends React.Component<Props, INodeListState> {
-  private _selection: Selection;
-  private _columns: IColumn[];
+  private selection: Selection;
+  private columns: IColumn[];
 
   constructor(props: Props) {
     super(props);
-    this._selection = new Selection({
+    this.selection = new Selection({
       onSelectionChanged: () => {
-        const items = this._selection.getItems();
-        const selectedItems = this._selection.getSelectedIndices();
+        const items = this.selection.getItems();
+        const selectedItems = this.selection.getSelectedIndices();
         const selectedNames: string[] = selectedItems.map((item) => {
           return (items[+item] as INodeListItem).name;
         });
@@ -56,7 +56,7 @@ export class NodeList extends React.Component<Props, INodeListState> {
       }
     });
 
-    this._columns = [
+    this.columns = [
       { key: 'column1', name: 'Name', fieldName: 'name', minWidth: 250, maxWidth: 250, isResizable: true },
     ];
 
@@ -66,11 +66,11 @@ export class NodeList extends React.Component<Props, INodeListState> {
   }
 
   private setNodeVisibility(shouldDisplayFn: (node: INodeListItem) => boolean): void {
-    this._selection.setChangeEvents(false);
+    this.selection.setChangeEvents(false);
     this.props.nodes.forEach(node => {
-      this._selection.setKeySelected(`${node.key}`, shouldDisplayFn(node), false);
+      this.selection.setKeySelected(`${node.key}`, shouldDisplayFn(node), false);
     });
-    this._selection.setChangeEvents(true);
+    this.selection.setChangeEvents(true);
   }
 
   public override componentDidMount(): void {
@@ -82,24 +82,58 @@ export class NodeList extends React.Component<Props, INodeListState> {
       return ReactNull;
     }
 
+    const headerStyle: CSSProperties = {
+      backgroundColor: "#1A191F",
+      border: "1px solid white",
+      width: "300px",
+      padding: "8px",
+      height: "35px",
+      borderRadius: "4px",
+      marginTop: "10px",
+      marginBottom: "5px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+    };
+
+    const headerInputStyle: CSSProperties = {
+      display: "flex",
+      alignItems: "center",
+    };
+
+    const inputStyle: CSSProperties = {
+      backgroundColor: "transparent",
+      fontSize: '14px',
+      width: "200px",
+      marginLeft: "0px",
+      marginRight: "0px",
+      padding: "8px 5px"
+    };
+
+    const counterStyle: CSSProperties = {
+      color: colors.TEXT_NORMAL,
+    };
+
     return (
       <div>
-        <div style={{ backgroundColor: "#1A191F", width: "300px", padding: "0", height: "35px", borderRadius: "4px", border: "1px solid white", marginTop: "10px", marginBottom: "5px" }}>
-          <Icon size="medium" style={{ marginLeft: "5px", display: "inline" }}>
-            <SearchIcon />
-          </Icon>
-          <LegacyInput
-            type="text"
-            placeholder="Filter nodes..."
-            spellCheck={false}
-            style={{ backgroundColor: "transparent", fontSize: '14px', width: "195px", marginLeft: "0px", marginRight: "0px", padding: "8px 5px" }}
-            onChange={(e) => {
-              const text = e.currentTarget.value;
-              const filteredNodes = text ? this.props.nodes.filter(node => node.name.toLowerCase().includes(text)) : this.props.nodes;
-              this.setState({ items: filteredNodes });
-            }}
-          />
-          <span style={{ color: colors.TEXT_NORMAL, display: "inline", textAlign: "center", marginRight: "5px", marginLeft: "5px" }}>
+        <div style={headerStyle}>
+          <div style={headerInputStyle}>
+            <Icon>
+              <SearchIcon />
+            </Icon>
+            <LegacyInput
+              type="text"
+              placeholder="Filter nodes..."
+              spellCheck={false}
+              style={inputStyle}
+              onChange={(e) => {
+                const text = e.currentTarget.value;
+                const filteredNodes = text ? this.props.nodes.filter(node => node.name.toLowerCase().includes(text)) : this.props.nodes;
+                this.setState({ items: filteredNodes });
+              }}
+            />
+          </div>
+          <span style={counterStyle} >
             {this.state["items"].length} of {this.props.nodes.length}
           </span>
         </div>
@@ -164,10 +198,10 @@ export class NodeList extends React.Component<Props, INodeListState> {
         <DetailsList
           compact={true}
           items={items}
-          columns={this._columns}
+          columns={this.columns}
           setKey="set"
           cellStyleProps={{ cellLeftPadding: 0, cellRightPadding: 5, cellExtraRightPadding: 0, }}
-          selection={this._selection}
+          selection={this.selection}
           selectionPreservedOnEmptyClick={true}
           onRenderDetailsHeader={this.onRenderDetailsHeader}
           onRenderRow={this.onRenderRow}
