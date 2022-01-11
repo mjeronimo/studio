@@ -77,19 +77,9 @@ const RosNode: FC<NodeProps> = (props: NodeProps) => {
   };
 
   const targetHandleStyle: CSSProperties = {
-    //background: '#555'
-    //top: (props.targetPosition === Position.Top) ? -8 : 'auto',
-    //left: 'auto',
-    //left: -8,
-    //right: -8,
-    //bottom: -8,
   };
 
   const sourceHandleStyle: CSSProperties = {
-    //top: -8,
-    //left: -8,
-    //right: -8,
-    //bottom: -8,
   };
 
   return (
