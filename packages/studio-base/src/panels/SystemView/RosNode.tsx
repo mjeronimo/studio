@@ -15,7 +15,7 @@
 import { useTheme } from "@fluentui/react";
 import ChevronRightIcon from "@mdi/svg/svg/chevron-right.svg";
 import CloseIcon from "@mdi/svg/svg/close.svg";
-import { memo, FC, CSSProperties } from 'react';
+import { memo, FC, CSSProperties, useState } from 'react';
 import { Handle, NodeProps } from 'react-flow-renderer';
 
 import Icon from "@foxglove/studio-base/components/Icon";
@@ -24,7 +24,8 @@ import NodeIcon from "./assets/icons/ros_logo.svg";
 
 const RosNode: FC<NodeProps> = ({ data }) => {
   const theme = useTheme();
-  //background: theme.palette.themeLighter,
+  const initialOpacity = 0.25;
+  const [opacity, setOpacity] = useState(initialOpacity);
 
   const nodeStyle: CSSProperties = {
     boxSizing: "border-box",
@@ -67,7 +68,7 @@ const RosNode: FC<NodeProps> = ({ data }) => {
     border: '0px solid red',
     cursor: "pointer",
     pointerEvents: "all",
-    opacity: "0.25",
+    opacity: opacity,
   };
 
   const bodyStyle: CSSProperties = {
@@ -91,8 +92,17 @@ const RosNode: FC<NodeProps> = ({ data }) => {
           </Icon>
           {data.label}
         </div>
-        <div style={closeStyle}>
-          <Icon style={{ color: "white" }} size="xsmall">
+        <div 
+          style={closeStyle}
+          onMouseEnter={()=>{setOpacity(1.0); }}
+          onMouseLeave={()=>{setOpacity(initialOpacity); }}
+        >
+          <Icon 
+            style={{ color: "white" }} 
+            size="xsmall"
+            clickable={true}
+            onClick={()=> { console.log("clicked"); }}
+          >
             <CloseIcon />
           </Icon>
         </div>

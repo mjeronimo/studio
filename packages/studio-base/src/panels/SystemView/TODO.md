@@ -1,5 +1,4 @@
 # Tasks
-* Change highlight color for 'X' in RosNode
 * Remove RosNode upon clicking 'X'
 * Merge nodes and edges into elements (state) so that rendering happens in one pass upon setElements
 * Move the layout direction to the Settings panel
@@ -10,8 +9,9 @@
 * Change border style for RosNodes upon select
 * Change border style for RosTopics upon select
 * Split out connection points, per topic
+* The pop-up panels are larger than appearance (prohibiting clicks and hovers)
 * Merge Audrow's changes
 
 # Done
-
 * Fix the "Filter nodes" counter (right justify; see RosNode header for 'flex' layout)
+* Change highlight color for 'X' in RosNode
