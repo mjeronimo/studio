@@ -64,13 +64,8 @@ export const createGraphLayout = async (
         const topic = el as Node;
         const result = measureText(el.data.label, theme);
 
-        console.log("el: ", el);
-
         topic.style!.width = result.width;
         topic.style!.height = result.height;
-
-        console.log("el2: ", el);
-        console.log("topic:", topic);
 
         elk_nodes.push({
           id: el.id,

@@ -19,6 +19,7 @@ import GroupIcon from "@mdi/svg/svg/group.svg";
 import UnlockIcon from "@mdi/svg/svg/lock-open-variant-outline.svg";
 import LockIcon from "@mdi/svg/svg/lock-outline.svg";
 import MinusIcon from "@mdi/svg/svg/minus.svg";
+import NodeGraphIcon from "@mdi/svg/svg/graph.svg";
 import PlusIcon from "@mdi/svg/svg/plus.svg";
 import React, { CSSProperties, useState } from "react";
 import { Elements } from 'react-flow-renderer';
@@ -37,11 +38,10 @@ import FitviewIcon from "./assets/icons/fitview.svg";
 export type Props = {
   nodes: Elements
   lrOrientation: boolean
-  isInteractive: boolean
   onZoomIn?: () => void
   onZoomOut?: () => void
   onFitview?: () => void
-  onInteractiveChange?: (isInteractive: boolean) => void
+  onLayoutGraph?: (lrOrientation: boolean) => void
   onToggleOrientation?: (lrOrientation: boolean) => void
   onSelectionChange: (selectedNodes: string[]) => void
 };
@@ -62,7 +62,6 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
   const optionArray: Option[] = Object.values(GroupingOptions);
 
   const [lrOrientation, setLROrientation] = useState<boolean>(props.lrOrientation);
-  const [isInteractive, setInteractive] = useState<boolean>(props.isInteractive);
   const [includeHiddenNodes, setIncludeHiddenNotes] = useState<boolean>(false);
   const [selectedTab, setSelectedTab] = React.useState(defaultSelectedTab);
   const [selectedTab2, setSelectedTab2] = React.useState(defaultSelectedTab2);
@@ -72,12 +71,6 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
     const newOrientation = !lrOrientation;
     setLROrientation(newOrientation);
     props.onToggleOrientation?.(newOrientation);
-  }
-
-  const onInteractiveChangeHandler = () => {
-    const newInteractive = !isInteractive;
-    setInteractive(newInteractive);
-    props.onInteractiveChange?.(newInteractive);
   }
 
   const onZoomInHandler = () => {
@@ -90,6 +83,10 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
 
   const onFitViewHandler = () => {
     props.onFitview?.();
+  }
+
+  const onLayoutGraph = () => {
+    props.onLayoutGraph?.(lrOrientation);
   }
 
   const onCheckboxChange = (isChecked: boolean) => {
@@ -175,6 +172,13 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
         </ToolGroup>
       </ExpandingToolbar>
       <div className={styles.buttons}>
+        <Button className={styles.iconButton} tooltip="Layout node graph" onClick={onLayoutGraph}>
+          <Icon style={iconStyles} size="small">
+            <NodeGraphIcon />
+          </Icon>
+        </Button>
+      </div>
+      <div className={styles.buttons}>
         <Button className={styles.iconButton} tooltip="Change graph orientation" onClick={onToggleOrientation}>
           <Icon style={iconStyles} size="small">
             {lrOrientation ? <ArrowUpDownIcon /> : <ArrowLeftRightIcon />}
@@ -195,11 +199,6 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
         <Button className={styles.iconButton} tooltip="Fit graph to window" onClick={onFitViewHandler}>
           <Icon style={iconStyles} size="small">
             <FitviewIcon />
-          </Icon>
-        </Button>
-        <Button className={styles.iconButton} tooltip="Lock/unlock the node positions" onClick={onInteractiveChangeHandler}>
-          <Icon style={iconStyles} size="small">
-            {isInteractive ? <UnlockIcon /> : <LockIcon />}
           </Icon>
         </Button>
       </div>

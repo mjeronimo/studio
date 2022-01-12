@@ -57,9 +57,9 @@ const RosNode: FC<NodeProps> = (props: NodeProps) => {
 
   const titleStyle: CSSProperties = {
     border: '0px solid red',
-    whiteSpace: "nowrap",
     overflow: "hidden",
     textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
   };
 
   const closeStyle: CSSProperties = {
@@ -76,10 +76,11 @@ const RosNode: FC<NodeProps> = (props: NodeProps) => {
     padding: "8px",
   };
 
-  const targetHandleStyle: CSSProperties = {
-  };
-
-  const sourceHandleStyle: CSSProperties = {
+  const handleStyle: CSSProperties = {
+//  backgroundColor: 'transparent',
+//  border: '1px solid red',
+//  height: '1px',
+//  width: '1px',
   };
 
   return (
@@ -112,8 +113,8 @@ const RosNode: FC<NodeProps> = (props: NodeProps) => {
         </Icon>
         Parameters
       </div>
-      <Handle type="target" position={props.targetPosition!} style={targetHandleStyle}/>
-      <Handle type="source" position={props.sourcePosition!} style={sourceHandleStyle}/>
+      <Handle type="target" position={props.targetPosition!} style={handleStyle}/>
+      <Handle type="source" position={props.sourcePosition!} style={handleStyle}/>
     </div>
   );
 };

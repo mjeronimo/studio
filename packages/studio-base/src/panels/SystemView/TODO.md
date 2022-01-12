@@ -1,8 +1,7 @@
 # System Viewer Task List
 
 ## Features/Changes
-* Manual layout: Add layout button to NodeList
-* Move the layout direction to the Settings panel
+* Move the layout direction to the Settings panel (save and restore a configuration)
 * Show full name in tooltip if ROSNode name is truncated ("...")
 * Split out connection points, per topic
     * Select connection point
@@ -20,6 +19,8 @@
 * Change border style for RosTopics upon select
 * Selecting checkbox in node list does not layout again
 * Limit length of ROSNode name string (use "...")
+* Manual layout: Add layout button to NodeList
+* Change the 'interactive' default (and remove the lock/unlock button)
 
 ## Postponed/Not Needed
 * Merge nodes and edges into elements (state) so that rendering happens in one pass upon setElements

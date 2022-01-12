@@ -42,7 +42,6 @@ const onSelectionChange = (elements: Elements | null) => {
 export const SystemViewer = (props: Props) => {
 
   const theme = useTheme();
-  const isInteractive = false;
 
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(initialEdges);
@@ -63,7 +62,7 @@ export const SystemViewer = (props: Props) => {
 
   const onLoad = async (reactFlowInstance: OnLoadParams) => {
     setReactFlowInstance(reactFlowInstance);
-    setInteractive(isInteractive);
+    setInteractive(true);
   }
 
   const selectionChange = async (selectedNames: string[]) => {
@@ -141,14 +140,16 @@ export const SystemViewer = (props: Props) => {
     reactFlowInstance?.fitView();
   }
 
-  const interactiveChange = (newInteractive: boolean) => {
-    setInteractive?.(newInteractive);
-  }
-
   const toggleOrientation = async (lrOrientation: boolean) => {
     setLROrientation(lrOrientation);
     createGraphLayout(nodes, edges, lrOrientation, theme)
       .then(els => { setNodes(els); reactFlowInstance!.zoomTo(1.0); reactFlowInstance!.fitView(); })
+      .catch(err => console.error(err))
+  }
+
+  const layoutGraph = async (lrOrientation: boolean) => {
+    createGraphLayout(nodes, edges, lrOrientation, theme)
+      .then(els => { setNodes(els); })
       .catch(err => console.error(err))
   }
 
@@ -174,11 +175,10 @@ export const SystemViewer = (props: Props) => {
       <SystemViewToolbar
         nodes={nodes.filter(node => isRosNode(node))}
         lrOrientation={lrOrientation}
-        isInteractive={isInteractive}
         onZoomIn={zoomIn}
         onZoomOut={zoomOut}
         onFitview={fitView}
-        onInteractiveChange={interactiveChange}
+        onLayoutGraph={layoutGraph}
         onToggleOrientation={toggleOrientation}
         onSelectionChange={selectionChange}
       />
