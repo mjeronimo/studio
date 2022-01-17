@@ -1,6 +1,8 @@
 # System Viewer Task List
 
-## Features/Changes
+## Features/Changes/Ideas
+* Add "default layout direction" to the settings panel
+* Implement "Include hidden topics"
 * Split out connection points, per topic
     * Select connection point
     * Show connection point QoS

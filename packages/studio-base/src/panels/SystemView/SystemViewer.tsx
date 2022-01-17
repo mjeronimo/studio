@@ -32,10 +32,6 @@ const nodeTypes = {
 type Props = {
 }
 
-const onSelectionChange = (elements: Elements | null) => {
-  console.log('selection change', elements);
-}
-
 export const SystemViewer = memo((props: Props) => {
   const theme = useTheme();
   const [elements, setElements] = useState(initialElements);
@@ -176,7 +172,6 @@ export const SystemViewer = memo((props: Props) => {
         onLoad={onLoad}
         nodesConnectable={isConnectable}
         nodeTypes={nodeTypes}
-        onSelectionChange={onSelectionChange}
       >
         <Background
           color={theme.semanticColors.accentButtonBackground}
