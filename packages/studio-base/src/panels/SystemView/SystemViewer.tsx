@@ -13,14 +13,14 @@
 // limitations under the License.
 
 import { useTheme } from '@fluentui/react';
-import { useState, useEffect } from 'react';
+import { memo, useState, useEffect } from 'react';
 import ReactFlow, { Node, Edge, Elements, Background, OnLoadParams } from 'react-flow-renderer';
 import { useStoreActions } from 'react-flow-renderer';
 
 import RosNode from "./RosNode";
 import RosTopic from "./RosTopic";
 import { SystemViewToolbar } from "./SystemViewToolbar";
-import { initialNodes, initialEdges, getPeerNodeIds, isRosNode, isRosTopic } from './initial-elements';
+import { initialElements, getPeerNodeIds, isRosNode, isRosTopic, isEdge } from './initial-elements';
 import { createGraphLayout } from "./layout";
 import './layouting.css';
 
@@ -34,62 +34,72 @@ type Props = {
 
 const onSelectionChange = (elements: Elements | null) => {
   console.log('selection change', elements);
-  elements && elements.forEach((element) => {
-    console.log(element);
-  });
 }
 
-export const SystemViewer = (props: Props) => {
-
+export const SystemViewer = memo((props: Props) => {
   const theme = useTheme();
-
-  const [nodes, setNodes] = useState(initialNodes);
-  const [edges, setEdges] = useState(initialEdges);
+  const [elements, setElements] = useState(initialElements);
   const [lrOrientation, setLROrientation] = useState(false);
   const [reactFlowInstance, setReactFlowInstance] = useState<OnLoadParams>();
   const [isConnectable, _setIsConnectable] = useState<boolean>(false);
-
   const setInteractive = useStoreActions((actions) => actions.setInteractive);
+  const setSelectedElements = useStoreActions((actions) => actions.setSelectedElements);
 
   useEffect(() => {
-    // TODO: Will this cause a render? Could do first render off-screen and update dimensions
-    setNodes(nodes);
+    elements.forEach((el) => {
+      if (isRosNode(el) || isRosTopic(el)) {
+        el.data.hideNode = { hideNode }
+      }
+    });
+  }, [elements]);
 
-    createGraphLayout(nodes, edges, lrOrientation, theme)
-      .then(els => { setNodes(els); setEdges(edges); })
-      .catch(err => console.error(err))
-  }, []);
-
-  const onLoad = async (reactFlowInstance: OnLoadParams) => {
+  const onLoad = (reactFlowInstance: OnLoadParams) => {
     setReactFlowInstance(reactFlowInstance);
     setInteractive(true);
+    elements.forEach((el) => {
+      if (isRosNode(el) || isRosTopic(el)) {
+        el.data.hideNode = { hideNode }
+      }
+    });
+    createGraphLayout(elements, lrOrientation, theme)
+      .then(els => {
+        setElements(els);
+      })
+      .catch(err => console.error(err))
   }
 
-  const selectionChange = async (selectedNames: string[]) => {
-    const ros_nodes = nodes.filter(node => isRosNode(node));
-    const ros_topics = nodes.filter(node => isRosTopic(node));
+  const hideNode = (nodeId: string) => {
+    setSelectedElements([]);
+    const visibleNodes = elements.filter((node) => {
+      return isRosNode(node) && (node.isHidden == false) && (node.id != nodeId);
+    });
+    const selectedNames: string[] = visibleNodes.map(node => { return node.data.label });
+    selectionChange(selectedNames);
+  }
 
-    console.log("selectionChange");
+  const selectionChange = (selectedNames: string[]) => {
+    const ros_nodes = elements.filter(node => isRosNode(node));
+    const ros_topics = elements.filter(node => isRosTopic(node));
 
     const newNodes = ros_nodes.map(node => {
       if (node.data && node.data.label && selectedNames.includes(node.data.label)) {
         return {
           ...node,
-          isHidden: false
+          isHidden: false,
         }
       }
       return {
         ...node,
-        isHidden: true
+        isHidden: true,
       }
     });
 
     const newTopics = ros_topics.map(node => {
-      const peer_node_ids = getPeerNodeIds(node, edges as Edge[]);
+      const peer_node_ids = getPeerNodeIds(node, elements);
       let shouldHide = true;
       peer_node_ids.forEach(peer_node_id => {
         const peer_node = newNodes.find((n) => n.id === peer_node_id);
-        if (!peer_node!.isHidden) {
+        if (peer_node && !peer_node.isHidden) {
           shouldHide = false;
         }
       })
@@ -103,9 +113,7 @@ export const SystemViewer = (props: Props) => {
     const allNodes = newNodes.concat(newTopics);
     const visibleNodes = allNodes.filter(node => { return (node as Node).isHidden === false });
     const visibleNodeIds = visibleNodes.map(node => { return node.id })
-
-    console.log("edges", edges);
-
+    const edges = elements.filter((el) => isEdge(el));
     const newEdges = edges.map(edge => {
       if (visibleNodeIds.includes((edge as Edge<any>).source) && visibleNodeIds.includes((edge as Edge<any>).target)) {
         return {
@@ -119,13 +127,8 @@ export const SystemViewer = (props: Props) => {
       }
     });
 
-    console.log("newEdges", newEdges);
-
-    setEdges(newEdges), 
-    setNodes(allNodes); 
-    //createGraphLayout(allNodes, newEdges, lrOrientation, theme)
-    //  .then(els => { setEdges(newEdges), setNodes(els); })
-    //  .catch(err => console.error(err))
+    const newElements = allNodes.concat(newEdges);
+    setElements(newElements);
   }
 
   const zoomIn = () => {
@@ -140,23 +143,31 @@ export const SystemViewer = (props: Props) => {
     reactFlowInstance?.fitView();
   }
 
-  const toggleOrientation = async (lrOrientation: boolean) => {
+  const toggleOrientation = (lrOrientation: boolean) => {
     setLROrientation(lrOrientation);
-    createGraphLayout(nodes, edges, lrOrientation, theme)
-      .then(els => { setNodes(els); reactFlowInstance!.zoomTo(1.0); reactFlowInstance!.fitView(); })
+    createGraphLayout(elements, lrOrientation, theme)
+      .then(els => {
+        setElements(els);
+
+        // TODO: Decide whether to zoom and fit here
+        //reactFlowInstance!.zoomTo(1.0);
+        //reactFlowInstance!.fitView();
+      })
       .catch(err => console.error(err))
   }
 
-  const layoutGraph = async (lrOrientation: boolean) => {
-    createGraphLayout(nodes, edges, lrOrientation, theme)
-      .then(els => { setNodes(els); })
+  const layoutGraph = (lrOrientation: boolean) => {
+    createGraphLayout(elements, lrOrientation, theme)
+      .then(els => {
+        setElements(els);
+      })
       .catch(err => console.error(err))
   }
 
   return (
     <div className="layoutflow">
       <ReactFlow
-        elements={nodes.concat(edges)}
+        elements={elements}
         snapToGrid={true}
         snapGrid={[15, 15]}
         defaultZoom={1.0}
@@ -173,7 +184,7 @@ export const SystemViewer = (props: Props) => {
         />
       </ReactFlow>
       <SystemViewToolbar
-        nodes={nodes.filter(node => isRosNode(node))}
+        elements={elements}
         lrOrientation={lrOrientation}
         onZoomIn={zoomIn}
         onZoomOut={zoomOut}
@@ -184,4 +195,4 @@ export const SystemViewer = (props: Props) => {
       />
     </div>
   )
-};
+});

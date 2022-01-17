@@ -15,9 +15,11 @@
 import { ReactFlowProvider } from 'react-flow-renderer';
 
 import Panel from "@foxglove/studio-base/components/Panel";
+import PanelToolbar from "@foxglove/studio-base/components/PanelToolbar";
 import { SaveConfig } from "@foxglove/studio-base/types/panels";
 
 import { SystemViewer } from "./SystemViewer";
+import helpContent from "./index.help.md";
 
 type Props = {
   config: unknown;
@@ -26,15 +28,18 @@ type Props = {
 
 const SystemViewPanel = (props: Props) => {
   return (
-    <ReactFlowProvider>
-      <SystemViewer />
-    </ReactFlowProvider>
+    <>
+      <PanelToolbar floating helpContent={helpContent} />
+      <ReactFlowProvider>
+        <SystemViewer />
+      </ReactFlowProvider>
+    </>
   )
 };
 
 SystemViewPanel.displayName = "SystemView";
 SystemViewPanel.panelType = "SystemView";
 SystemViewPanel.defaultConfig = {};
-SystemViewPanel.supportsStrictMode = false;
+SystemViewPanel.supportsStrictMode = true;
 
 export default Panel(SystemViewPanel);

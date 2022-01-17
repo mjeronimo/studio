@@ -15,11 +15,8 @@
 import ArrowLeftRightIcon from "@mdi/svg/svg/arrow-left-right.svg";
 import ArrowUpDownIcon from "@mdi/svg/svg/arrow-up-down.svg";
 import SelectionIcon from "@mdi/svg/svg/checkbox-multiple-marked-outline.svg";
-import GroupIcon from "@mdi/svg/svg/group.svg";
-import UnlockIcon from "@mdi/svg/svg/lock-open-variant-outline.svg";
-import LockIcon from "@mdi/svg/svg/lock-outline.svg";
-import MinusIcon from "@mdi/svg/svg/minus.svg";
 import NodeGraphIcon from "@mdi/svg/svg/graph.svg";
+import MinusIcon from "@mdi/svg/svg/minus.svg";
 import PlusIcon from "@mdi/svg/svg/plus.svg";
 import React, { CSSProperties, useState } from "react";
 import { Elements } from 'react-flow-renderer';
@@ -29,6 +26,7 @@ import Checkbox from "@foxglove/studio-base/components/Checkbox";
 import ExpandingToolbar, { ToolGroup } from "@foxglove/studio-base/components/ExpandingToolbar";
 import Icon from "@foxglove/studio-base/components/Icon";
 import SegmentedControl, { Option } from "@foxglove/studio-base/components/SegmentedControl";
+import { isRosNode } from "@foxglove/studio-base/panels/SystemView/initial-elements";
 import styles from "@foxglove/studio-base/panels/ThreeDimensionalViz/sharedStyles";
 
 import { NodeList, INodeListItem } from "./NodeList";
@@ -36,7 +34,7 @@ import Toolbar from "./Toolbar";
 import FitviewIcon from "./assets/icons/fitview.svg";
 
 export type Props = {
-  nodes: Elements
+  elements: Elements
   lrOrientation: boolean
   onZoomIn?: () => void
   onZoomOut?: () => void
@@ -52,7 +50,6 @@ const iconStyles: CSSProperties = { color: 'white' };
 export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
 
   let defaultSelectedTab: string | undefined;
-  let defaultSelectedTab2: string | undefined;
 
   const GroupingOptions = {
     first: { id: "logical", label: "Logical", },
@@ -64,7 +61,6 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
   const [lrOrientation, setLROrientation] = useState<boolean>(props.lrOrientation);
   const [includeHiddenNodes, setIncludeHiddenNotes] = useState<boolean>(false);
   const [selectedTab, setSelectedTab] = React.useState(defaultSelectedTab);
-  const [selectedTab2, setSelectedTab2] = React.useState(defaultSelectedTab2);
   const [selectedId, setSelectedId] = React.useState(GroupingOptions.third.id);
 
   const onToggleOrientation = () => {
@@ -93,8 +89,10 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
     setIncludeHiddenNotes(isChecked);
   }
 
-  const filterNodeList = (nodes: Elements): INodeListItem[] => {
+  const filterNodeList = (els: Elements): INodeListItem[] => {
+    const nodes = els.filter((el): boolean => { return isRosNode(el); });
     const elements: INodeListItem[] = nodes.map((node) => { return { key: node.id, name: node.data.label as string, isHidden: node.isHidden as boolean } });
+
     const newElements = elements.reduce((filtered: INodeListItem[], item: INodeListItem) => {
       if (item.name.startsWith('_')) {
         if (includeHiddenNodes) {
@@ -109,6 +107,7 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
     return newElements;
   }
 
+
   return (
     <Toolbar>
       <br />
@@ -121,46 +120,32 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
         }
         style={toolbarStyles}
         className={styles.buttons}
-        selectedTab={selectedTab2}
+        selectedTab={selectedTab}
         onSelectTab={(newSelectedTab) => {
-          setSelectedTab2(newSelectedTab)
+          setSelectedTab(newSelectedTab)
         }}
       >
-        <ToolGroup name={"Node List"}>
+        <ToolGroup name={"Nodes"}>
           <NodeList
-            nodes={filterNodeList(props.nodes)}
+            nodes={filterNodeList(props.elements)}
             onSelectionChange={props.onSelectionChange}
           />
         </ToolGroup>
         <ToolGroup name={"Options"}>
           <>
             <Checkbox
-              label="Automatically select new nodes"
-              checked={false}
-              onChange={() => console.log("onChange")}
-            />
-            <Checkbox
               label="Include hidden nodes"
               checked={includeHiddenNodes}
               onChange={onCheckboxChange}
             />
+            <Checkbox
+              label="Include hidden topics"
+              checked={false}
+              onChange={() => console.log("onChange")}
+            />
           </>
         </ToolGroup>
-      </ExpandingToolbar>
-      <ExpandingToolbar
-        tooltip="Group nodes"
-        icon={
-          <Icon style={iconStyles}>
-            <GroupIcon />
-          </Icon>
-        }
-        className={styles.buttons}
-        selectedTab={selectedTab}
-        onSelectTab={(newSelectedTab) => {
-          setSelectedTab(newSelectedTab)
-        }}
-      >
-        <ToolGroup name={"Node Grouping"}>
+        <ToolGroup name={"Grouping"}>
           <>
             <br />
             <SegmentedControl

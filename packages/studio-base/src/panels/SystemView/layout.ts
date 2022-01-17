@@ -5,12 +5,9 @@
 import type { Theme } from "@fluentui/theme";
 import calculateSize from "calculate-size";
 import ELK, { ElkNode, ElkPrimitiveEdge } from "elkjs/lib/elk.bundled";
-import { isNode, Position, Node, Edge, NodeProps, Elements } from "react-flow-renderer";
+import { isNode, Position, Node, Edge, Elements, FlowElement } from "react-flow-renderer";
 
-import RosNode from "./RosNode";
-import { isRosTopic } from "./initial-elements";
-import React from "react";
-import ReactDOM from 'react-dom';
+import { isRosNode, isRosTopic, isEdge } from "./initial-elements";
 
 const DEFAULT_WIDTH = 200;
 const DEFAULT_HEIGHT = 50;
@@ -49,17 +46,30 @@ export function measureText(text: string, theme: Theme) {
 }
 
 export const createGraphLayout = async (
-  nodes: Elements,
-  edges: Elements,
+  elements: Elements,
   lrOrientation: boolean,
   theme: Theme,
 ): Promise<Elements> => {
   const direction = lrOrientation ? "RIGHT" : "DOWN";
   const elk_nodes: ElkNode[] = [];
 
-  nodes.forEach((el) => {
+  const nodes = elements.filter((el): boolean => {
+    return isRosNode(el) || isRosTopic(el);
+  });
+  const edges = elements.filter((el): boolean => {
+    return isEdge(el);
+  });
+
+  nodes.forEach((el: FlowElement) => {
     if (!el.isHidden) {
-      if (isRosTopic(el)) {
+      if (isRosNode(el)) {
+        elk_nodes.push({
+          id: el.id,
+          // TODO: would like to layout using the actual dimensions
+          width: DEFAULT_WIDTH,
+          height: DEFAULT_HEIGHT,
+        });
+      } else if (isRosTopic(el)) {
         // Resize and reposition the topics based on the topic name
         const topic = el as Node;
         const result = measureText(el.data.label, theme);
@@ -69,15 +79,10 @@ export const createGraphLayout = async (
 
         elk_nodes.push({
           id: el.id,
+          // TODO: would like to layout using the actual dimensions
           //width: result.width,
           //height: result.height,
-          width: DEFAULT_WIDTH, // TODO: would like to layout using the actual dimensions
-          height: DEFAULT_HEIGHT,
-        });
-      } else {
-        elk_nodes.push({
-          id: el.id,
-          width: DEFAULT_WIDTH, // TODO: would like to layout using the actual dimensions
+          width: DEFAULT_WIDTH,
           height: DEFAULT_HEIGHT,
         });
       }
@@ -110,7 +115,7 @@ export const createGraphLayout = async (
     },
   });
 
-  return nodes.map((el) => {
+  const newNodes: FlowElement[] = nodes.map((el) => {
     const temp = Object.assign({}, el) as Node;
     if (isNode(el)) {
       const node = newGraph?.children?.find((n) => n.id === el.id);
@@ -127,26 +132,9 @@ export const createGraphLayout = async (
       // Initialize the location of the connection points (top/bottom or left/right)
       temp.targetPosition = isHorizontal ? Position.Left : Position.Top;
       temp.sourcePosition = isHorizontal ? Position.Right : Position.Bottom;
-
-      // Resize and reposition the topics based on the topic name
-      //if (isRosTopic(el)) {
-      if (false) {
-        const result = measureText(el.data.label, theme);
-        const current = el.style!.width as number;
-        const actual = result.width;
-        const half_diff = (actual - current) / 2;
-
-        console.log("1: temp.style.height: ", temp.style!.height);
-
-        temp.style!.width = result.width;
-        temp.style!.height = result.height;
-        temp.position.x = temp.position.x - half_diff;
-
-        //console.log("temp.style.width: ", temp.style!.width);
-        console.log("2: temp.style.height: ", temp.style!.height);
-        //console.log("temp.position.x: ", temp.position.x);
-      }
     }
     return temp;
   });
+
+  return newNodes.concat(edges);
 };

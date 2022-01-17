@@ -1,3 +1,7 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/
+
 // Copyright 2021 Open Source Robotics Foundation, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,36 +16,37 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {
-  FlowElement,
-  Elements,
-  Edge,
-  Position,
-  XYPosition,
-  ArrowHeadType,
-} from "react-flow-renderer";
+import { FlowElement, Elements, Edge, XYPosition, ArrowHeadType } from "react-flow-renderer";
 
 const position: XYPosition = { x: 0, y: 0 };
 
-export const isRosNode = (node: FlowElement): boolean => {
-  return node.type === "rosNode";
+export const isRosNode = (element: FlowElement): boolean => {
+  return element.type === "rosNode";
 };
 
-export const isRosTopic = (node: FlowElement): boolean => {
-  return node.type === "rosTopic";
+export const isRosTopic = (element: FlowElement): boolean => {
+  return element.type === "rosTopic";
 };
 
-export const getPeerNodeIds = (node: FlowElement, edges: Edge[]): string[] => {
-  const connected_edges = edges.filter((edge) => {
-    return edge.source === node.id || edge.target === node.id;
+export const isEdge = (element: FlowElement): boolean => {
+  return element.hasOwnProperty("source");
+};
+
+export const getPeerNodeIds = (topic: FlowElement, elements: FlowElement[]): string[] => {
+  const connected_edges: FlowElement[] = elements.filter((el): boolean => {
+    return isEdge(el) && ((el as Edge).source === topic.id || (el as Edge).target === topic.id);
   });
-
-  return connected_edges.map((edge) => {
-    return edge.source === node.id ? edge.target : edge.source;
+  const connected_node_ids: string[] = connected_edges.map((edge): string => {
+    if ((edge as Edge).source == topic.id) {
+      return (edge as Edge).target;
+    } else {
+      return (edge as Edge).source;
+    }
   });
+  return connected_node_ids;
 };
 
-export const initialNodes: Elements = [
+export const initialElements: Elements = [
   // Nodes
   {
     id: "1",
@@ -178,9 +183,8 @@ export const initialNodes: Elements = [
     position,
     style: { width: 125, height: 40 },
   },
-];
 
-export const initialEdges: Elements = [
+  // Edges
   {
     id: "edge-1-101",
     type: "default",

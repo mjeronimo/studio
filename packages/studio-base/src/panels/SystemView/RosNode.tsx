@@ -16,9 +16,10 @@ import { useTheme } from "@fluentui/react";
 import ChevronRightIcon from "@mdi/svg/svg/chevron-right.svg";
 import CloseIcon from "@mdi/svg/svg/close.svg";
 import { memo, FC, CSSProperties, useState } from 'react';
-import { Handle, NodeProps, Position } from 'react-flow-renderer';
+import { Handle, NodeProps } from 'react-flow-renderer';
 
 import Icon from "@foxglove/studio-base/components/Icon";
+
 import NodeIcon from "./assets/icons/ros_logo.svg";
 
 const normalOpacity = 0.25;
@@ -30,7 +31,7 @@ const RosNode: FC<NodeProps> = (props: NodeProps) => {
 
   const nodeStyle: CSSProperties = {
     backgroundColor: "black",
-    border: props.selected? '2px solid red' : '2px solid rgb(51, 49, 84)',
+    border: props.selected ? '2px solid red' : '2px solid rgb(51, 49, 84)',
     boxShadow: "non !important",
     boxSizing: "border-box",
     color: "rgb(255,255,255)",
@@ -65,7 +66,7 @@ const RosNode: FC<NodeProps> = (props: NodeProps) => {
   const closeStyle: CSSProperties = {
     border: '0px solid red',
     cursor: "pointer",
-    opacity: opacity,
+    opacity,
     pointerEvents: "all",
   };
 
@@ -77,10 +78,6 @@ const RosNode: FC<NodeProps> = (props: NodeProps) => {
   };
 
   const handleStyle: CSSProperties = {
-//  backgroundColor: 'transparent',
-//  border: '1px solid red',
-//  height: '1px',
-//  width: '1px',
   };
 
   return (
@@ -94,14 +91,16 @@ const RosNode: FC<NodeProps> = (props: NodeProps) => {
         </div>
         <div
           style={closeStyle}
-          onMouseEnter={()=>{setOpacity(highlightOpacity); }}
-          onMouseLeave={()=>{setOpacity(normalOpacity); }}
+          onMouseEnter={() => { setOpacity(highlightOpacity); }}
+          onMouseLeave={() => { setOpacity(normalOpacity); }}
         >
           <Icon
             style={{ color: "white", marginLeft: "8px" }}
             size="xsmall"
             clickable={true}
-            onClick={()=> { console.log("clicked"); }}
+            onClick={() => {
+              props.data.hideNode.hideNode(props.id);
+            }}
           >
             <CloseIcon />
           </Icon>
@@ -113,8 +112,8 @@ const RosNode: FC<NodeProps> = (props: NodeProps) => {
         </Icon>
         Parameters
       </div>
-      <Handle type="target" position={props.targetPosition!} style={handleStyle}/>
-      <Handle type="source" position={props.sourcePosition!} style={handleStyle}/>
+      <Handle type="target" position={props.targetPosition!} style={handleStyle} />
+      <Handle type="source" position={props.sourcePosition!} style={handleStyle} />
     </div>
   );
 };

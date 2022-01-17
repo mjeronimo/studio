@@ -14,8 +14,10 @@
 
 import { storiesOf } from "@storybook/react";
 import { ReactFlowProvider } from 'react-flow-renderer';
-import { SystemViewToolbar } from "./SystemViewToolbar";
+
 import MockPanelContextProvider from "@foxglove/studio-base/components/MockPanelContextProvider";
+
+import { SystemViewToolbar } from "./SystemViewToolbar";
 import { initialNodes } from './initial-elements';
 
 const containerStyle = {
@@ -36,13 +38,11 @@ const fitView = () => {
 }
 
 const interactiveChange = (isInteractive: boolean) => {
-  console.log("interactiveChange: isInteractive");
-  console.log(isInteractive);
+  console.log("interactiveChange: isInteractive: ", isInteractive);
 }
 
 const toggleOrientation = (lrOrientation: boolean) => {
-  console.log("toggleOrientation");
-  console.log(lrOrientation);
+  console.log("toggleOrientation: ", lrOrientation);
 }
 
 const SystemViewToolbarWrapper = (props: any) => (
