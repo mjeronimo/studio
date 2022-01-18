@@ -26,9 +26,9 @@ import Checkbox from "@foxglove/studio-base/components/Checkbox";
 import ExpandingToolbar, { ToolGroup } from "@foxglove/studio-base/components/ExpandingToolbar";
 import Icon from "@foxglove/studio-base/components/Icon";
 import SegmentedControl, { Option } from "@foxglove/studio-base/components/SegmentedControl";
-import { isRosNode } from "@foxglove/studio-base/panels/SystemView/initial-elements";
 import styles from "@foxglove/studio-base/panels/ThreeDimensionalViz/sharedStyles";
 
+import { isRosNode } from "./utils"
 import { NodeList, INodeListItem } from "./NodeList";
 import Toolbar from "./Toolbar";
 import FitviewIcon from "./assets/icons/fitview.svg";

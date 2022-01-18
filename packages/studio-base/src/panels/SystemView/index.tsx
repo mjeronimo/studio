@@ -16,14 +16,43 @@ import { ReactFlowProvider } from 'react-flow-renderer';
 
 import Panel from "@foxglove/studio-base/components/Panel";
 import PanelToolbar from "@foxglove/studio-base/components/PanelToolbar";
-import { SaveConfig } from "@foxglove/studio-base/types/panels";
+import { PanelConfigSchema, SaveConfig } from "@foxglove/studio-base/types/panels";
 
 import { SystemViewer } from "./SystemViewer";
+import { NodeGrouping, Orientation } from "./types";
 import helpContent from "./index.help.md";
 
-type Props = {
-  config: unknown;
-  saveConfig: SaveConfig<unknown>;
+type SystemViewConfig = {
+  orientation?: Orientation;
+  nodeGrouping?: NodeGrouping;
+  includeHiddenNodes: boolean;
+  includeHiddenTopics: boolean;
+}; 
+
+const configSchema: PanelConfigSchema<SystemViewConfig> = [
+  { key: "orientation", type: "dropdown", title: "Default Graph Orientation", options: [
+    { 'value': Orientation.LeftToRight, 'text': 'Left to right' },
+    { 'value': Orientation.TopToBottom, 'text': 'Top to bottom' },
+  ]},
+  { key: "nodeGrouping", type: "dropdown", title: "Default Node Grouping", options: [
+    { 'value': NodeGrouping.Logical, 'text': 'Logical' },
+    { 'value': NodeGrouping.Physical, 'text': 'Physical' },
+    { 'value': NodeGrouping.None, 'text': 'None' },
+  ]},
+  { key: "includeHiddenNodes", type: "toggle", title: "Include hidden nodes" },
+  { key: "includeHiddenTopics", type: "toggle", title: "Include hidden topics" },
+];
+
+const defaultConfig: SystemViewConfig = {
+  orientation: Orientation.LeftToRight,
+  nodeGrouping: NodeGrouping.Logical,
+  includeHiddenNodes: false,
+  includeHiddenTopics: false,
+};
+
+export type Props = {
+  config: SystemViewConfig;
+  saveConfig: SaveConfig<SystemViewConfig>;
 }
 
 const SystemViewPanel = (props: Props) => {
@@ -39,7 +68,8 @@ const SystemViewPanel = (props: Props) => {
 
 SystemViewPanel.displayName = "SystemView";
 SystemViewPanel.panelType = "SystemView";
-SystemViewPanel.defaultConfig = {};
+SystemViewPanel.defaultConfig = defaultConfig;
 SystemViewPanel.supportsStrictMode = true;
+SystemViewPanel.configSchema = configSchema;
 
 export default Panel(SystemViewPanel);

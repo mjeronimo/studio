@@ -16,38 +16,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { FlowElement, Elements, Edge, XYPosition, ArrowHeadType } from "react-flow-renderer";
+import { Elements, XYPosition, ArrowHeadType } from "react-flow-renderer";
 
 const position: XYPosition = { x: 0, y: 0 };
 
-export const isRosNode = (element: FlowElement): boolean => {
-  return element.type === "rosNode";
-};
-
-export const isRosTopic = (element: FlowElement): boolean => {
-  return element.type === "rosTopic";
-};
-
-export const isEdge = (element: FlowElement): boolean => {
-  return element.hasOwnProperty("source");
-};
-
-export const getPeerNodeIds = (topic: FlowElement, elements: FlowElement[]): string[] => {
-  const connected_edges: FlowElement[] = elements.filter((el): boolean => {
-    return isEdge(el) && ((el as Edge).source === topic.id || (el as Edge).target === topic.id);
-  });
-  const connected_node_ids: string[] = connected_edges.map((edge): string => {
-    if ((edge as Edge).source == topic.id) {
-      return (edge as Edge).target;
-    } else {
-      return (edge as Edge).source;
-    }
-  });
-  return connected_node_ids;
-};
-
 export const initialElements: Elements = [
-  // Nodes
+  // ROS Nodes
   {
     id: "1",
     type: "rosNode",
@@ -115,7 +89,7 @@ export const initialElements: Elements = [
     style: { width: 275, height: 79 },
   },
 
-  // Topics
+  // ROS Topics
   {
     id: "101",
     type: "rosTopic",
@@ -184,7 +158,7 @@ export const initialElements: Elements = [
     style: { width: 125, height: 40 },
   },
 
-  // Edges
+  // Publishers/Subscribers (Edges)
   {
     id: "edge-1-101",
     type: "default",

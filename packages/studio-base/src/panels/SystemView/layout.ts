@@ -7,7 +7,7 @@ import calculateSize from "calculate-size";
 import ELK, { ElkNode, ElkPrimitiveEdge } from "elkjs/lib/elk.bundled";
 import { isNode, Position, Node, Edge, Elements, FlowElement } from "react-flow-renderer";
 
-import { isRosNode, isRosTopic, isEdge } from "./initial-elements";
+import { isRosNode, isRosTopic, isEdge } from "./utils";
 
 const DEFAULT_WIDTH = 200;
 const DEFAULT_HEIGHT = 50;

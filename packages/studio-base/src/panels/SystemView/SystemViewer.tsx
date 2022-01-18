@@ -14,13 +14,14 @@
 
 import { useTheme } from '@fluentui/react';
 import { memo, useState, useEffect } from 'react';
-import ReactFlow, { Node, Edge, Elements, Background, OnLoadParams } from 'react-flow-renderer';
+import ReactFlow, { Node, Edge, Background, OnLoadParams } from 'react-flow-renderer';
 import { useStoreActions } from 'react-flow-renderer';
 
 import RosNode from "./RosNode";
 import RosTopic from "./RosTopic";
 import { SystemViewToolbar } from "./SystemViewToolbar";
-import { initialElements, getPeerNodeIds, isRosNode, isRosTopic, isEdge } from './initial-elements';
+import { initialElements } from './initial-elements';
+import { getPeerNodeIds, isRosNode, isRosTopic, isEdge } from './utils';
 import { createGraphLayout } from "./layout";
 import './layouting.css';
 
