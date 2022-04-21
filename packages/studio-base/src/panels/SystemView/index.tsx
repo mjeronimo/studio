@@ -27,6 +27,8 @@ type SystemViewConfig = {
   nodeGrouping?: NodeGrouping;
   includeHiddenNodes: boolean;
   includeHiddenTopics: boolean;
+  includeRosoutTopic: boolean;
+  includeParameterEventsTopic: boolean;
 }; 
 
 const configSchema: PanelConfigSchema<SystemViewConfig> = [
@@ -41,6 +43,8 @@ const configSchema: PanelConfigSchema<SystemViewConfig> = [
   ]},
   { key: "includeHiddenNodes", type: "toggle", title: "Include hidden nodes" },
   { key: "includeHiddenTopics", type: "toggle", title: "Include hidden topics" },
+  { key: "includeRosoutTopic", type: "toggle", title: "Include /rosout topic" },
+  { key: "includeParameterEventsTopic", type: "toggle", title: "Include /parameter_events topic" },
 ];
 
 const defaultConfig: SystemViewConfig = {
@@ -48,6 +52,8 @@ const defaultConfig: SystemViewConfig = {
   nodeGrouping: NodeGrouping.Logical,
   includeHiddenNodes: false,
   includeHiddenTopics: false,
+  includeRosoutTopic: false,
+  includeParameterEventsTopic: false,
 };
 
 export type Props = {

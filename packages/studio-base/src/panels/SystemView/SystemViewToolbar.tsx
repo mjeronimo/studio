@@ -59,7 +59,10 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
   const optionArray: Option[] = Object.values(GroupingOptions);
 
   const [lrOrientation, setLROrientation] = useState<boolean>(props.lrOrientation);
-  const [includeHiddenNodes, setIncludeHiddenNotes] = useState<boolean>(false);
+  const [includeHiddenNodes, setIncludeHiddenNodes] = useState<boolean>(false);
+  const [includeHiddenTopics, setIncludeHiddenTopics] = useState<boolean>(false);
+  const [includeRosoutTopic, setIncludeRosoutTopic] = useState<boolean>(false);
+  const [includeParameterEventsTopic, setIncludeParameterEventsTopic] = useState<boolean>(false);
   const [selectedTab, setSelectedTab] = React.useState(defaultSelectedTab);
   const [selectedId, setSelectedId] = React.useState(GroupingOptions.third.id);
 
@@ -85,8 +88,20 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
     props.onLayoutGraph?.(lrOrientation);
   }
 
-  const onCheckboxChange = (isChecked: boolean) => {
-    setIncludeHiddenNotes(isChecked);
+  const onToggleIncludeHiddenNodes = (isChecked: boolean) => {
+    setIncludeHiddenNodes(isChecked);
+  }
+
+  const onToggleIncludeHiddenTopics = (isChecked: boolean) => {
+    setIncludeHiddenTopics(isChecked);
+  }
+
+  const onToggleIncludeRosoutTopic = (isChecked: boolean) => {
+    setIncludeRosoutTopic(isChecked);
+  }
+
+  const onToggleIncludeParameterEventsTopic = (isChecked: boolean) => {
+    setIncludeParameterEventsTopic(isChecked);
   }
 
   const filterNodeList = (els: Elements): INodeListItem[] => {
@@ -106,7 +121,6 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
 
     return newElements;
   }
-
 
   return (
     <Toolbar>
@@ -136,12 +150,22 @@ export const SystemViewToolbar: React.FC<Props> = (props: Props) => {
             <Checkbox
               label="Include hidden nodes"
               checked={includeHiddenNodes}
-              onChange={onCheckboxChange}
+              onChange={onToggleIncludeHiddenNodes}
             />
             <Checkbox
               label="Include hidden topics"
-              checked={false}
-              onChange={() => console.log("onChange")}
+              checked={includeHiddenTopics}
+              onChange={onToggleIncludeHiddenTopics}
+            />
+            <Checkbox
+              label="Include /rosout topic"
+              checked={includeRosoutTopic}
+              onChange={onToggleIncludeRosoutTopic}
+            />
+            <Checkbox
+              label="Include /parameter_events topic"
+              checked={includeParameterEventsTopic}
+              onChange={onToggleIncludeParameterEventsTopic}
             />
           </>
         </ToolGroup>
